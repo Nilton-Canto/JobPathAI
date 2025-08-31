@@ -133,3 +133,5 @@ Apenas uma ideia de como o site pode ser, sujeita a futuras alterações. Neste 
 - Internacionalização (EN, ES).
 
 - Autenticação social (Google/GitHub).
+- 
+- Autenticação social (Google/GitHub).
