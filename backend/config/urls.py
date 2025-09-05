@@ -20,5 +20,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("cadastro.urls")),  # Include the cadastro app URLs
+    path("", include("users.urls")),  # Atualizado de "cadastro.urls" para "users.urls"
 ]

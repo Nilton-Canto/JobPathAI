@@ -1,211 +1,86 @@
-# Guia de Contribuição - JobPathAI
+# Guia de Contribuição para o JobPathAI
 
-## Visão Geral
-Este documento estabelece as convenções e melhores práticas para contribuir com o desenvolvimento do JobPathAI. Seguimos um fluxo de trabalho baseado no GitFlow com conventional commits.
+Este documento descreve as diretrizes para contribuir com o projeto JobPathAI, focando nas convenções de branches e mensagens de commit.
 
-## Pré-requisitos
+## 1. Convenções de Nomenclatura de Branches
 
-### Ambiente de Desenvolvimento
-- Python 3.8+
-- Django 4.2+
-- Git
-- Node.js (futuro, para frontend avançado)
+Para manter o histórico do Git limpo e organizado, seguimos as seguintes convenções de nomenclatura de branches:
 
-### Configuração Inicial
-```bash
-# Clonar o repositório
-git clone <url-do-repositorio>
+- **`main`**: Branch principal e protegida, onde o código em produção reside. Nenhuma alteração direta é permitida nesta branch.
+- **`develop`**: Branch de integração para todas as novas funcionalidades e correções de bugs que serão lançadas na próxima versão.
+- **`feature/<nome-da-feature>`**: Para o desenvolvimento de novas funcionalidades. O `<nome-da-feature>` deve ser descritivo e conciso, usando kebab-case (ex: `feature/onboarding-inicial`, `feature/integracao-llm`).
+- **`bugfix/<nome-do-bug>`**: Para correção de bugs. O `<nome-do-bug>` deve ser uma breve descrição do problema (ex: `bugfix/login-invalido`, `bugfix/erro-visualizacao-perfil`).
+- **`hotfix/<nome-do-hotfix>`**: Para correções urgentes diretamente na `main` (raramente usada, apenas em casos críticos). O `<nome-do-hotfix>` deve descrever a correção (ex: `hotfix/falha-autenticacao`).
+- **`refactor/<nome-do-refactor>`**: Para refatorações de código que não adicionam novas funcionalidades nem corrigem bugs, mas melhoram a estrutura ou performance (ex: `refactor/otimizacao-queries`).
+- **`docs/<nome-da-doc>`**: Para atualizações na documentação (ex: `docs/atualizar-readme`).
 
-# Criar ambiente virtual
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# ou
-venv\Scripts\activate     # Windows
+**Exemplo de fluxo:**
 
-# Instalar dependências
-pip install -r requirements.txt
+1. Crie uma branch a partir da `develop` (ex: `git checkout -b feature/minha-feature develop`).
+2. Desenvolva sua funcionalidade.
+3. Faça commits seguindo as diretrizes abaixo.
+4. Quando a funcionalidade estiver pronta, abra um Pull Request para a `develop`.
 
-# Executar migrações
-python manage.py migrate
+## 2. Convenções de Mensagens de Commit
 
-# Criar superusuário (opcional)
-python manage.py createsuperuser
-```
+As mensagens de commit devem ser claras, concisas e seguir o padrão Conventional Commits sempre que possível. Isso facilita a leitura do histórico do projeto e a geração automática de changelogs.
 
-## Fluxo de Desenvolvimento
-
-### 1. Branches
-
-#### Convenções de Nomenclatura
-```
-main           # Branch de produção (sempre estável)
-develop        # Branch de desenvolvimento (integração)
-feature/*      # Novas funcionalidades
-bugfix/*       # Correções de bugs
-hotfix/*       # Correções críticas em produção
-release/*      # Preparação para release
-```
-
-#### Exemplos de Branches
-```
-feature/auth-system          # Sistema de autenticação
-feature/career-paths         # Trilhas de carreira
-feature/llm-integration      # Integração com LLM
-bugfix/login-validation      # Correção na validação de login
-hotfix/security-patch        # Correção de segurança urgente
-```
-
-### 2. Commits
-
-#### Conventional Commits
-Seguimos o padrão [Conventional Commits](https://conventionalcommits.org/):
+### Formato da Mensagem de Commit:
 
 ```
-<type>[optional scope]: <description>
+<tipo>(<escopo>): <descrição>
 
-[optional body]
+[corpo-opcional]
 
-[optional footer(s)]
+[rodape-opcional]
 ```
 
-#### Tipos de Commit
-- `feat`: Nova funcionalidade
-- `fix`: Correção de bug
-- `docs`: Documentação
-- `style`: Formatação/código (não funcional)
-- `refactor`: Refatoração de código
-- `test`: Adição/edição de testes
-- `chore`: Manutenção/tarefas diversas
+- **`<tipo>`**: Obrigatório, deve ser um dos seguintes:
+    - `feat`: Uma nova funcionalidade.
+    - `fix`: Uma correção de bug.
+    - `docs`: Alterações na documentação.
+    - `style`: Alterações que não afetam o significado do código (espaços em branco, formatação, ponto e vírgula ausentes, etc.).
+    - `refactor`: Uma mudança de código que não corrige um bug nem adiciona uma funcionalidade.
+    - `perf`: Uma mudança de código que melhora o desempenho.
+    - `test`: Adição de testes ausentes ou correção de testes existentes.
+    - `build`: Alterações que afetam o sistema de build ou dependências externas (escopo npm, gulp, etc.).
+    - `ci`: Alterações nos arquivos e scripts de configuração de CI.
+    - `chore`: Outras alterações que não modificam o código-fonte ou os arquivos de teste (ex: atualização de dependências, tarefas de build).
+    - `revert`: Reverte um commit anterior.
 
-#### Exemplos de Commits
-```
-feat: adicionar sistema de autenticação de usuários
-fix: corrigir validação de email no cadastro
-docs: atualizar guia de instalação
-style: formatar código seguindo PEP8
-refactor: otimizar query de busca de usuários
-test: adicionar testes para view de login
-chore: atualizar requirements.txt
-```
+- **`<escopo>` (opcional)**: Indica a parte do sistema que foi afetada pela mudança (ex: `(login)`, `(cadastro)`, `(api)`, `(frontend)`, `(llm)`).
 
-#### Regras dos Commits
-- Use **imperativo presente**: "adicionar", não "adicionou" ou "adicionando"
-- **Primeira letra minúscula**
-- **Sem ponto final**
-- **Máximo 72 caracteres** na linha do título
-- **Corpo opcional** com descrição detalhada se necessário
+- **`<descrição>`**: Obrigatório, uma descrição concisa da mudança, escrita no imperativo, começando com letra minúscula e sem ponto final.
 
-### 3. Pull Requests (PR)
+- **`[corpo-opcional]`**: Um corpo de mensagem mais detalhado, se necessário, explicando o *porquê* da mudança, e não o *como*. Use quebras de linha para manter a legibilidade.
 
-#### Template de PR
-```markdown
-## Descrição
-Descrição clara e concisa do que foi implementado
+- **`[rodape-opcional]`**: Pode conter informações de fechamento de issues (ex: `Closes #123`), referências a Pull Requests, ou informações de *Breaking Changes*.
 
-## Tipo de Mudança
-- [ ] Bug fix
-- [ ] Nova funcionalidade
-- [ ] Breaking change
-- [ ] Documentação
-
-## Como Testar
-Passos para testar a funcionalidade:
-1. Faça X
-2. Vá para Y
-3. Clique em Z
-
-## Screenshots (se aplicável)
-Adicione screenshots das mudanças
-
-## Checklist
-- [ ] Testes foram adicionados/atualizados
-- [ ] Documentação foi atualizada
-- [ ] Código segue padrões do projeto
-- [ ] Commit messages seguem convenções
-```
-
-#### Revisão de Código
-- **Mínimo 1 aprovação** para merge
-- **CI/CD deve passar** (quando implementado)
-- **Cobertura de testes** deve ser mantida
-- **Não há conflitos** com develop
-
-## Estrutura do Projeto
+### Exemplos de Mensagens de Commit:
 
 ```
-JobPathAI/
-├── config/                 # Configurações Django
-├── cadastro/              # App de usuários (renomear para users)
-├── docs/                  # Documentação
-├── requirements.txt       # Dependências
-├── manage.py             # Comando Django
-└── README.md             # Documentação principal
+feat(autenticacao): adicionar funcionalidade de login de usuário
 ```
 
-## Boas Práticas
+```
+fix(cadastro): corrigir validação de email duplicado
 
-### Código
-- **PEP8**: Seguir guia de estilo Python
-- **Django best practices**: Padrões do framework
-- **DRY (Don't Repeat Yourself)**: Evitar duplicação
-- **SOLID principles**: Princípios de design orientado a objetos
-
-### Testes
-- **Testes unitários** para lógica de negócio
-- **Testes de integração** para APIs
-- **Testes end-to-end** para fluxos críticos
-- **Cobertura mínima**: 70%
-
-### Segurança
-- **Nunca commite secrets**: Use variáveis de ambiente
-- **Validação de entrada**: Sempre valide dados do usuário
-- **CSRF protection**: Proteger contra ataques CSRF
-- **SQL injection**: Usar ORM corretamente
-
-## Desenvolvimento Local
-
-### Servidor de Desenvolvimento
-```bash
-python manage.py runserver
+O email não estava sendo verificado corretamente no banco de dados, permitindo cadastros duplicados.
 ```
 
-### Testes
-```bash
-python manage.py test
+```
+docs: atualizar seção de instalação no README
 ```
 
-### Linting
-```bash
-# Instalar flake8
-pip install flake8
-
-# Executar linting
-flake8 .
+```
+refactor(views): otimizar importações na LoginView
 ```
 
-### Migrações
-```bash
-# Criar migração
-python manage.py makemigrations
+## 3. Antes de Contribuir
 
-# Aplicar migrações
-python manage.py migrate
-```
-
-## Troubleshooting
-
-### Problemas Comuns
-1. **Erro de migração**: Verificar se todas as dependências estão instaladas
-2. **Erro de template**: Verificar se STATICFILES_DIRS está configurado
-3. **Erro de autenticação**: Verificar se middleware está ativo
-
-### Suporte
-- **Issues no GitHub**: Para bugs e solicitações
-- **Discord/Slack**: Para discussões em tempo real
-- **Documentação**: Sempre atualizar quando fizer mudanças
-
-## Reconhecimento
-Contribuições são sempre bem-vindas! Todos os contribuidores serão reconhecidos no README.md do projeto.
+- Certifique-se de que todas as dependências estão instaladas (`pip install -r requirements.txt`).
+- Rode os testes locais (`python manage.py test`) para garantir que suas mudanças não quebraram nada.
+- Formate o código usando ferramentas como `black` e `isort`.
+- Atualize a documentação, se suas mudanças impactarem o funcionamento ou a configuração do projeto.
 
 ---
-*Guia atualizado em: Janeiro 2025*

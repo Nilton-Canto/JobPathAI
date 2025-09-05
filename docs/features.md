@@ -1,150 +1,34 @@
-# JobPathAI - Documento de Features
+# JobPathAI - Sistema de Recomendação de Carreira
 
-## Visão Geral
-JobPathAI é um sistema web de recomendação de carreira que utiliza IA (LLM) para ajudar usuários a planejar suas carreiras profissionais através de trilhas personalizadas ou pré-definidas.
+## 1. Visão Geral do Projeto
 
-## Funcionalidades Implementadas ✅
+O JobPathAI é uma aplicação web desenvolvida para auxiliar usuários na definição e planejamento de suas carreiras profissionais. O sistema permite que o usuário escolha entre trilhas de carreira pré-definidas ou crie um plano de carreira personalizado com o auxílio de um agente baseado em LLM (Large Language Model). Com base no perfil, interesses e competências do usuário, o sistema sugerirá possíveis caminhos profissionais e as etapas recomendadas para alcançá-los.
 
-### 1. Sistema de Autenticação e Cadastro
-- **Login de usuários**: Autenticação com username/senha
-- **Cadastro de novos usuários**: Formulário completo com validações
-- **Validações implementadas**:
-  - Username único
-  - Email único
-  - CPF único
-  - Confirmação de senha
-  - Campos obrigatórios
-- **Tratamento de erros**: Mensagens de erro específicas para diferentes cenários
+## 2. Requisitos do Sistema
 
-### 2. Estrutura de Dados do Usuário
-- **Modelo Cadastro**: Armazena informações pessoais (nome, email, idade, CPF)
-- **Integração com Django User**: Vinculação entre dados pessoais e autenticação
-- **Validações de unicidade**: Prevenção de cadastros duplicados
+### 2.1 Requisitos Funcionais
 
-### 3. Interface Básica
-- **Templates HTML**: Páginas de login, cadastro e index
-- **CSS básico**: Estilização para página de login
-- **Estrutura responsiva**: Preparada para desenvolvimento mobile-first
+- Autenticação de usuários (login e cadastro).
+- Escolha de trilhas de carreira pré-definidas por área.
+- Criação de planos de carreira personalizados com o auxílio de um agente LLM, a partir de uma descrição textual do usuário.
+- Visualização do progresso nas etapas da carreira escolhida.
+- Marcar etapas como concluídas.
+- Administração de áreas profissionais, trilhas de carreira e etapas (CRUD).
+- Interface de conversa com o agente LLM para sugestões e dúvidas relacionadas à carreira.
 
-### 4. Configuração do Projeto
-- **Django 4.2.23**: Framework web Python
-- **SQLite**: Banco de dados para desenvolvimento
-- **Estrutura modular**: Apps Django organizados
-- **Sistema de templates**: Configurado com diretórios customizados
+### 2.2 Requisitos Não Funcionais
 
-## Funcionalidades Pendentes 🚧
+- O sistema deve ser desenvolvido com Django no backend.
+- O frontend utilizará HTML, CSS e JS com design responsivo.
+- Integração com API LLM (OpenAI ou Ollama local).
+- Interface amigável e intuitiva.
+- Tempo de resposta do sistema inferior a 2 segundos para ações principais.
 
-### 5. Módulo de Carreiras
-- **Modelo de Áreas Profissionais**: CRUD para áreas (Tecnologia, Marketing, etc.)
-- **Modelo de Trilhas**: Caminhos de carreira por área/nível
-- **Modelo de Etapas**: Passos específicos dentro das trilhas
-- **Relacionamentos**: User -> Trilhas -> Etapas
+## 3. Casos de Uso
 
-### 6. Sistema de LLM
-- **Integração com OpenAI**: API para geração de recomendações
-- **Prompts personalizados**: Baseados no perfil do usuário
-- **Análise de lacunas**: Comparação entre perfil atual e objetivo
-- **Sugestões contextuais**: Recomendações baseadas em progresso
-
-### 7. Dashboard do Usuário
-- **Visualização de trilhas**: Interface gráfica das carreiras
-- **Acompanhamento de progresso**: Checklist de etapas concluídas
-- **Timeline interativa**: Cronograma visual da carreira
-- **Métricas de progresso**: Estatísticas e indicadores
-
-### 8. Interface Avançada
-- **Design responsivo completo**: Mobile, tablet e desktop
-- **Componentes reutilizáveis**: Cards, modais, navegação
-- **Animações e transições**: UX aprimorada
-- **Acessibilidade**: WCAG compliance
-
-### 9. Funcionalidades Administrativas
-- **Painel admin**: Gestão de usuários, trilhas e etapas
-- **Relatórios**: Analytics de uso do sistema
-- **Backup/Restore**: Gestão de dados
-- **Logs de auditoria**: Rastreamento de ações
-
-### 10. Recursos Avançados
-- **Exportação de dados**: PDF, CSV, Markdown
-- **Integração com plataformas**: Coursera, Udemy, LinkedIn
-- **Sistema de notificações**: Lembretes de progresso
-- **Gamificação**: Pontos, badges, conquistas
-
-## Casos de Uso Prioritários
-
-### UC01 - Autenticação (✅ IMPLEMENTADO)
-- Login com credenciais válidas
-- Redirecionamento após login
-- Tratamento de erros de autenticação
-
-### UC02 - Cadastro (✅ IMPLEMENTADO)
-- Formulário de cadastro completo
-- Validações de dados
-- Criação de conta e redirecionamento
-
-### UC03 - Visualização de Perfil (🚧 PENDENTE)
-- Dashboard pessoal
-- Informações do usuário
-- Histórico de atividades
-
-### UC04 - Seleção de Trilhas (🚧 PENDENTE)
-- Listagem de trilhas pré-definidas
-- Filtros por área/nível
-- Visualização detalhada
-
-### UC05 - Plano Personalizado (🚧 PENDENTE)
-- Formulário de onboarding
-- Geração via LLM
-- Ajustes manuais
-
-### UC06 - Acompanhamento (🚧 PENDENTE)
-- Marcação de etapas concluídas
-- Atualização automática do progresso
-- Relatórios de andamento
-
-## Tecnologias e Dependências
-
-### Backend
-- **Django 4.2.23**: Framework web principal
-- **SQLite**: Banco de dados (desenvolvimento)
-- **PostgreSQL**: Banco de dados (produção)
-- **OpenAI API**: Serviço de LLM
-
-### Frontend
-- **HTML5**: Estrutura das páginas
-- **CSS3**: Estilização e layout
-- **JavaScript**: Interatividade (futuro)
-- **Bootstrap/Tailwind**: Framework CSS (futuro)
-
-### DevOps
-- **Docker**: Containerização
-- **Git**: Controle de versão
-- **GitHub Actions**: CI/CD (futuro)
-
-## Critérios de Aceitação
-
-### Funcionalidades Core
-- [x] Sistema de autenticação funcionando
-- [x] Cadastro de usuários com validações
-- [ ] Interface responsiva completa
-- [ ] Integração com LLM
-- [ ] Sistema de trilhas de carreira
-- [ ] Dashboard de progresso
-
-### Qualidade
-- [x] Código seguindo padrões Django
-- [ ] Testes automatizados (70% cobertura)
-- [ ] Documentação técnica completa
-- [ ] Performance < 2s por ação
-
-## Próximos Passos de Desenvolvimento
-
-1. **Fase 1**: Melhorar interface e UX
-2. **Fase 2**: Implementar modelos de carreira
-3. **Fase 3**: Integrar LLM (OpenAI)
-4. **Fase 4**: Dashboard e analytics
-5. **Fase 5**: Recursos avançados e otimização
-
----
-*Documento atualizado em: Janeiro 2025*
-*Status: Em desenvolvimento ativo*
+- UC01 – Login e autenticação do usuário.
+- UC02 – Escolher trilha de carreira pré-definida.
+- UC03 – Solicitar plano de carreira personalizado via LLM.
+- UC04 – Visualizar plano de carreira e progresso.
+- UC05 – Marcar etapa como concluída.
+- UC06 – Gerenciar áreas profissionais, trilhas e etapas (Admin).

@@ -31,7 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "cadastro",
+    "corsheaders", # Adicionado para CORS
+    "users", # Atualizado de "cadastro" para "users"
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware", # Adicionado para CORS
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -55,7 +57,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'cadastro' / 'templates'], # Adiciona o diretório de templates do app 'cadastro'
+        "DIRS": [BASE_DIR / 'users' / 'templates'], # Atualizado de 'cadastro' para 'users'
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -118,8 +120,17 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# CORS_ALLOW_ALL_ORIGINS = True # Para desenvolvimento, permite todas as origens
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Porta padrão do Vite para o frontend
+    "http://127.0.0.1:5173", # Porta padrão do Vite para o frontend
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles" # Para o build de produção
+
 STATICFILES_DIRS = [
-    BASE_DIR / "cadastro" / "static",  # Diz ao Django onde estão os arquivos estáticos do app
+    BASE_DIR / "users" / "static",
+    BASE_DIR / "frontend" / "dist", # Adicionado para servir os arquivos estáticos do frontend React
 ]
 
 # Default primary key field type

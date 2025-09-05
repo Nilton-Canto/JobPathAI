@@ -54,7 +54,6 @@ Apenas uma ideia de como o site pode ser, sujeita a futuras alterações. Neste 
 ---
 
 ## 🔑 Principais Recursos
-
 - **Onboarding guiado**: coleta de objetivos, senioridade e preferências.
 - **Recomendações com LLM**: caminhos sugeridos e explicados.
 - **Trilhas**: pré-definidas por área/nível e personalizáveis.
@@ -66,8 +65,6 @@ Apenas uma ideia de como o site pode ser, sujeita a futuras alterações. Neste 
 ---
 
 ## 🏗 Arquitetura (alto nível)
-
-
 **Observações:**
 - O LLM recebe o **perfil** + **objetivo** + **histórico de progresso** para sugerir trilhas e etapas.
 - Camada de **regra de negócio** valida, versiona e explica recomendações.
@@ -76,62 +73,41 @@ Apenas uma ideia de como o site pode ser, sujeita a futuras alterações. Neste 
 ---
 
 ## 🧰 Stack & Pré-requisitos
-
 - **Frontend**: HTML/CSS.
 - **Backend**: Python/DJANGO.
 - **DB**: Postgres (recomendado) ou outro SQL.
 - **LLM**: provedor compatível (ex.: OpenAI, Azure OpenAI, etc.).
 - **Docker** (opcional)
 - **Git** e **Make**
-
 > Ajuste esta seção conforme sua implementação real.
 
 ---
 
 ## 🧪 Uso
-
 - Crie seu perfil no onboarding: interesses, competências, objetivo (ex.: “Engenheiro de Dados Pleno em 12 meses”).
-
 - Gere sua trilha com o agente LLM (pré-definida ou personalizada).
-
 - Revise as etapas (cursos, projetos, certificações, soft skills).
-
 - Acompanhe o progresso e dê feedback; a trilha se ajusta.
-
 - Exporte seu plano se quiser (PDF/Markdown/CSV).
 
 ---
 
 ## 🧠 Modelagem de Trilhas
-
 - **Trilha:** coleção de etapas (tarefas/objetivos com duração/complexidade).
-
 - **Etapa:** ação recomendada (ex.: “Projeto ETL com Spark”).
-
 - **Skill tags:** habilidades ligadas à etapa (ex.: python, spark, sql).
-
 - **Critérios de conclusão:** definição de “feito” (artefato, avaliação, quiz).
-
 - **Replanejamento:** o LLM reordena/insere/remove com base em progresso e feedback.
 
 ---
 
 ## 🗺 Roadmap
-
 - Módulo de análise de lacunas com métricas claras.
-
 - Explicabilidade das recomendações (racional do LLM).
-
 - Memória do usuário (preferências e histórico).
-
 - Integração com plataformas de curso (ex.: Coursera/Udemy).
-
 - Painel de analytics do progresso.
-
 - Exportação de plano (PDF/CSV).
-
 - Internacionalização (EN, ES).
-
 - Autenticação social (Google/GitHub).
-- 
 - Autenticação social (Google/GitHub).
