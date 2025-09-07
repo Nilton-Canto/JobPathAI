@@ -22,7 +22,8 @@ const RegisterPage: React.FC = () => {
     }
 
     // Implementar a lógica de cadastro aqui (placeholder por enquanto)
-    alert('Cadastro simulado bem-sucedido!'); // Mensagem para o usuário
+    console.log('Dados de Cadastro:', { name, username, email, age, cpf, password });
+    alert('Tentativa de cadastro. Verifique o console para os dados.');
     // Redirecionar para a página de login ou dashboard
   };
 

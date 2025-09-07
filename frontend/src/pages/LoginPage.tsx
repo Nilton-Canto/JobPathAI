@@ -7,14 +7,28 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implementar a lógica de login aqui (placeholder por enquanto)
-    if (username === 'testuser' && password === 'testpass') {
-      alert('Login bem-sucedido!'); // Mensagem para o usuário
-      // Redirecionar para a dashboard ou página inicial
-    } else {
-      setError('Usuário ou senha inválidos.'); // Mensagem para o usuário
+    setError(null); // Limpa erros anteriores
+
+    try {
+      const response = await fetch('http://localhost:3000/usuarios');
+      const users = await response.json();
+
+      const foundUser = users.find(
+        (user: any) => user.username === username && user.password === password
+      );
+
+      if (foundUser) {
+        alert('Login bem-sucedido!');
+        console.log('Usuário logado:', foundUser);
+        // Aqui você pode redirecionar o usuário ou armazenar o estado de login
+      } else {
+        setError('Usuário ou senha inválidos.');
+      }
+    } catch (err) {
+      setError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+      console.error('Erro na requisição de login:', err);
     }
   };
 

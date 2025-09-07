@@ -130,7 +130,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles" # Para o build de produção
 
 STATICFILES_DIRS = [
     BASE_DIR / "users" / "static",
-    BASE_DIR / "frontend" / "dist", # Adicionado para servir os arquivos estáticos do frontend React
+    BASE_DIR.parent / "frontend" / "dist", # Corrigido para apontar para o diretório `frontend/dist` na raiz do projeto
 ]
 
 # Default primary key field type

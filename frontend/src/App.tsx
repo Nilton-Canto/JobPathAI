@@ -1,19 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
+import Header from './components/Header/Header'; // Importar o componente Header
 import './App.css'; // Estilos do App
 
 function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Início</Link>
-        <Link to="/login">Login</Link>
-        <Link to="/register">Cadastro</Link>
-      </nav>
+      <Header /> {/* Renderizar o Header aqui */}
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
