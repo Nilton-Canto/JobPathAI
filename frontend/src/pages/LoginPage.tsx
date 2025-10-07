@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../components/FormStyles.css';
 
+interface User {
+  id: number;
+  username: string;
+  password: string;
+  email?: string;
+}
+
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -16,7 +23,7 @@ const LoginPage: React.FC = () => {
       const users = await response.json();
 
       const foundUser = users.find(
-        (user: any) => user.username === username && user.password === password
+        (user: User) => user.username === username && user.password === password
       );
 
       if (foundUser) {
