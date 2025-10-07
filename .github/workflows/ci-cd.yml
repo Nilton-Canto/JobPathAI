@@ -25,13 +25,13 @@ jobs:
       - name: Instalar dependências
         run: |
           python -m pip install --upgrade pip
-          pip install -r ./backend/requirements.txt
+          pip install -r backend/requirements.txt
 
       - name: Rodar testes Django
         env:
           DJANGO_SETTINGS_MODULE: myproject.settings
         run: |
-          python ./backend/manage.py test
+          python backend/manage.py test
 
   frontend-tests:
     runs-on: ubuntu-latest
