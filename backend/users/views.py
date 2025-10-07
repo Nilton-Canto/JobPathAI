@@ -1,18 +1,18 @@
 from django.views import View  # Importa a classe base para views orientadas a objetos
 from django.contrib.auth import authenticate, login  # Funções para autenticar e logar usuários
 from django.shortcuts import render, redirect  # Funções para renderizar templates e redirecionar
-from .models import Cadastro  # Importa o modelo Cadastro
+from .models import Users  # Importa o modelo Users
 from django.contrib.auth.models import User  # Importa o modelo User do Django
 
 # Create your views here.
 def index(request):
     context = {'titulo_pagina': 'Formulário de Cadastro'}
-    return render(request, 'cadastro/index.html', context)
+    return render(request, 'users/index.html', context)
 
 class LoginView(View):
     def get(self, request):
         # Renderiza o template de login quando o usuário acessa a página via GET
-        return render(request, 'cadastro/login.html')
+        return render(request, 'users/login.html')
 
     def post(self, request):
         # Recebe os dados do formulário enviados via POST
@@ -35,11 +35,11 @@ class LoginView(View):
             else:
                 # Senha incorreta
                 contexto = {'error': 'Senha incorreta.'}
-                return render(request, 'cadastro/login.html', contexto)
+                return render(request, 'users/login.html', contexto)
         except User.DoesNotExist:
             # Usuário não encontrado
             contexto = {'error': 'Usuário não encontrado.'}
-            return render(request, 'cadastro/login.html', contexto)
+            return render(request, 'users/login.html', contexto)
         '''
         
 
@@ -50,17 +50,12 @@ class LoginView(View):
             return redirect('index')  # Encaminha para a view index
         else:
             # Se falhar, renderiza o template novamente com uma mensagem de erro
-            return render(request, 'cadastro/login.html', {'error': 'Usuário ou senha inválidos'})
+            return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
 '''
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.views import View
 
-from .models import Cadastro
-
-class NovoUsuarioView(View):
+class NewUsersView(View):
     def get(self, request):
-        return render(request, 'cadastro/novo_usuario.html')
+        return render(request, 'users/novo_usuario.html')
 
     def post(self, request):
         # Recebe os dados do formulário
@@ -75,24 +70,24 @@ class NovoUsuarioView(View):
         # Lógica de verificação para o username e email no modelo User
         if User.objects.filter(username=username_recebido).exists():
             contexto = {'erro': 'Este nome de usuário já está em uso.'}
-            return render(request, 'cadastro/novo_usuario.html', contexto)
+            return render(request, 'users/novo_usuario.html', contexto)
         
         if User.objects.filter(email=email_recebido).exists():
             contexto = {'erro': 'Este e-mail já está em uso.'}
-            return render(request, 'cadastro/novo_usuario.html', contexto)
+            return render(request, 'users/novo_usuario.html', contexto)
 
-        # Lógica de verificação para o CPF no modelo Cadastro
-        if Cadastro.objects.filter(cpf=cpf_recebido).exists():
+        # Lógica de verificação para o CPF no modelo Users
+        if Users.objects.filter(cpf=cpf_recebido).exists():
             contexto = {'erro': 'Este CPF já está cadastrado.'}
-            return render(request, 'cadastro/novo_usuario.html', contexto)
+            return render(request, 'users/novo_usuario.html', contexto)
         
         if password_recebida != confirm_password_recebida:
             contexto = {'erro': 'As senhas não coincidem. Por favor, tente novamente.'}
-            return render(request, 'cadastro/novo_usuario.html', contexto)
+            return render(request, 'users/novo_usuario.html', contexto)
         
         # Se as verificações passarem, cria o novo usuário do Django e o seu modelo
         user = User.objects.create_user(username=username_recebido, password=password_recebida, email=email_recebido)
-        novo_cadastro = Cadastro.objects.create(
+        new_user = Users.objects.create(
             nome=nome_recebido,
             email=email_recebido,
             idade=idade_recebida,
