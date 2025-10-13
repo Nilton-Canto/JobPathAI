@@ -69,13 +69,14 @@ Apenas uma ideia de como o site pode ser, sujeita a futuras alterações. Neste 
 - O LLM recebe o **perfil** + **objetivo** + **histórico de progresso** para sugerir trilhas e etapas.
 - Camada de **regra de negócio** valida, versiona e explica recomendações.
 - **DB** armazena usuários, trilhas, etapas, progresso, feedback.
+- **API RESTful (Django REST Framework)**: expõe endpoints para gerenciamento de usuários, trilhas de carreira e habilidades.
 
 ---
 
 ## 🧰 Stack & Pré-requisitos
-- **Frontend**: HTML/CSS.
-- **Backend**: Python/DJANGO.
-- **DB**: Postgres (recomendado) ou outro SQL.
+- **Frontend**: React com TypeScript.
+- **Backend**: Python/DJANGO, Django REST Framework.
+- **DB**: SQL (SQLite usado em desenvolvimento).
 - **LLM**: provedor compatível (ex.: OpenAI, Azure OpenAI, etc.).
 - **Docker** (opcional)
 - **Git** e **Make**
@@ -102,12 +103,19 @@ Apenas uma ideia de como o site pode ser, sujeita a futuras alterações. Neste 
 ---
 
 ## 🗺 Roadmap
-- Módulo de análise de lacunas com métricas claras.
-- Explicabilidade das recomendações (racional do LLM).
-- Memória do usuário (preferências e histórico).
-- Integração com plataformas de curso (ex.: Coursera/Udemy).
-- Painel de analytics do progresso.
-- Exportação de plano (PDF/CSV).
-- Internacionalização (EN, ES).
-- Autenticação social (Google/GitHub).
-- Autenticação social (Google/GitHub).
+- **Fase 1: Base & Autenticação (Concluída)**
+    - Configuração inicial do projeto (Django + React)
+    - Autenticação e Cadastro de Usuários (Frontend e Backend API)
+    - Validação de formulários no Frontend
+    - Implementação básica de Dashboard e Perfil do Usuário (Frontend)
+    - Configuração básica do app `career` no Backend (Modelos, Serializadores, Views, URLs)
+- **Fase 2: Sistema de Trilhas & LLM (Em Andamento)**
+    - Módulo de análise de lacunas com métricas claras.
+    - Explicabilidade das recomendações (racional do LLM).
+    - Memória do usuário (preferências e histórico).
+    - Integração com plataformas de curso (ex.: Coursera/Udemy).
+    - Painel de analytics do progresso.
+    - Exportação de plano (PDF/CSV).
+    - Internacionalização (EN, ES).
+    - Autenticação social (Google/GitHub).
+    - Autenticação social (Google/GitHub).

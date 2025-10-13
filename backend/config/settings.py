@@ -33,16 +33,17 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "corsheaders", # Adicionado para CORS
     "users", # Atualizado de "cadastro" para "users"
+    "career", # Novo app para trilhas de carreira
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "django.contrib.staticfiles"
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware", # Adicionado para CORS
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -120,11 +121,12 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-# CORS_ALLOW_ALL_ORIGINS = True # Para desenvolvimento, permite todas as origens
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Porta padrão do Vite para o frontend
-    "http://127.0.0.1:5173", # Porta padrão do Vite para o frontend
-]
+CORS_ALLOW_ALL_ORIGINS = True # Temporário para desenvolvimento
+CORS_ALLOW_CREDENTIALS = True # Permite o envio de credenciais (cookies, headers de autorização)
+# CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:5173",  # Porta padrão do Vite para o frontend
+#    "http://127.0.0.1:5173", # Porta padrão do Vite para o frontend
+# ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles" # Para o build de produção
 
