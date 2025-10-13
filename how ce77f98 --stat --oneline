@@ -1,0 +1,48 @@
+[33mcommit ce77f988df4b594dc8fa09d8888689ff6192b2c5[m
+Author: Eduardo Mattos <eduardo.fdemattos@gmail.com>
+Date:   Tue Oct 7 02:51:38 2025 -0300
+
+    feat: Implementação inicial de funcionalidades de autenticação, dashboard, perfil e estrutura de API para trilhas de carreira.
+
+ README.md                                        |    32 [32m+[m[31m-[m
+ backend/career/__init__.py                       |     0
+ backend/career/admin.py                          |     3 [32m+[m
+ backend/career/apps.py                           |     6 [32m+[m
+ backend/career/migrations/0001_initial.py        |    54 [32m+[m
+ backend/career/migrations/__init__.py            |     0
+ backend/career/models.py                         |    44 [32m+[m
+ backend/career/serializers.py                    |    21 [32m+[m
+ backend/career/tests.py                          |     3 [32m+[m
+ backend/career/urls.py                           |     9 [32m+[m
+ backend/career/views.py                          |    18 [32m+[m
+ backend/config/settings.py                       |    14 [32m+[m[31m-[m
+ backend/config/urls.py                           |     1 [32m+[m
+ backend/requirements.txt                         |     1 [32m+[m
+ backend/users/views.py                           |   134 [32m+[m[31m-[m
+ docs/estrutura_repositorio.md                    |     7 [32m+[m[31m-[m
+ docs/features.md                                 |     4 [32m+[m[31m-[m
+ frontend/.vite/deps/_metadata.json               |    40 [32m+[m
+ frontend/.vite/deps/chunk-4J6BLW67.js            |   279 [32m+[m
+ frontend/.vite/deps/chunk-4J6BLW67.js.map        |     7 [32m+[m
+ frontend/.vite/deps/chunk-WYQRYOQT.js            |   999 [32m++[m
+ frontend/.vite/deps/chunk-WYQRYOQT.js.map        |     7 [32m+[m
+ frontend/.vite/deps/package.json                 |     3 [32m+[m
+ frontend/.vite/deps/react-dom_client.js          | 18106 [32m+++++++++++++++++++++[m
+ frontend/.vite/deps/react-dom_client.js.map      |     7 [32m+[m
+ frontend/.vite/deps/react-router-dom.js          | 13436 [32m+++++++++++++++[m
+ frontend/.vite/deps/react-router-dom.js.map      |     7 [32m+[m
+ frontend/.vite/deps/react.js                     |     4 [32m+[m
+ frontend/.vite/deps/react.js.map                 |     7 [32m+[m
+ frontend/.vite/deps/react_jsx-dev-runtime.js     |   279 [32m+[m
+ frontend/.vite/deps/react_jsx-dev-runtime.js.map |     7 [32m+[m
+ frontend/src/App.css                             |   353 [32m+[m[31m-[m
+ frontend/src/App.tsx                             |     4 [32m+[m
+ frontend/src/components/FormStyles.css           |    50 [32m+[m[31m-[m
+ frontend/src/components/Header/Header.tsx        |    46 [32m+[m[31m-[m
+ frontend/src/index.css                           |    60 [32m+[m[31m-[m
+ frontend/src/pages/DashboardPage.tsx             |    66 [32m+[m
+ frontend/src/pages/HomePage.tsx                  |    68 [32m+[m[31m-[m
+ frontend/src/pages/LoginPage.tsx                 |    35 [32m+[m[31m-[m
+ frontend/src/pages/ProfilePage.tsx               |    94 [32m+[m
+ frontend/src/pages/RegisterPage.tsx              |   100 [32m+[m[31m-[m
+ 41 files changed, 34169 insertions(+), 246 deletions(-)

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "corsheaders", # Adicionado para CORS
+    "rest_framework", # Django REST Framework
     "users", # Atualizado de "cadastro" para "users"
     "career", # Novo app para trilhas de carreira
     "django.contrib.admin",
