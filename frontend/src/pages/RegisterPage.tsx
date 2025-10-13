@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../components/FormStyles.css';
 
 const RegisterPage: React.FC = () => {
@@ -12,6 +12,7 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +44,7 @@ const RegisterPage: React.FC = () => {
         setError(null);
         setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
         setTimeout(() => {
-          window.location.href = '/';
+          navigate('/login');
         }, 1500);
         return;
       }
