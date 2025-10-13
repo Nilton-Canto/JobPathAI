@@ -11,8 +11,9 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -21,10 +22,41 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    // Implementar a lógica de cadastro aqui (placeholder por enquanto)
-    console.log('Dados de Cadastro:', { name, username, email, age, cpf, password });
-    alert('Tentativa de cadastro. Verifique o console para os dados.');
-    // Redirecionar para a página de login ou dashboard
+    try {
+      const response = await fetch('http://127.0.0.1:8000/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          username,
+          email,
+          age,
+          cpf,
+          password,
+          confirm_password: confirmPassword,
+        }),
+      });
+
+      if (response.ok) {
+        setError(null);
+        setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+        return;
+      }
+
+      const data = await response.json().catch(() => null);
+      if (data?.detail) {
+        setError(data.detail);
+      } else {
+        setError('Falha ao cadastrar. Tente novamente.');
+      }
+    } catch (err) {
+      setError('Erro de rede. Verifique se o backend está rodando.');
+    }
   };
 
   return (
@@ -105,6 +137,26 @@ const RegisterPage: React.FC = () => {
         <button type="submit">Cadastrar</button>
       </form>
       <p>Já tem uma conta? <Link to="/login">Faça login</Link></p>
+      {successMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            right: '16px',
+            bottom: '16px',
+            background: '#10b981',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+            fontWeight: 600,
+            zIndex: 1000,
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

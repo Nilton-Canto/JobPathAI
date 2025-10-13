@@ -3,6 +3,10 @@ from django.contrib.auth import authenticate, login  # Funções para autenticar
 from django.shortcuts import render, redirect  # Funções para renderizar templates e redirecionar
 from .models import Users  # Importa o modelo Users
 from django.contrib.auth.models import User  # Importa o modelo User do Django
+from django.http import JsonResponse  # Importa JsonResponse para respostas JSON
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+import json  # Importa o módulo JSON para manipulação de dados JSON
 
 # Create your views here.
 def index(request):
@@ -53,39 +57,57 @@ class LoginView(View):
             return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
 '''
 
+@method_decorator(csrf_exempt, name='dispatch')
 class NewUsersView(View):
     def get(self, request):
-        return render(request, 'users/novo_usuario.html')
+        return render(request, 'users/register.html')
 
     def post(self, request):
-        # Recebe os dados do formulário
-        nome_recebido = request.POST.get('nome').strip()
-        username_recebido = request.POST.get('username').strip()
-        email_recebido = request.POST.get('email').strip()
-        idade_recebida = request.POST.get('idade').strip()
-        cpf_recebido = request.POST.get('cpf').strip()
-        password_recebida = request.POST.get('password').strip()
-        confirm_password_recebida = request.POST.get('confirm_password').strip()
+        # Tenta carregar os dados como JSON
+        is_json_request = False
+        try:
+            data = json.loads(request.body)
+            is_json_request = True
+            nome_recebido = data.get('name', '').strip()
+            username_recebido = data.get('username', '').strip()
+            email_recebido = data.get('email', '').strip()
+            idade_recebida = data.get('age', '').strip()
+            cpf_recebido = data.get('cpf', '').strip()
+            password_recebida = data.get('password', '').strip()
+            confirm_password_recebida = data.get('confirm_password', '').strip()
 
-        # Lógica de verificação para o username e email no modelo User
-        if User.objects.filter(username=username_recebido).exists():
-            contexto = {'erro': 'Este nome de usuário já está em uso.'}
-            return render(request, 'users/novo_usuario.html', contexto)
+            # Validação básica json
+            
+            if User.objects.filter(username=username_recebido).exists():
+                return JsonResponse({'detail': 'Este nome de usuário já está em uso.'}, status=400)
+            if User.objects.filter(email=email_recebido).exists():
+                return JsonResponse({'detail': 'Este e-mail já está em uso.'}, status=400)
+            if Users.objects.filter(cpf=cpf_recebido).exists():
+                return JsonResponse({'detail': 'Este CPF já está cadastrado.'}, status=400)
+            if password_recebida != confirm_password_recebida:
+                return JsonResponse({'detail': 'As senhas não coincidem.'}, status=400)
         
-        if User.objects.filter(email=email_recebido).exists():
-            contexto = {'erro': 'Este e-mail já está em uso.'}
-            return render(request, 'users/novo_usuario.html', contexto)
+        except Exception:
+            # Se não for JSON, tenta pegar do formulário tradicional
+            nome_recebido = request.POST.get('name', '').strip()
+            username_recebido = request.POST.get('username', '').strip()
+            email_recebido = request.POST.get('email', '').strip()
+            idade_recebida = request.POST.get('age', '').strip()
+            cpf_recebido = request.POST.get('cpf', '').strip()
+            password_recebida = request.POST.get('password', '').strip()
+            confirm_password_recebida = request.POST.get('confirm_password', '').strip()
+            
+            # Validação básica form
+            if User.objects.filter(username=username_recebido).exists():
+                return render(request, 'users/register.html', {'error': 'Este nome de usuário já está em uso.'})
+            if User.objects.filter(email=email_recebido).exists():
+                return render(request, 'users/register.html', {'error': 'Este e-mail já está em uso.'})
+            if Users.objects.filter(cpf=cpf_recebido).exists():
+                return render(request, 'users/register.html', {'error': 'Este CPF já está cadastrado.'})
+            if password_recebida != confirm_password_recebida:
+                return render(request, 'users/register.html', {'error': 'As senhas não coincidem.'})
 
-        # Lógica de verificação para o CPF no modelo Users
-        if Users.objects.filter(cpf=cpf_recebido).exists():
-            contexto = {'erro': 'Este CPF já está cadastrado.'}
-            return render(request, 'users/novo_usuario.html', contexto)
-        
-        if password_recebida != confirm_password_recebida:
-            contexto = {'erro': 'As senhas não coincidem. Por favor, tente novamente.'}
-            return render(request, 'users/novo_usuario.html', contexto)
-        
-        # Se as verificações passarem, cria o novo usuário do Django e o seu modelo
+        # Criação do usuário
         user = User.objects.create_user(username=username_recebido, password=password_recebida, email=email_recebido)
         new_user = Users.objects.create(
             nome=nome_recebido,
@@ -93,5 +115,7 @@ class NewUsersView(View):
             idade=idade_recebida,
             cpf=cpf_recebido
         )
+        if is_json_request:
+            return JsonResponse({'detail': 'Usuário cadastrado com sucesso!'}, status=201)
+        return redirect('index')
         
-        return redirect('login')
