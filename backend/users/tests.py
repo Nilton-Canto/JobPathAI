@@ -1,10 +1,10 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.http import JsonResponse
-import json
-from .models import Users
-from .views import NewUsersView
+from django.test import TestCase, Client # Client é usado para testar as views e TestCase é usado para criar os testes
+from django.contrib.auth.models import User # User é o modelo de usuário do Django
+from django.urls import reverse # reverse é usado para criar URLs para os testes
+from django.http import JsonResponse # JsonResponse é usado para retornar respostas JSON
+import json # json é usado para converter os dados em JSON para verificar se o usuário foi criado corretamente via frontend
+from .models import Users # Users é o modelo de usuário customizado
+from .views import NewUsersView # NewUsersView é a view de criação de usuários
 
 
 class UserCreationTestCase(TestCase):
@@ -140,7 +140,7 @@ class UserCreationTestCase(TestCase):
         
         # A view atual tem problemas com validação de formulário
         # Vamos apenas verificar se retorna algum status
-        self.assertIn(response.status_code, [200, 302, 500])
+        self.assertIn(response.status_code, [200, 302, 500]) # O que o assertIn faz é verificar se o status code está dentro da lista de status codes
     
     def test_empty_fields_json(self):
         """Testa validação de campos obrigatórios via JSON"""
@@ -256,7 +256,7 @@ class UserCreationIntegrationTestCase(TestCase):
         
         # Verifica criação no Django User
         django_user = User.objects.get(username='ana123')
-        self.assertEqual(django_user.email, 'ana@email.com')
+        self.assertEqual(django_user.email, 'ana@email.com') # Verifica se o email está correto ([x] = [x]) - recebido = enviado
         self.assertTrue(django_user.check_password('minhasenha123'))
         
         # Verifica criação no modelo Users

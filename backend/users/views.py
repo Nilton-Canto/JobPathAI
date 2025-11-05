@@ -50,9 +50,20 @@ class LoginView(View):
             if user.check_password(password_recebida):
                 # Se a senha estiver correta, faça o login
                 login(request, user)
+                
+                # admins -> painel administrativo
+                if user.is_superuser or user.is_staff:
+                    return redirect('/admin/') # aqui já redireciona para o admin do django.
+                
                 if is_json_request:
+                    # admins -> painel administrativo (ainda não funciona plenamente! Fazer ajuste no front)
+                    if user.is_superuser or user.is_staff:
+                        return JsonResponse({'success': True, 'message': 'Login realizado com sucesso (admin)'})
+                    
                     return JsonResponse({'success': True, 'message': 'Login realizado com sucesso'})
+                
                 return redirect('area_inicial')
+            
             else:
                 # Senha incorreta
                 if is_json_request:
@@ -98,7 +109,6 @@ class NewUsersView(View):
             confirm_password_recebida = data.get('confirm_password', '').strip()
 
             # Validação básica json
-            
             if User.objects.filter(username=username_recebido).exists():
                 return JsonResponse({'detail': 'Este nome de usuário já está em uso.'}, status=400)
             if User.objects.filter(email=email_recebido).exists():
