@@ -21,4 +21,5 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("users.urls")),  # Atualizado de "cadastro.urls" para "users.urls"
+    path("api/v1/", include("career.urls")), # Incluído as URLs da API do app 'career'
 ]

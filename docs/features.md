@@ -18,8 +18,8 @@ O JobPathAI é uma aplicação web desenvolvida para auxiliar usuários na defin
 
 ### 2.2 Requisitos Não Funcionais
 
-- O sistema deve ser desenvolvido com Django no backend.
-- O frontend utilizará HTML, CSS e JS com design responsivo.
+- O sistema deve ser desenvolvido com Django no backend (utilizando Django REST Framework para APIs).
+- O frontend utilizará React com TypeScript, HTML, CSS e JS com design responsivo.
 - Integração com API LLM (OpenAI ou Ollama local).
 - Interface amigável e intuitiva.
 - Tempo de resposta do sistema inferior a 2 segundos para ações principais.
