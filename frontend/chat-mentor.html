@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPathAI - Mentor de Carreira IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Personalização da barra de scroll para o chat */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200 flex-shrink-0 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                         <a href="dashboard.html" class="flex items-center gap-2">
+                            <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm rotate-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                </svg>
+                            </div>
+                            <span class="text-xl font-bold text-gray-800 hidden sm:block">JobPathAI</span>
+                         </a>
+                    </div>
+                    <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Meu Painel
+                        </a>
+                        <a href="explorar-trilhas.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Explorar Trilhas
+                        </a>
+                        <a href="chat-mentor.html" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" aria-current="page">
+                            Mentor IA
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <div class="ml-3 relative">
+                        <div>
+                            <button type="button" class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                <span class="sr-only">Abrir menu do utilizador</span>
+                                <img class="h-8 w-8 rounded-full object-cover border-2 border-gray-200" src="https://via.placeholder.com/150/0000FF/FFFFFF?text=U" alt="Foto do Utilizador">
+                            </button>
+                        </div>
+                        <div id="user-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden transition-all duration-200 ease-out transform opacity-0 scale-95" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                            <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center" role="menuitem" tabindex="-1">
+                                <i data-lucide="user" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                Meu Perfil
+                            </a>
+                            <a href="admin-trilhas.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center" role="menuitem" tabindex="-1">
+                                <i data-lucide="settings" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                Admin
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="login.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center" role="menuitem" tabindex="-1">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-2 text-red-500"></i>
+                                Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 overflow-hidden">
+        
+        <div class="flex-1 bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden">
+            
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center">
+                    <div class="relative">
+                        <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-sm">
+                            <i data-lucide="bot" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white bg-green-400"></span>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-lg font-semibold text-gray-900">Mentor de Carreira IA</h2>
+                        <p class="text-sm text-green-600 font-medium">Online agora</p>
+                    </div>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100" title="Limpar Conversa">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50 chat-scroll">
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-sm">
+                            <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-200 max-w-[85%] sm:max-w-[75%]">
+                        <p class="text-gray-800 leading-relaxed">
+                            Olá! 👋 Eu sou o seu assistente de carreira inteligente. Estou aqui para ajudar a analisar o seu progresso, sugerir novas competências ou tirar dúvidas sobre o mercado de trabalho.
+                        </p>
+                        <p class="text-gray-800 leading-relaxed mt-3">
+                            Como posso ser útil hoje?
+                        </p>
+                        <span class="text-xs text-gray-400 mt-2 block">10:00</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start justify-end">
+                    <div class="bg-blue-600 p-4 rounded-2xl rounded-tr-none shadow-sm text-white max-w-[85%] sm:max-w-[75%]">
+                        <p class="leading-relaxed">
+                            Estou na dúvida se devo focar em aprender TypeScript agora ou se termino primeiro o módulo de React básico. O que acha melhor para o mercado atual?
+                        </p>
+                        <span class="text-xs text-blue-200 mt-2 block text-right">10:05</span>
+                    </div>
+                </div>
+
+                 <div class="flex items-start">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-sm">
+                            <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-200 max-w-[85%] sm:max-w-[75%]">
+                        <p class="text-gray-800 leading-relaxed">
+                            Ótima pergunta! Com base na análise de vagas recentes, o **TypeScript** tornou-se quase um padrão da indústria para projetos React de médio a grande porte.
+                        </p>
+                        <p class="text-gray-800 leading-relaxed mt-3">
+                            No entanto, para não se sentir sobrecarregado, sugiro:
+                        </p>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-gray-800">
+                            <li>Termine os conceitos fundamentais de React (hooks, estado, props).</li>
+                            <li>Depois, introduza o TypeScript gradualmente nos seus próximos projetos.</li>
+                        </ul>
+                        <span class="text-xs text-gray-400 mt-2 block">10:06</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-100 flex-shrink-0">
+                <form id="chat-form" class="flex gap-4 items-end" onsubmit="event.preventDefault(); sendMessage();">
+                    <div class="flex-grow relative">
+                        <textarea 
+                            id="message-input" 
+                            rows="1" 
+                            class="block w-full py-3 px-4 pr-12 bg-gray-100 border-transparent rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-0 resize-none max-h-32 transition-all" 
+                            placeholder="Digite a sua mensagem..."
+                            required
+                        ></textarea>
+                        <button type="button" class="absolute right-3 bottom-2.5 text-gray-400 hover:text-gray-600 p-1">
+                            <i data-lucide="paperclip" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="flex-shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i data-lucide="send" class="w-5 h-5 ml-0.5"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Lógica do Dropdown do Menu de Utilizador
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenuDropdown = document.getElementById('user-menu-dropdown');
+
+        if (userMenuButton && userMenuDropdown) {
+            userMenuButton.addEventListener('click', () => {
+                const isExpanded = userMenuButton.getAttribute('aria-expanded') === 'true';
+                userMenuButton.setAttribute('aria-expanded', !isExpanded);
+                
+                if (!isExpanded) {
+                    userMenuDropdown.classList.remove('hidden');
+                    setTimeout(() => {
+                        userMenuDropdown.classList.remove('opacity-0', 'scale-95');
+                        userMenuDropdown.classList.add('opacity-100', 'scale-100');
+                    }, 10);
+                } else {
+                    userMenuDropdown.classList.remove('opacity-100', 'scale-100');
+                    userMenuDropdown.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                         userMenuDropdown.classList.add('hidden');
+                    }, 200);
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!userMenuButton.contains(event.target) && !userMenuDropdown.contains(event.target)) {
+                    if (userMenuButton.getAttribute('aria-expanded') === 'true') {
+                         userMenuButton.setAttribute('aria-expanded', 'false');
+                         userMenuDropdown.classList.remove('opacity-100', 'scale-100');
+                         userMenuDropdown.classList.add('opacity-0', 'scale-95');
+                         setTimeout(() => {
+                              userMenuDropdown.classList.add('hidden');
+                         }, 200);
+                    }
+                }
+            });
+        }
+
+        // --- Lógica do Chat ---
+        const messagesContainer = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+
+        // Auto-resize do textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            // Adiciona mensagem do utilizador
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messagesContainer.insertAdjacentHTML('beforeend', `
+                <div class="flex items-start justify-end">
+                    <div class="bg-blue-600 p-4 rounded-2xl rounded-tr-none shadow-sm text-white max-w-[85%] sm:max-w-[75%]">
+                        <p class="leading-relaxed">${text}</p>
+                        <span class="text-xs text-blue-200 mt-2 block text-right">${time}</span>
+                    </div>
+                </div>
+            `);
+
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+
+            // Simula "typing" da IA
+            setTimeout(() => {
+                const typingIndicatorId = 'typing-' + Date.now();
+                messagesContainer.insertAdjacentHTML('beforeend', `
+                    <div id="${typingIndicatorId}" class="flex items-start">
+                        <div class="flex-shrink-0 mr-4">
+                            <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-sm">
+                                <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-200">
+                            <div class="flex space-x-2 items-center h-6">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+                lucide.createIcons();
+
+                // Remove indicador e mostra resposta após 2s
+                setTimeout(() => {
+                    document.getElementById(typingIndicatorId).remove();
+                    const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    messagesContainer.insertAdjacentHTML('beforeend', `
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-sm">
+                                    <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-200 max-w-[85%] sm:max-w-[75%]">
+                                <p class="text-gray-800 leading-relaxed">Esta é uma resposta simulada. Num ambiente real, a sua mensagem seria enviada para o backend Django, que consultaria a API da OpenAI ou Ollama e devolveria a resposta inteligente aqui.</p>
+                                <span class="text-xs text-gray-400 mt-2 block">${responseTime}</span>
+                            </div>
+                        </div>
+                    `);
+                    messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+                    lucide.createIcons();
+                }, 2000);
+
+            }, 600);
+        }
+    </script>
+</body>
+</html>

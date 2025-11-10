@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPathAI - O Meu Perfil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="h-full">
+    <div class="min-h-full">
+        <nav class="bg-white shadow-sm border-b border-gray-200 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                             <a href="dashboard.html" class="flex items-center gap-2">
+                                <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm rotate-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-gray-800 hidden sm:block">JobPathAI</span>
+                             </a>
+                        </div>
+                        <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Meu Painel
+                            </a>
+                            <a href="explorar-trilhas.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Explorar Trilhas
+                            </a>
+                            <a href="chat-mentor.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Mentor IA
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                        <div class="ml-3 relative">
+                            <div>
+                                <button type="button" class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                    <span class="sr-only">Abrir menu do utilizador</span>
+                                    <img class="h-8 w-8 rounded-full object-cover border-2 border-gray-200" src="https://via.placeholder.com/150/0000FF/FFFFFF?text=U" alt="Foto do Utilizador">
+                                </button>
+                            </div>
+                            <div id="user-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden transition-all duration-200 ease-out transform opacity-0 scale-95" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                <a href="perfil.html" class="block px-4 py-2 text-sm text-gray-700 bg-gray-100 transition-colors flex items-center" role="menuitem" tabindex="-1">
+                                    <i data-lucide="user" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                    Meu Perfil
+                                </a>
+                                <a href="admin-trilhas.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center" role="menuitem" tabindex="-1">
+                                    <i data-lucide="settings" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                    Admin
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center" role="menuitem" tabindex="-1">
+                                    <i data-lucide="log-out" class="w-4 h-4 mr-2 text-red-500"></i>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold leading-tight text-gray-900">
+                    O Meu Perfil
+                </h1>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Informações Pessoais</h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            Atualize os seus dados pessoais e como prefere ser contactado.
+                        </p>
+                        
+                        <div class="mt-6 flex items-center">
+                            <span class="inline-block h-20 w-20 rounded-full overflow-hidden bg-gray-100 ring-4 ring-white shadow-sm">
+                                <img class="h-full w-full object-cover" src="https://via.placeholder.com/150/0000FF/FFFFFF?text=U" alt="Sua foto de perfil">
+                            </span>
+                            <button type="button" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                Alterar foto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 md:mt-0 md:col-span-2 space-y-6">
+                    
+                    <div class="shadow sm:rounded-md sm:overflow-hidden">
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="first-name" class="block text-sm font-medium text-gray-700">Primeiro nome</label>
+                                    <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md border px-3 py-2" value="João">
+                                </div>
+
+                                <div class="col-span-6 sm:col-span-3">
+                                    <label for="last-name" class="block text-sm font-medium text-gray-700">Apelido</label>
+                                    <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md border px-3 py-2" value="Silva">
+                                </div>
+
+                                <div class="col-span-6 sm:col-span-4">
+                                    <label for="email-address" class="block text-sm font-medium text-gray-700">Endereço de e-mail</label>
+                                    <input type="text" name="email-address" id="email-address" autocomplete="email" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md border px-3 py-2 bg-gray-50 text-gray-500 cursor-not-allowed" value="joao.silva@example.com" disabled>
+                                    <p class="mt-1 text-xs text-gray-500">O e-mail não pode ser alterado diretamente por razões de segurança.</p>
+                                </div>
+
+                                <div class="col-span-6">
+                                    <label for="about" class="block text-sm font-medium text-gray-700">Bio / Sobre mim</label>
+                                    <div class="mt-1">
+                                        <textarea id="about" name="about" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md px-3 py-2" placeholder="Uma breve descrição sobre si..."></textarea>
+                                    </div>
+                                    <p class="mt-2 text-sm text-gray-500">Breve descrição para o seu perfil público (opcional).</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                Guardar Alterações
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="hidden sm:block" aria-hidden="true">
+                        <div class="py-5">
+                            <div class="border-t border-gray-200"></div>
+                        </div>
+                    </div>
+
+                    <div class="md:grid md:grid-cols-3 md:gap-6">
+                        <div class="md:col-span-1">
+                            <div class="px-4 sm:px-0">
+                                <h3 class="text-lg font-medium leading-6 text-gray-900">Segurança</h3>
+                                <p class="mt-1 text-sm text-gray-600">
+                                    Mantenha a sua conta segura atualizando a sua palavra-passe regularmente.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-5 md:mt-0 md:col-span-2">
+                            <form action="#" method="POST">
+                                <div class="shadow sm:rounded-md sm:overflow-hidden">
+                                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                                        <div class="grid grid-cols-6 gap-6">
+                                            <div class="col-span-6 sm:col-span-4">
+                                                <label for="current-password" class="block text-sm font-medium text-gray-700">Palavra-passe atual</label>
+                                                <input type="password" name="current-password" id="current-password" autocomplete="current-password" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md border px-3 py-2">
+                                            </div>
+
+                                            <div class="col-span-6 sm:col-span-4">
+                                                <label for="new-password" class="block text-sm font-medium text-gray-700">Nova palavra-passe</label>
+                                                <input type="password" name="new-password" id="new-password" autocomplete="new-password" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md border px-3 py-2">
+                                            </div>
+
+                                            <div class="col-span-6 sm:col-span-4">
+                                                <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirmar nova palavra-passe</label>
+                                                <input type="password" name="confirm-password" id="confirm-password" autocomplete="new-password" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md border px-3 py-2">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                            Atualizar Palavra-passe
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 pt-10 border-t border-gray-200">
+                        <div class="md:grid md:grid-cols-3 md:gap-6">
+                            <div class="md:col-span-1">
+                                <h3 class="text-lg font-medium leading-6 text-red-600">Zona de Perigo</h3>
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Ações irreversíveis relacionadas com a sua conta.
+                                </p>
+                            </div>
+                            <div class="mt-5 md:mt-0 md:col-span-2">
+                                <div class="bg-red-50 sm:rounded-lg border border-red-100 p-4 sm:p-6 flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-base font-medium text-red-800">Eliminar Conta</h3>
+                                        <p class="mt-1 text-sm text-red-600">
+                                            Ao eliminar a sua conta, todos os seus dados e progresso serão permanentemente removidos.
+                                        </p>
+                                    </div>
+                                    <button type="button" class="ml-4 inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm transition-colors whitespace-nowrap">
+                                        Eliminar Conta
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Lógica do Dropdown do Menu de Utilizador
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenuDropdown = document.getElementById('user-menu-dropdown');
+
+        if (userMenuButton && userMenuDropdown) {
+            userMenuButton.addEventListener('click', () => {
+                const isExpanded = userMenuButton.getAttribute('aria-expanded') === 'true';
+                userMenuButton.setAttribute('aria-expanded', !isExpanded);
+                
+                if (!isExpanded) {
+                    userMenuDropdown.classList.remove('hidden');
+                    setTimeout(() => {
+                        userMenuDropdown.classList.remove('opacity-0', 'scale-95');
+                        userMenuDropdown.classList.add('opacity-100', 'scale-100');
+                    }, 10);
+                } else {
+                    userMenuDropdown.classList.remove('opacity-100', 'scale-100');
+                    userMenuDropdown.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                         userMenuDropdown.classList.add('hidden');
+                    }, 200);
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!userMenuButton.contains(event.target) && !userMenuDropdown.contains(event.target)) {
+                    if (userMenuButton.getAttribute('aria-expanded') === 'true') {
+                         userMenuButton.setAttribute('aria-expanded', 'false');
+                         userMenuDropdown.classList.remove('opacity-100', 'scale-100');
+                         userMenuDropdown.classList.add('opacity-0', 'scale-95');
+                         setTimeout(() => {
+                              userMenuDropdown.classList.add('hidden');
+                         }, 200);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+```eof
