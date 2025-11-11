@@ -11,104 +11,52 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Inicializar o hook de navegação
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Novo estado para mensagem de sucesso
-
-  // Funções de validação
-  const validateName = (name: string) => {
-    if (!name.trim()) return 'O nome não pode ser vazio.';
-    return null;
-  };
-
-  const validateUsername = (username: string) => {
-    if (!username.trim()) return 'O nome de usuário não pode ser vazio.';
-    if (username.length < 3) return 'O nome de usuário deve ter pelo menos 3 caracteres.';
-    // Adicionar mais validações, se necessário (ex: alfanumérico)
-    return null;
-  };
-
-  const validateEmail = (email: string) => {
-    if (!email.trim()) return 'O e-mail não pode ser vazio.';
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) return 'Formato de e-mail inválido.';
-    return null;
-  };
-
-  const validateAge = (ageStr: string) => {
-    const ageNum = parseInt(ageStr, 10);
-    if (isNaN(ageNum)) return 'A idade deve ser um número.';
-    if (ageNum < 18) return 'Você deve ter pelo menos 18 anos.';
-    return null;
-  };
-
-  const validateCpf = (cpf: string) => {
-    if (!cpf.trim()) return 'O CPF não pode ser vazio.';
-    // Regex básica para formato XXX.XXX.XXX-XX
-    if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) return 'Formato de CPF inválido (ex: 123.456.789-00).';
-    return null;
-  };
-
-  const validatePassword = (password: string) => {
-    if (password.length < 8) return 'A senha deve ter pelo menos 8 caracteres.';
-    if (!/[A-Z]/.test(password)) return 'A senha deve conter pelo menos uma letra maiúscula.';
-    if (!/[a-z]/.test(password)) return 'A senha deve conter pelo menos uma letra minúscula.';
-    if (!/[0-9]/.test(password)) return 'A senha deve conter pelo menos um número.';
-    if (!/[^A-Za-z0-9]/.test(password)) return 'A senha deve conter pelo menos um caractere especial.';
-    return null;
-  };
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccessMessage(null); // Limpa mensagens de sucesso anteriores
-
-    // Executar validações
-    let validationError = validateName(name);
-    if (validationError) { setError(validationError); return; }
-
-    validationError = validateUsername(username);
-    if (validationError) { setError(validationError); return; }
-
-    validationError = validateEmail(email);
-    if (validationError) { setError(validationError); return; }
-
-    validationError = validateAge(age);
-    if (validationError) { setError(validationError); return; }
-
-    validationError = validateCpf(cpf);
-    if (validationError) { setError(validationError); return; }
-
-    validationError = validatePassword(password);
-    if (validationError) { setError(validationError); return; }
 
     if (password !== confirmPassword) {
-      setError('As senhas não coincidem.');
+      setError('As senhas não coincidem.'); // Mensagem para o usuário
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:8000/register/', {
+      const response = await fetch('http://127.0.0.1:8000/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, username, email, age, cpf, password }),
+        body: JSON.stringify({
+          name,
+          username,
+          email,
+          age,
+          cpf,
+          password,
+          confirm_password: confirmPassword,
+        }),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        setSuccessMessage('Cadastro realizado com sucesso! Redirecionando para o login...'); // Mensagem inline
-        console.log('Usuário cadastrado:', data);
-        window.dispatchEvent(new Event('storage')); // Opcional: Para manter consistência, mesmo que não faça auto-login
+        setError(null);
+        setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
         setTimeout(() => {
-          navigate('/login'); // Redirecionar para a página de login após um pequeno delay
-        }, 1500); // 1.5 segundos para o usuário ver a mensagem
+          navigate('/login');
+        }, 1500);
+        return;
+      }
+
+      const data = await response.json().catch(() => null);
+      if (data?.detail) {
+        setError(data.detail);
       } else {
-        setError(data.error || 'Erro no cadastro. Tente novamente.');
+        setError('Falha ao cadastrar. Tente novamente.');
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
-      console.error('Erro na requisição de cadastro:', err);
+      setError('Erro de rede. Verifique se o backend está rodando.');
     }
   };
 
@@ -187,10 +135,29 @@ const RegisterPage: React.FC = () => {
           />
         </div>
         {error && <p className="error-message">{error}</p>}
-        {successMessage && <p className="success-message">{successMessage}</p>} {/* Exibir mensagem de sucesso */}
         <button type="submit">Cadastrar</button>
       </form>
       <p>Já tem uma conta? <Link to="/login">Faça login</Link></p>
+      {successMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            right: '16px',
+            bottom: '16px',
+            background: '#10b981',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+            fontWeight: 600,
+            zIndex: 1000,
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

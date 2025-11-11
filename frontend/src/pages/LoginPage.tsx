@@ -6,41 +6,74 @@ const LoginPage: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Inicializar o hook de navegação
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Novo estado para mensagem de sucesso
+  const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Limpa erros anteriores
-    setSuccessMessage(null); // Limpa mensagens de sucesso anteriores
+    setError(null);
+    setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/login/', {
+      const response = await fetch('http://127.0.0.1:8000/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          username,
+          password,
+        }),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        // Sucesso no login
-        setSuccessMessage('Login bem-sucedido! Redirecionando...'); // Mensagem inline
-        console.log('Usuário logado:', data);
-        localStorage.setItem('isLoggedIn', 'true'); // Definir status de login
-        window.dispatchEvent(new Event('storage')); // Forçar atualização do Header
-        setTimeout(() => {
-          navigate('/dashboard'); // Redirecionar para o dashboard após um pequeno delay
-        }, 1500); // 1.5 segundos para o usuário ver a mensagem
+        // Login bem-sucedido - busca dados do usuário
+        try {
+          const userResponse = await fetch('http://127.0.0.1:8000/api/user-profile/', {
+            method: 'GET',
+            credentials: 'include',
+          });
+          
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            localStorage.setItem('userProfile', JSON.stringify(userData));
+            localStorage.setItem('isLoggedIn', 'true');
+          } else {
+            // Se não conseguir buscar o perfil, usa dados básicos
+            localStorage.setItem('userProfile', JSON.stringify({
+              nome: username,
+              email: '',
+              idade: 0,
+              cpf: ''
+            }));
+            localStorage.setItem('isLoggedIn', 'true');
+          }
+        } catch (profileError) {
+          console.warn('Erro ao buscar perfil do usuário:', profileError);
+          // Continua com login mesmo sem perfil
+          localStorage.setItem('userProfile', JSON.stringify({
+            nome: username,
+            email: '',
+            idade: 0,
+            cpf: ''
+          }));
+          localStorage.setItem('isLoggedIn', 'true');
+        }
+        
+        navigate('/dashboard');
       } else {
-        // Erro no login
-        setError(data.error || 'Usuário ou senha inválidos.');
+        const errorData = await response.json().catch(() => null);
+        if (errorData?.error) {
+          setError(errorData.error);
+        } else {
+          setError('Usuário ou senha inválidos.');
+        }
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+      setError('Erro de rede. Verifique se o backend está rodando.');
       console.error('Erro na requisição de login:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,8 +102,9 @@ const LoginPage: React.FC = () => {
           />
         </div>
         {error && <p className="error-message">{error}</p>}
-        {successMessage && <p className="success-message">{successMessage}</p>} {/* Exibir mensagem de sucesso */}
-        <button type="submit">Entrar</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Entrando...' : 'Entrar'}
+        </button>
       </form>
       <p>Não tem uma conta? <Link to="/register">Cadastre-se</Link></p>
     </div>

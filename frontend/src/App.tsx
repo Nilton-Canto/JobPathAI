@@ -1,7 +1,9 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Header from './components/Header/Header'; // Importar o componente Header
 import DashboardPage from './pages/DashboardPage'; // Importar o componente DashboardPage
@@ -17,9 +19,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} /> {/* Nova rota para o Dashboard */}
-          <Route path="/profile" element={<ProfilePage />} /> {/* Nova rota para o Perfil */}
-          {/* Rotas futuras, ex: Dashboard, Perfil, Trilhas */}
+          <Route path="/dashboard" element={<DashboardPage />} />
+          {/* Rotas futuras, ex: Perfil, Trilhas */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
