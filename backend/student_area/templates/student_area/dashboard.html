@@ -1,0 +1,21 @@
+{% extends "student_area/base_student.html" %}
+{% block title %}Dashboard do Estudante{% endblock %}
+{% block content %}
+    <h2>Bem-vindo{% if profile %}, {{ profile.user.get_full_name|default:profile.user.username }}{% endif %}</h2>
+    <p>Use este painel simples para acompanhar o que já implementamos no backend.</p>
+
+    <section class="info-card">
+        <h3>Resumo rápido</h3>
+        <ul>
+            <li>Total de vagas cadastradas: <strong>{{ stats.jobs_count }}</strong></li>
+            <li>Suas candidaturas: <strong>{{ stats.applications_count }}</strong></li>
+        </ul>
+    </section>
+
+    {% if not profile %}
+        <p style="color:#b91c1c;">
+            Você ainda não possui um perfil estudantil. Acesse a aba Perfil para criá-lo.
+        </p>
+    {% endif %}
+{% endblock %}
+

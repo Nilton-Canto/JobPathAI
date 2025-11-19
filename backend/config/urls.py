@@ -20,6 +20,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('student/', include('student_area.urls')),
+    path('api/student/', include('student_area.api_urls')), # API REST para área do estudante
     path("", include("users.urls")),  # Atualizado de "cadastro.urls" para "users.urls"
     path("api/v1/", include("career.urls")), # Incluído as URLs da API do app 'career'
 ]

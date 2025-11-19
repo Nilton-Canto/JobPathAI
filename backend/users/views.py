@@ -62,7 +62,7 @@ class LoginView(View):
                     
                     return JsonResponse({'success': True, 'message': 'Login realizado com sucesso'})
                 
-                return redirect('area_inicial')
+                return redirect('student:dashboard')
             
             else:
                 # Senha incorreta

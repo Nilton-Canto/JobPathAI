@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "student_area", # Área do estudante
-    "rest_framework", # 
+    "rest_framework", # Django REST Framework
 ]
 
 MIDDLEWARE = [
@@ -137,6 +137,10 @@ STATICFILES_DIRS = [
     BASE_DIR.parent / "frontend" / "dist", # Corrigido para apontar para o diretório `frontend/dist` na raiz do projeto
 ]
 
+# Autenticação
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/student/"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -146,6 +150,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',

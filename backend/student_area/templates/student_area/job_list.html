@@ -1,0 +1,21 @@
+{% extends "student_area/base_student.html" %}
+{% block title %}Vagas Disponíveis{% endblock %}
+{% block content %}
+    <h2>Vagas Disponíveis</h2>
+    <p>Estas vagas vêm diretamente do banco de dados. Cada item linka para o detalhe da vaga.</p>
+
+    {% if jobs %}
+        <ul>
+            {% for job in jobs %}
+                <li style="margin-bottom:1rem;">
+                    <strong>{{ job.titulo }}</strong> · {{ job.empresa }} · {{ job.cidade }}/{{ job.estado }}
+                    <br>
+                    <a href="{% url 'student:job_detail' job.pk %}">Ver detalhes</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Não há vagas cadastradas ainda.</p>
+    {% endif %}
+{% endblock %}
+
