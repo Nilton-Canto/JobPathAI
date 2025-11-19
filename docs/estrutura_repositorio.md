@@ -10,8 +10,8 @@ Optamos por uma estrutura de monorepo para centralizar o código do frontend (Re
 JobPathAI/
 ├── backend/                    # Contém todo o projeto Django
 │   ├── config/                 # Configurações globais do Django
-│   ├── users/                  # App Django para autenticação e gestão de usuários (antigo 'cadastro')
-│   ├── career/                 # Futuro app Django para trilhas de carreira e etapas
+│   ├── users/                  # App Django para autenticação e gestão de usuários
+│   ├── career/                 # App Django para trilhas de carreira e etapas (com Django REST Framework)
 │   ├── llm/                    # Futuro app Django para integração com LLM
 │   ├── manage.py               # Utilitário de linha de comando do Django
 │   ├── requirements.txt        # Dependências Python do backend
@@ -22,7 +22,7 @@ JobPathAI/
 │   │   ├── assets/
 │   │   │   ├──react.svg
 │   │   ├── components/         # Componentes React reutilizáveis
-│   │   ├── pages/              # Páginas da aplicação (ex: Login, Cadastro, Dashboard)
+│   │   ├── pages/              # Páginas da aplicação (ex: Login, Cadastro, Dashboard, Perfil)
 │   │   ├── services/           # Funções para comunicação com o backend (APIs)
 │   │   ├── types/              # Definições de tipos TypeScript
 │   │   ├── vite-env.d.ts
@@ -56,6 +56,7 @@ JobPathAI/
 *   Para cada funcionalidade ou módulo principal, crie um novo app Django (ex: `career`, `llm`).
 *   Utilize o `manage.py` dentro de `backend/` para operações Django (ex: `python backend/manage.py runserver`).
 *   Gerencie as dependências Python no `backend/requirements.txt`.
+*   As APIs RESTful são desenvolvidas usando o Django REST Framework, com endpoints versionados sob `/api/v1/`.
 
 ### Frontend (React com TypeScript)
 
