@@ -1,0 +1,29 @@
+{% extends "student_area/base_student.html" %}
+{% block title %}Perfil do Estudante{% endblock %}
+{% block content %}
+    <h2>Perfil do Estudante</h2>
+    <p>Este é um formulário simples apenas para visualizar o fluxo do backend.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label>Biografia</label>
+        <textarea name="bio" rows="4" style="width:100%;">{{ profile.bio }}</textarea>
+
+        <label>Telefone</label>
+        <input type="text" name="telefone" value="{{ profile.telefone }}" style="width:100%;padding:0.5rem;">
+
+        <label>Cidade</label>
+        <input type="text" name="cidade" value="{{ profile.cidade }}" style="width:100%;padding:0.5rem;">
+
+        <label>Estado</label>
+        <input type="text" name="estado" value="{{ profile.estado }}" style="width:100%;padding:0.5rem;">
+
+        <label>Área de interesse</label>
+        <input type="text" name="area_interesse" value="{{ profile.area_interesse }}" style="width:100%;padding:0.5rem;">
+
+        <button type="submit" style="margin-top:1rem;padding:0.75rem 1.5rem;background:#2563eb;color:white;border:none;border-radius:6px;">
+            Salvar perfil
+        </button>
+    </form>
+{% endblock %}
+

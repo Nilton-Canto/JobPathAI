@@ -1,0 +1,24 @@
+{% extends "student_area/base_student.html" %}
+{% block title %}Currículo{% endblock %}
+{% block content %}
+    <h2>Currículo</h2>
+    <p>Em breve este formulário será substituído por componentes completos. Por enquanto, editamos apenas o objetivo profissional.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label>Objetivo profissional</label>
+        <textarea name="objetivo_profissional" rows="6" style="width:100%;">{{ resume.objetivo_profissional }}</textarea>
+
+        <button type="submit" style="margin-top:1rem;padding:0.75rem 1.5rem;background:#2563eb;color:white;border:none;border-radius:6px;">
+            Salvar currículo
+        </button>
+    </form>
+
+    <section class="info-card">
+        <h3>Outras seções</h3>
+        <p>
+            Experiências, formações, habilidades e idiomas serão renderizados aqui assim que os componentes forem construídos.
+        </p>
+    </section>
+{% endblock %}
+
