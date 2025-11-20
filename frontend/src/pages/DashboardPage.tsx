@@ -29,6 +29,7 @@ const DashboardPage: React.FC = () => {
           navigate('/login');
         }
       } catch (err) {
+        console.error(err);
         setError('Erro ao carregar dados do usuário');
       } finally {
         setLoading(false);

@@ -7,7 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Header from './components/Header/Header'; // Importar o componente Header
 import DashboardPage from './pages/DashboardPage'; // Importar o componente DashboardPage
-import ProfilePage from './pages/ProfilePage'; // Importar o componente ProfilePage
+// import ProfilePage from './pages/ProfilePage'; // Importar o componente ProfilePage
 import './App.css'; // Estilos do App
 
 function App() {

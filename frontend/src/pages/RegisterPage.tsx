@@ -56,6 +56,7 @@ const RegisterPage: React.FC = () => {
         setError('Falha ao cadastrar. Tente novamente.');
       }
     } catch (err) {
+      console.error(err);
       setError('Erro de rede. Verifique se o backend está rodando.');
     }
   };
