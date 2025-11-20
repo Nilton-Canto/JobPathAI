@@ -1,9 +1,7 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Header from './components/Header/Header'; // Importar o componente Header
 import DashboardPage from './pages/DashboardPage'; // Importar o componente DashboardPage
