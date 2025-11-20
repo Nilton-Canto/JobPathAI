@@ -31,17 +31,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "corsheaders", # Adicionado para CORS
-    "users", # Atualizado de "cadastro" para "users"
-    "career", # Novo app para trilhas de carreira
+    "corsheaders",  # Adicionado para CORS
+    "users",  # Atualizado de "cadastro" para "users"
+    "career",  # Novo app para trilhas de carreira
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "student_area", # Área do estudante
-    "rest_framework", # Django REST Framework
+    "student_area",  # Área do estudante
+    "rest_framework",  # Django REST Framework
 ]
 
 MIDDLEWARE = [
@@ -60,7 +60,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'users' / 'templates'], # Atualizado de 'cadastro' para 'users'
+        "DIRS": [BASE_DIR / 'users' / 'templates'],  # Atualizado de 'cadastro' para 'users'
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -123,18 +123,18 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-CORS_ALLOW_ALL_ORIGINS = True # Temporário para desenvolvimento
-CORS_ALLOW_CREDENTIALS = True # Permite o envio de credenciais (cookies, headers de autorização)
+CORS_ALLOW_ALL_ORIGINS = True  # Temporário para desenvolvimento
+CORS_ALLOW_CREDENTIALS = True  # Permite o envio de credenciais (cookies, headers de autorização)
 # CORS_ALLOWED_ORIGINS = [
 #    "http://localhost:5173",  # Porta padrão do Vite para o frontend
 #    "http://127.0.0.1:5173", # Porta padrão do Vite para o frontend
 # ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles" # Para o build de produção
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Para o build de produção
 
 STATICFILES_DIRS = [
     BASE_DIR / "users" / "static",
-    BASE_DIR.parent / "frontend" / "dist", # Corrigido para apontar para o diretório `frontend/dist` na raiz do projeto
+    BASE_DIR.parent / "frontend" / "dist",  # Corrigido para apontar para o diretório `frontend/dist` na raiz do projeto
 ]
 
 # Autenticação

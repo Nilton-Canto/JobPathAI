@@ -19,4 +19,3 @@ router.register(r"applications", JobApplicationViewSet, basename="student-applic
 urlpatterns = [
     path("", include(router.urls)),
 ]
-

@@ -30,6 +30,7 @@ class IsOwnerOrStaff(permissions.BasePermission):
             return obj.student.user == user or user.is_staff
         return user.is_staff
 
+
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.all()
     serializer_class = StudentProfileSerializer
@@ -43,6 +44,7 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
 
 class ResumeViewSet(viewsets.ModelViewSet):
     queryset = Resume.objects.all()
@@ -66,10 +68,12 @@ class ResumeViewSet(viewsets.ModelViewSet):
             raise ValidationError("StudentProfile não encontrado para o usuário autenticado.")
         serializer.save(student=profile)
 
+
 class JobOpportunityViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = JobOpportunity.objects.all()
     serializer_class = JobOpportunitySerializer
     permission_classes = [permissions.AllowAny]
+
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
     queryset = JobApplication.objects.all()

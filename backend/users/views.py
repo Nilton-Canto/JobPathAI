@@ -10,9 +10,12 @@ from django.views.decorators.csrf import csrf_exempt
 import json  # Importa o módulo JSON para manipulação de dados JSON
 
 # Create your views here.
+
+
 def index(request):
     context = {'titulo_pagina': 'Formulário de Cadastro'}
     return render(request, 'users/index.html', context)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
@@ -24,7 +27,7 @@ class LoginView(View):
         # Verifica se é uma requisição JSON (do frontend)
         content_type = request.content_type
         is_json_request = 'application/json' in content_type
-        
+
         if is_json_request:
             # Requisição do frontend - retorna JSON
             try:
@@ -37,8 +40,8 @@ class LoginView(View):
             # Requisição de formulário HTML
             username_recebido = request.POST.get('username', '').strip()
             password_recebida = request.POST.get('password', '').strip()
-        
-        #Debugando
+
+        # Debugando
         print(f"Tentativa de login com Username: '{username_recebido}'")
         print(f"Tentativa de login com Senha: '{password_recebida}'")
 
@@ -50,20 +53,20 @@ class LoginView(View):
             if user.check_password(password_recebida):
                 # Se a senha estiver correta, faça o login
                 login(request, user)
-                
+
                 # admins -> painel administrativo
                 if user.is_superuser or user.is_staff:
-                    return redirect('/admin/') # aqui já redireciona para o admin do django.
-                
+                    return redirect('/admin/')  # aqui já redireciona para o admin do django.
+
                 if is_json_request:
                     # admins -> painel administrativo (ainda não funciona plenamente! Fazer ajuste no front)
                     if user.is_superuser or user.is_staff:
                         return JsonResponse({'success': True, 'message': 'Login realizado com sucesso (admin)'})
-                    
+
                     return JsonResponse({'success': True, 'message': 'Login realizado com sucesso'})
-                
+
                 return redirect('student:dashboard')
-            
+
             else:
                 # Senha incorreta
                 if is_json_request:
@@ -88,6 +91,7 @@ class LoginView(View):
             # Se falhar, renderiza o template novamente com uma mensagem de erro
             return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
 '''
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class NewUsersView(View):
@@ -117,7 +121,7 @@ class NewUsersView(View):
                 return JsonResponse({'detail': 'Este CPF já está cadastrado.'}, status=400)
             if password_recebida != confirm_password_recebida:
                 return JsonResponse({'detail': 'As senhas não coincidem.'}, status=400)
-        
+
         except Exception:
             # Se não for JSON, tenta pegar do formulário tradicional
             nome_recebido = request.POST.get('name', '').strip()
@@ -127,7 +131,7 @@ class NewUsersView(View):
             cpf_recebido = request.POST.get('cpf', '').strip()
             password_recebida = request.POST.get('password', '').strip()
             confirm_password_recebida = request.POST.get('confirm_password', '').strip()
-            
+
             # Validação básica form
             if User.objects.filter(username=username_recebido).exists():
                 return render(request, 'users/register.html', {'error': 'Este nome de usuário já está em uso.'})
@@ -150,7 +154,8 @@ class NewUsersView(View):
             return JsonResponse({'detail': 'Usuário cadastrado com sucesso!'}, status=201)
         return redirect('index')
 
-@login_required # Decorator para views que requerem login
+
+@login_required  # Decorator para views que requerem login
 def area_inicial(request):
     """View para a área inicial do usuário logado"""
     try:
@@ -158,15 +163,15 @@ def area_inicial(request):
         user_profile = Users.objects.get(email=request.user.email)
     except Users.DoesNotExist:
         user_profile = None
-    
+
     context = {
         'user': request.user,
         'user_profile': user_profile
     }
     return render(request, 'users/area_inicial.html', context)
 
+
 def logout_view(request):
     """View para logout do usuário"""
     logout(request)
     return redirect('login')
-        

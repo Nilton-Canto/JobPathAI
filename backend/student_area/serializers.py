@@ -17,12 +17,16 @@ from .models import (
 )
 
 # SkillSerializer #
-class SkillSerializer(serializers.ModelSerializer): # Serializer simples para o modelo Skill (CRUD)
+
+
+class SkillSerializer(serializers.ModelSerializer):  # Serializer simples para o modelo Skill (CRUD)
     class Meta:
         model = Skill
         fields = ['id', 'nome', 'categoria']  # ajuste conforme seus campos reais
 
-class StudentSkillSerializer(serializers.ModelSerializer): # helper, nested (aninhado). Serializer para a relação StudentSkill (through). 
+
+# helper, nested (aninhado). Serializer para a relação StudentSkill (through).
+class StudentSkillSerializer(serializers.ModelSerializer):
     # Usado de forma aninhada dentro de StudentProfileSerializer.
     # Referenciamos Skill pelo campo 'nome' para payloads legíveis:
     # Ex. -> {"skill": "Python", "nivel": "avancado", "anos_experiencia": 2}
@@ -41,10 +45,11 @@ class StudentSkillSerializer(serializers.ModelSerializer): # helper, nested (ani
 class StudentProfileSerializer(serializers.ModelSerializer):
     # Serializer principal para StudentProfile.
     # - aceita nested 'habilidades' (lista de StudentSkillSerializer - feito acima).
-    #- se 'user' não for enviado, tenta usar request.user automaticamente.
-    
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False) # Se user não for enviado, tenta preencher com request.user
-    habilidades = StudentSkillSerializer(many=True, source='habilidades', required=False) # nested list de habilidades
+    # - se 'user' não for enviado, tenta usar request.user automaticamente.
+
+    # Se user não for enviado, tenta preencher com request.user
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    habilidades = StudentSkillSerializer(many=True, source='habilidades', required=False)  # nested list de habilidades
 
     class Meta:
         model = StudentProfile
@@ -60,9 +65,9 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         # Evita skills duplicadas no payload — verifica cada item na lista.
         # Garante que 'nivel' pertença às opções (choices) do model StudentSkill.
         # Verifica 'anos_experiencia' ser inteiro >= 0 quando fornecido.
-        
-        seen = set() # para rastrear skills já vistas.
-        valid_niveis = {choice[0] for choice in StudentSkill._meta.get_field('nivel').choices} # obtém opções válidas.
+
+        seen = set()  # para rastrear skills já vistas.
+        valid_niveis = {choice[0] for choice in StudentSkill._meta.get_field('nivel').choices}  # obtém opções válidas.
 
         for item in value:
             skill_name = item.get('skill')
@@ -77,7 +82,8 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                 raise ValidationError(f"Nível inválido '{nivel}'. Opções: {sorted(valid_niveis)}")
 
             anos = item.get('anos_experiencia')
-            if anos is not None and (not isinstance(anos, int) or anos < 0): # se fornecido, deve ser inteiro >= 0 (anos de experiência)
+            # se fornecido, deve ser inteiro >= 0 (anos de experiência)
+            if anos is not None and (not isinstance(anos, int) or anos < 0):
                 raise ValidationError("'anos_experiencia' deve ser inteiro >= 0.")
         return value
 
@@ -138,6 +144,8 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         return instance
 
 # ResumeSerializer (com nested para peças) #
+
+
 class WorkExperienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkExperience
@@ -177,7 +185,7 @@ class ResumeSerializer(serializers.ModelSerializer):
     # Resume com nested lists para experiencias/formacoes/certificacoes/idiomas (feitas acima).
     # A estratégia adotada aqui é: ao atualizar, remover e recriar as listas recebidas
     # (implementação simples e robusta). Se preferir atualização por ID, isso exige lógica extra.
-    
+
     experiencias = WorkExperienceSerializer(many=True, required=False)
     formacoes = EducationSerializer(many=True, required=False)
     certificacoes = CertificationSerializer(many=True, required=False)
@@ -247,7 +255,7 @@ class ResumeSerializer(serializers.ModelSerializer):
 class JobOpportunitySerializer(serializers.ModelSerializer):
     # Serializer para vagas. 'habilidades_requeridas' aceita lista de nomes de Skill
     # (SlugRelatedField) como: ["Python", "SQL"]. Por exemplo: em vez de enviar "skill": 3, você envia "skill": "Python" — mais humano e legível.
-    
+
     habilidades_requeridas = serializers.SlugRelatedField(
         many=True,
         slug_field='nome',
@@ -271,16 +279,16 @@ class JobOpportunitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # Para este caso, DRF já manipula many-to-many de habilidades_requeridas.
-        return super().create(validated_data) # chama o create padrão do ModelSerializer (herança)
+        return super().create(validated_data)  # chama o create padrão do ModelSerializer (herança)
 
 
 # JobApplicationSerializer #
 class JobApplicationSerializer(serializers.ModelSerializer):
-    
+
     # Serializer para candidaturas.
     # tenta inferir 'student' a partir de request.user caso não enviado.
     # previne candidaturas duplicadas (student + vaga).
-    
+
     student = serializers.PrimaryKeyRelatedField(queryset=StudentProfile.objects.all(), required=False)
 
     class Meta:
@@ -290,7 +298,8 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'status', 'data_candidatura', 'data_atualizacao_status', 'feedback_empresa',
             'visualizada_empresa', 'data_visualizacao'
         ]
-        read_only_fields = ['status', 'data_candidatura', 'data_atualizacao_status', 'visualizada_empresa', 'data_visualizacao']
+        read_only_fields = ['status', 'data_candidatura',
+                            'data_atualizacao_status', 'visualizada_empresa', 'data_visualizacao']
 
     def validate(self, attrs):
         request = self.context.get('request')
@@ -317,6 +326,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             if vaga and hasattr(vaga, 'incrementar_candidatura'):
                 vaga.incrementar_candidatura()
             return app
+
 
 # Próximo passo: criar views (HTML + Vite) e View para API.
 '''
