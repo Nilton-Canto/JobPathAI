@@ -58,32 +58,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       setIsLoading(true);
-      const loggedInStatus = localStorage.getItem('isLoggedIn');
       
-      if (loggedInStatus === 'true') {
-        // Try to fetch user profile from API
-        try {
-          const profile = await userAPI.getProfile();
-          setUser(profile);
-          setIsAuthenticated(true);
-          localStorage.setItem('userProfile', JSON.stringify(profile));
-        } catch (err: any) {
-          // If 401, user is not authenticated - clear everything
-          if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-            setIsAuthenticated(false);
-            setUser(null);
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userProfile');
-            return;
-          }
-          
-          // For other errors, fallback to localStorage if available
+      // Always try to fetch user profile from API first (session-based)
+      // This is more reliable than localStorage
+      try {
+        const profile = await userAPI.getProfile();
+        setUser(profile);
+        setIsAuthenticated(true);
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userProfile', JSON.stringify(profile));
+      } catch (err: any) {
+        // If 401, user is not authenticated
+        if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+          // Check localStorage as fallback (for remember me)
+          const loggedInStatus = localStorage.getItem('isLoggedIn');
           const storedProfile = localStorage.getItem('userProfile');
-          if (storedProfile) {
+          
+          if (loggedInStatus === 'true' && storedProfile) {
             try {
               const profile = JSON.parse(storedProfile);
               setUser(profile);
               setIsAuthenticated(true);
+              // Try to refresh from API in background (session might have expired)
+              userAPI.getProfile().then(profile => {
+                setUser(profile);
+                localStorage.setItem('userProfile', JSON.stringify(profile));
+              }).catch(() => {
+                // Session expired, but keep user logged in with cached profile
+                console.warn('Session expired, using cached profile');
+              });
             } catch {
               // Invalid stored profile
               setIsAuthenticated(false);
@@ -92,14 +95,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               localStorage.removeItem('userProfile');
             }
           } else {
+            // No cached data, user is not logged in
             setIsAuthenticated(false);
             setUser(null);
             localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userProfile');
+          }
+        } else {
+          // Other errors - try localStorage fallback
+          const loggedInStatus = localStorage.getItem('isLoggedIn');
+          const storedProfile = localStorage.getItem('userProfile');
+          
+          if (loggedInStatus === 'true' && storedProfile) {
+            try {
+              const profile = JSON.parse(storedProfile);
+              setUser(profile);
+              setIsAuthenticated(true);
+            } catch {
+              setIsAuthenticated(false);
+              setUser(null);
+              localStorage.removeItem('isLoggedIn');
+              localStorage.removeItem('userProfile');
+            }
+          } else {
+            setIsAuthenticated(false);
+            setUser(null);
           }
         }
-      } else {
-        setIsAuthenticated(false);
-        setUser(null);
       }
     } catch (err) {
       console.error('Error checking auth status:', err);
