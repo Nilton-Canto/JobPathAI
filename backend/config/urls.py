@@ -17,11 +17,22 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
+    # Root redirects to Django Admin (main purpose of backend)
+    path("", views.RootRedirectView.as_view(), name="root"),
+    
+    # Django Admin - for superusers/staff only
     path("admin/", admin.site.urls),
-    path('student/', include('student_area.urls')),
-    path('api/student/', include('student_area.api_urls')),  # API REST para área do estudante
-    path("", include("users.urls")),  # Atualizado de "cadastro.urls" para "users.urls"
-    path("api/v1/", include("career.urls")),  # Incluído as URLs da API do app 'career'
+    
+    # API endpoints - JSON only, frontend React handles UI
+    path("api/v1/", include("career.urls")),  # Career paths API
+    path('api/student/', include('student_area.api_urls')),  # Student area API REST
+    path("", include("users.urls")),  # User authentication API
+    
+    # Utility endpoints for developers/admins
+    path("api/status/", views.StatusView.as_view(), name="api_status"),  # API status and endpoints info
+    path("api/health/", views.HealthCheckView.as_view(), name="api_health"),  # Health check
+    path("api/stats/", views.DatabaseStatsView.as_view(), name="api_stats"),  # Database stats (admin only)
 ]

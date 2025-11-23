@@ -1,6 +1,4 @@
 from django.contrib import admin
-from .models import Users
 
-# Register your models here.
-
-admin.site.register(Users)
+# Users model was removed - data migrated to StudentProfile
+# Use StudentProfile (student_area.models.StudentProfile) instead

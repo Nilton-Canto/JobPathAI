@@ -1,10 +1,20 @@
+"""
+URL configuration for users app - API endpoints only
+Frontend React handles all UI
+"""
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),  # Maps the root URL to the index
-    path('login/', views.LoginView.as_view(), name='login'),  # Rota para a página de login
-    path('register/', views.NewUsersView.as_view(), name='register'),  # Atualizado de 'novo_usuario' para 'register'
-    path('area-inicial/', views.area_inicial, name='area_inicial'),  # Área inicial do usuário logado
-    path('logout/', views.logout_view, name='logout'),  # Logout do usuário
+    # API endpoints - JSON only
+    path('api/login/', views.LoginView.as_view(), name='api_login'),
+    path('api/register/', views.RegisterView.as_view(), name='api_register'),
+    path('api/logout/', views.LogoutView.as_view(), name='api_logout'),
+    path('api/user-profile/', views.UserProfileView.as_view(), name='api_user_profile'),
+    
+    # Keep old routes for backward compatibility (redirect to API)
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('register/', views.RegisterView.as_view(), name='register'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
 ]

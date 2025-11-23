@@ -322,7 +322,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         vaga = validated_data.get('vaga')
         with transaction.atomic():
             app = super().create(validated_data)
-            # no model de JobOpportunity tem um método para incrementar contagem. Imagino que deva funcionar.
+            # Increment application count in JobOpportunity model
             if vaga and hasattr(vaga, 'incrementar_candidatura'):
                 vaga.incrementar_candidatura()
             return app

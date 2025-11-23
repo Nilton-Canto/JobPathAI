@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "corsheaders",  # Adicionado para CORS
+    "config.apps.ConfigConfig",  # Config app with custom admin configuration
     "users",  # Atualizado de "cadastro" para "users"
     "career",  # Novo app para trilhas de carreira
     "django.contrib.admin",
@@ -55,13 +56,22 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Security headers configuration
+# Note: The Permissions Policy violation warning for 'unload' in RelatedObjectLookups.js
+# is a known Django Admin issue and can be safely ignored in development.
+# It doesn't affect functionality - Django Admin popups still work correctly.
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # Allows Django Admin popups/iframes to work
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'users' / 'templates'],  # Atualizado de 'cadastro' para 'users'
-        "APP_DIRS": True,
+        # Django Admin uses its own templates
+        # Frontend React handles all user-facing UI
+        "DIRS": [],
+        "APP_DIRS": True,  # Enables Django to find templates in app directories (for Django Admin)
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -133,13 +143,16 @@ CORS_ALLOW_CREDENTIALS = True  # Permite o envio de credenciais (cookies, header
 STATIC_ROOT = BASE_DIR / "staticfiles"  # Para o build de produção
 
 STATICFILES_DIRS = [
-    BASE_DIR / "users" / "static",
-    BASE_DIR.parent / "frontend" / "dist",  # Corrigido para apontar para o diretório `frontend/dist` na raiz do projeto
+    # BASE_DIR / "users" / "static",  # Removido - pasta não existe mais
+    BASE_DIR.parent / "frontend" / "dist",  # Frontend build directory
 ]
 
-# Autenticação
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/student/"
+# Authentication
+# Django Admin uses its own login at /admin/login/
+# Custom app login is at /login/ (for frontend React)
+LOGIN_URL = "/admin/login/"  # Django Admin login (porta 8000)
+LOGIN_REDIRECT_URL = "/student/"  # Redirect after login for regular users
+ADMIN_LOGIN_REDIRECT_URL = "/admin/"  # Redirect after admin login
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -158,3 +171,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+# Django Admin Configuration
+# Customize admin site header and title
+ADMIN_SITE_HEADER = "JobPathAI - Administração"
+ADMIN_SITE_TITLE = "JobPathAI Admin"
+ADMIN_INDEX_TITLE = "Painel de Administração"

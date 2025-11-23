@@ -1,177 +1,192 @@
-from django.views import View  # Importa a classe base para views orientadas a objetos
-from django.contrib.auth import authenticate, login, logout  # Funções para autenticar e logar usuários
-from django.shortcuts import render, redirect  # Funções para renderizar templates e redirecionar
-from django.contrib.auth.decorators import login_required  # Decorator para views que requerem login
-from django.utils.decorators import method_decorator
-from .models import Users  # Importa o modelo Users
-from django.contrib.auth.models import User  # Importa o modelo User do Django
-from django.http import JsonResponse  # Importa JsonResponse para respostas JSON
+"""
+API views for user authentication and profile management.
+All endpoints return JSON - frontend React handles UI.
+"""
+
+from django.views import View
+from django.contrib.auth import login, logout
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import json  # Importa o módulo JSON para manipulação de dados JSON
-
-# Create your views here.
-
-
-def index(request):
-    context = {'titulo_pagina': 'Formulário de Cadastro'}
-    return render(request, 'users/index.html', context)
+from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
+from student_area.models import StudentProfile
+import json
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
-    def get(self, request):
-        # Renderiza o template de login quando o usuário acessa a página via GET
-        return render(request, 'users/login.html')
-
+    """
+    API endpoint for user login - returns JSON only
+    Frontend React handles the UI
+    """
+    
     def post(self, request):
-        # Verifica se é uma requisição JSON (do frontend)
-        content_type = request.content_type
-        is_json_request = 'application/json' in content_type
-
-        if is_json_request:
-            # Requisição do frontend - retorna JSON
-            try:
-                data = json.loads(request.body)
-                username_recebido = data.get('username', '').strip()
-                password_recebida = data.get('password', '').strip()
-            except json.JSONDecodeError:
-                return JsonResponse({'error': 'Dados inválidos'}, status=400)
-        else:
-            # Requisição de formulário HTML
-            username_recebido = request.POST.get('username', '').strip()
-            password_recebida = request.POST.get('password', '').strip()
-
-        # Debugando
-        print(f"Tentativa de login com Username: '{username_recebido}'")
-        print(f"Tentativa de login com Senha: '{password_recebida}'")
-
+        """Handle login request - JSON only"""
         try:
-            # Tenta encontrar o usuário no banco de dados
-            user = User.objects.get(username=username_recebido)
-
-            # Verifica se a senha corresponde
-            if user.check_password(password_recebida):
-                # Se a senha estiver correta, faça o login
-                login(request, user)
-
-                # admins -> painel administrativo
-                if user.is_superuser or user.is_staff:
-                    return redirect('/admin/')  # aqui já redireciona para o admin do django.
-
-                if is_json_request:
-                    # admins -> painel administrativo (ainda não funciona plenamente! Fazer ajuste no front)
-                    if user.is_superuser or user.is_staff:
-                        return JsonResponse({'success': True, 'message': 'Login realizado com sucesso (admin)'})
-
-                    return JsonResponse({'success': True, 'message': 'Login realizado com sucesso'})
-
-                return redirect('student:dashboard')
-
-            else:
-                # Senha incorreta
-                if is_json_request:
-                    return JsonResponse({'error': 'Senha incorreta'}, status=400)
-                contexto = {'error': 'Senha incorreta.'}
-                return render(request, 'users/login.html', contexto)
-        except User.DoesNotExist:
-            # Usuário não encontrado
-            if is_json_request:
-                return JsonResponse({'error': 'Usuário não encontrado'}, status=400)
-            contexto = {'error': 'Usuário não encontrado.'}
-            return render(request, 'users/login.html', contexto)
-        '''
+            data = json.loads(request.body)
+            username = data.get('username', '').strip()
+            password = data.get('password', '').strip()
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         
-
-        user = authenticate(request, username=username_recebido, password=password_recebida)  # Tenta autenticar o usuário
-        if user is not None:
-            # Se a autenticação for bem-sucedida, faz login e redireciona para a página principal
-            login(request, user)
-            return redirect('index')  # Encaminha para a view index
-        else:
-            # Se falhar, renderiza o template novamente com uma mensagem de erro
-            return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
-'''
+        if not username or not password:
+            return JsonResponse({'error': 'Username and password are required'}, status=400)
+        
+        try:
+            user = User.objects.get(username=username)
+            
+            if user.check_password(password):
+                login(request, user)
+                
+                # Get user profile data from StudentProfile
+                user_profile = getattr(user, 'student_profile', None)
+                if user_profile:
+                    user_data = {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'nome': user.get_full_name() or user.username,
+                        'idade': user_profile.idade,
+                        'cpf': user_profile.cpf,
+                        'is_superuser': user.is_superuser,
+                        'is_staff': user.is_staff,
+                        'is_admin': user.is_superuser or user.is_staff
+                    }
+                else:
+                    user_data = {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'nome': user.get_full_name() or user.username,
+                        'idade': None,
+                        'cpf': None,
+                        'is_superuser': user.is_superuser,
+                        'is_staff': user.is_staff,
+                        'is_admin': user.is_superuser or user.is_staff
+                    }
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Login realizado com sucesso',
+                    'user': user_data
+                })
+            else:
+                return JsonResponse({'error': 'Senha incorreta'}, status=400)
+                
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Usuário não encontrado'}, status=400)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class NewUsersView(View):
-    def get(self, request):
-        return render(request, 'users/register.html')
-
+class RegisterView(View):
+    """
+    API endpoint for user registration - returns JSON only
+    Frontend React handles the UI
+    """
+    
     def post(self, request):
-        # Tenta carregar os dados como JSON
-        is_json_request = False
+        """Handle registration request - JSON only"""
         try:
             data = json.loads(request.body)
-            is_json_request = True
-            nome_recebido = data.get('name', '').strip()
-            username_recebido = data.get('username', '').strip()
-            email_recebido = data.get('email', '').strip()
-            idade_recebida = data.get('age', '').strip()
-            cpf_recebido = data.get('cpf', '').strip()
-            password_recebida = data.get('password', '').strip()
-            confirm_password_recebida = data.get('confirm_password', '').strip()
-
-            # Validação básica json
-            if User.objects.filter(username=username_recebido).exists():
-                return JsonResponse({'detail': 'Este nome de usuário já está em uso.'}, status=400)
-            if User.objects.filter(email=email_recebido).exists():
-                return JsonResponse({'detail': 'Este e-mail já está em uso.'}, status=400)
-            if Users.objects.filter(cpf=cpf_recebido).exists():
-                return JsonResponse({'detail': 'Este CPF já está cadastrado.'}, status=400)
-            if password_recebida != confirm_password_recebida:
-                return JsonResponse({'detail': 'As senhas não coincidem.'}, status=400)
-
-        except Exception:
-            # Se não for JSON, tenta pegar do formulário tradicional
-            nome_recebido = request.POST.get('name', '').strip()
-            username_recebido = request.POST.get('username', '').strip()
-            email_recebido = request.POST.get('email', '').strip()
-            idade_recebida = request.POST.get('age', '').strip()
-            cpf_recebido = request.POST.get('cpf', '').strip()
-            password_recebida = request.POST.get('password', '').strip()
-            confirm_password_recebida = request.POST.get('confirm_password', '').strip()
-
-            # Validação básica form
-            if User.objects.filter(username=username_recebido).exists():
-                return render(request, 'users/register.html', {'error': 'Este nome de usuário já está em uso.'})
-            if User.objects.filter(email=email_recebido).exists():
-                return render(request, 'users/register.html', {'error': 'Este e-mail já está em uso.'})
-            if Users.objects.filter(cpf=cpf_recebido).exists():
-                return render(request, 'users/register.html', {'error': 'Este CPF já está cadastrado.'})
-            if password_recebida != confirm_password_recebida:
-                return render(request, 'users/register.html', {'error': 'As senhas não coincidem.'})
-
-        # Criação do usuário
-        user = User.objects.create_user(username=username_recebido, password=password_recebida, email=email_recebido)
-        new_user = Users.objects.create(
-            nome=nome_recebido,
-            email=email_recebido,
-            idade=idade_recebida,
-            cpf=cpf_recebido
-        )
-        if is_json_request:
-            return JsonResponse({'detail': 'Usuário cadastrado com sucesso!'}, status=201)
-        return redirect('index')
+            nome = data.get('name', '').strip()
+            username = data.get('username', '').strip()
+            email = data.get('email', '').strip()
+            idade = data.get('age', '').strip()
+            cpf = data.get('cpf', '').strip()
+            password = data.get('password', '').strip()
+            confirm_password = data.get('confirm_password', '').strip()
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        
+        # Validation
+        if not all([nome, username, email, password, confirm_password]):
+            return JsonResponse({'error': 'Todos os campos são obrigatórios'}, status=400)
+        
+        if password != confirm_password:
+            return JsonResponse({'error': 'As senhas não coincidem'}, status=400)
+        
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'Este nome de usuário já está em uso'}, status=400)
+        
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'error': 'Este e-mail já está em uso'}, status=400)
+        
+        # Check CPF in StudentProfile
+        if StudentProfile.objects.filter(cpf=cpf).exists():
+            return JsonResponse({'error': 'Este CPF já está cadastrado'}, status=400)
+        
+        # Create user and StudentProfile
+        try:
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=nome.split()[0] if nome else '',
+                last_name=' '.join(nome.split()[1:]) if len(nome.split()) > 1 else ''
+            )
+            # Create StudentProfile instead of Users
+            StudentProfile.objects.create(
+                user=user,
+                idade=int(idade) if idade and idade.isdigit() else None,
+                cpf=cpf if cpf else None
+            )
+            return JsonResponse({
+                'success': True,
+                'message': 'Usuário cadastrado com sucesso!'
+            }, status=201)
+        except Exception as e:
+            return JsonResponse({'error': f'Erro ao criar usuário: {str(e)}'}, status=500)
 
 
-@login_required  # Decorator para views que requerem login
-def area_inicial(request):
-    """View para a área inicial do usuário logado"""
-    try:
-        # Busca o perfil do usuário na tabela Users
-        user_profile = Users.objects.get(email=request.user.email)
-    except Users.DoesNotExist:
-        user_profile = None
+@method_decorator(csrf_exempt, name='dispatch')
+class LogoutView(View):
+    """API endpoint for user logout - returns JSON only"""
+    
+    def post(self, request):
+        """Handle logout request"""
+        logout(request)
+        return JsonResponse({'success': True, 'message': 'Logout realizado com sucesso'})
+    
+    def get(self, request):
+        """Handle logout via GET (for compatibility)"""
+        logout(request)
+        return JsonResponse({'success': True, 'message': 'Logout realizado com sucesso'})
 
-    context = {
-        'user': request.user,
-        'user_profile': user_profile
-    }
-    return render(request, 'users/area_inicial.html', context)
 
-
-def logout_view(request):
-    """View para logout do usuário"""
-    logout(request)
-    return redirect('login')
+@method_decorator(csrf_exempt, name='dispatch')
+class UserProfileView(View):
+    """API endpoint to get authenticated user profile - returns JSON only"""
+    
+    def get(self, request):
+        """Return authenticated user profile"""
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Usuário não autenticado'}, status=401)
+        
+        # Get profile from StudentProfile
+        user_profile = getattr(request.user, 'student_profile', None)
+        if user_profile:
+            profile_data = {
+                'id': request.user.id,
+                'username': request.user.username,
+                'email': request.user.email,
+                'nome': request.user.get_full_name() or request.user.username,
+                'idade': user_profile.idade,
+                'cpf': user_profile.cpf,
+                'is_superuser': request.user.is_superuser,
+                'is_staff': request.user.is_staff,
+                'is_admin': request.user.is_superuser or request.user.is_staff,
+            }
+        else:
+            profile_data = {
+                'id': request.user.id,
+                'username': request.user.username,
+                'email': request.user.email,
+                'nome': request.user.get_full_name() or request.user.username,
+                'idade': None,
+                'cpf': None,
+                'is_superuser': request.user.is_superuser,
+                'is_staff': request.user.is_staff,
+                'is_admin': request.user.is_superuser or request.user.is_staff,
+            }
+        
+        return JsonResponse(profile_data)

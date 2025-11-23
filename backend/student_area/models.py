@@ -96,6 +96,22 @@ class StudentProfile(models.Model):
         verbose_name='Nível de Experiência'
     )
 
+    # Campos adicionais (migrados de Users para consolidar dados)
+    idade = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Idade'
+    )
+    
+    cpf = models.CharField(
+        max_length=11,
+        unique=True,
+        null=True,
+        blank=True,
+        verbose_name='CPF',
+        help_text='CPF do usuário (único)'
+    )
+
     disponibilidade = models.CharField(
         max_length=20,
         choices=[
@@ -175,11 +191,12 @@ class StudentProfile(models.Model):
         # A partir daqui é possível calcular o percentual de completude do perfil
         return int((preenchidos / len(campos_obrigatorios)) * 100)
 
-    # Override save para atualizar perfil_completo automaticamente. '*' são ponteiros? Sim, são ponteiros para os argumentos passados para o método.
     def save(self, *args, **kwargs):
-        """Override save para atualizar perfil_completo automaticamente"""
-        self.perfil_completo = self.calcular_completude_perfil() >= 80  # Só é possível salvar, se o perfil estiver completo em até 80%
-        # super() é usado para chamar o método save do modelo pai. Como assim? Porque o método save do modelo pai é o método que salva o objeto no banco de dados.
+        """
+        Override save method to automatically update perfil_completo field.
+        Profile is considered complete if at least 80% of required fields are filled.
+        """
+        self.perfil_completo = self.calcular_completude_perfil() >= 80
         super().save(*args, **kwargs)
 
 
