@@ -1,71 +1,15 @@
-:root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light;
-  color: #213547;
-  background-color: #ffffff;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-/* Estilos globais da aplicação JobPathAI */
+/* ============================================
+   APP.CSS - Estilos do Componente App
+   ============================================
+   
+   Este arquivo contém estilos específicos do App.tsx:
+   - Layout principal (#root, main)
+   - Header do usuário
+   - Header do admin
+   - Estilos compartilhados entre páginas
+   
+   NOTA: Estilos globais (variáveis CSS, reset) estão em index.css
+   ============================================ */
 
 #root {
   min-height: 100vh;
@@ -84,6 +28,15 @@ main {
   padding: 0;
   width: 100%;
   margin-top: 5rem; /* Ajuste esta margem conforme a altura do seu cabeçalho */
+  position: relative;
+}
+
+/* Login and Register pages need full-width background */
+main:has(.login-page-wrapper) {
+  margin-top: 0;
+  padding: 0;
+  background: transparent;
+  min-height: 100vh;
 }
 
 /* Estilos para as páginas */
@@ -361,14 +314,73 @@ section h2 {
   box-sizing: border-box;
 }
 
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.header-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: rotate(3deg);
+  transition: transform 0.3s ease;
+}
+
+.header-logo:hover .header-logo-icon {
+  transform: rotate(0deg) scale(1.05);
+}
+
+.header-logo-icon svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
 .header h1 {
   margin: 0;
-  color: var(--color-primary); /* Cor do título mais consistente */
+  color: var(--color-primary);
   font-size: 1.6rem;
-  /* Removido o gradiente de texto para um look mais limpo */
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  background-clip: unset;
+  font-weight: 700;
+}
+
+.header-logout-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-dark);
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.header-logout-btn:hover {
+  background-color: #dc3545;
+  color: white;
+  border-radius: 4px;
+}
+
+.header-register-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.header-register-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
 }
 
 .header nav ul {
@@ -389,12 +401,22 @@ section h2 {
   transition: all 0.2s ease-in-out;
   background-color: transparent;
   border: none;
+  font-family: inherit; /* Garante a mesma fonte */
+  font-size: inherit; /* Garante o mesmo tamanho */
+  cursor: pointer;
+  display: inline-block; /* Garante alinhamento */
 }
 
 .header nav ul li a:hover,
 .header nav ul li .link-button:hover {
   background-color: var(--color-primary);
   color: var(--color-text-light);
+}
+
+/* Remove estilos antigos conflitantes se houver */
+.header-logout-btn {
+  /* Mantendo apenas o necessário caso seja usado em outro lugar, 
+     mas o .link-button sobrescreve para o menu */
 }
 
 /* Ajuste para o conteúdo principal para evitar que o cabeçalho o cubra */
@@ -419,5 +441,184 @@ main {
     flex-direction: column;
     align-items: center;
     gap: 0.4rem;
+  }
+}
+
+/* ============================================
+   ADMIN STYLES - Separate Admin Area
+   ============================================ */
+
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 2rem;
+  margin-top: 64px; /* Height of admin header */
+}
+
+/* Admin Header */
+.admin-header-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #1f2937; /* Dark gray/black */
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-header-content {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.admin-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: white;
+}
+
+.admin-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: #3b82f6; /* Blue */
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.admin-logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-nav-link {
+  padding: 0.5rem 1rem;
+  color: #d1d5db; /* Light gray */
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.admin-nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-back-link {
+  color: #d1d5db;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.admin-back-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.admin-logout-btn {
+  padding: 0.5rem 1rem;
+  background: #dc2626; /* Red */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.admin-logout-btn:hover {
+  background: #b91c1c;
+}
+
+/* Admin Container Styles */
+.admin-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+@media (max-width: 768px) {
+  .admin-header-content {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+
+  .admin-header-left {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .admin-nav {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .admin-main {
+    margin-top: 120px;
+    padding: 1rem;
+  }
+}
+
+/* Loading Spinner Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
