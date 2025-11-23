@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Skill, CareerPath, CareerStage
+from .models import (
+    Skill, 
+    CareerPath, 
+    CareerStage,
+    UserCareerPath,
+    UserStageProgress,
+    Favorite
+)
 
 
 @admin.register(Skill)
@@ -28,3 +35,30 @@ class CareerStageAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'career_path__title')
     readonly_fields = ('completed_at',)
     ordering = ('career_path', 'order')
+
+
+@admin.register(UserCareerPath)
+class UserCareerPathAdmin(admin.ModelAdmin):
+    """Admin configuration for UserCareerPath model"""
+    list_display = ('user', 'career_path', 'is_active', 'started_at', 'updated_at')
+    list_filter = ('is_active', 'started_at')
+    search_fields = ('user__username', 'career_path__title')
+    readonly_fields = ('started_at', 'updated_at')
+
+
+@admin.register(UserStageProgress)
+class UserStageProgressAdmin(admin.ModelAdmin):
+    """Admin configuration for UserStageProgress model"""
+    list_display = ('user', 'stage', 'is_completed', 'completed_at', 'started_at')
+    list_filter = ('is_completed', 'completed_at')
+    search_fields = ('user__username', 'stage__title')
+    readonly_fields = ('started_at',)
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    """Admin configuration for Favorite model"""
+    list_display = ('user', 'career_path', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'career_path__title')
+    readonly_fields = ('created_at',)

@@ -5,12 +5,12 @@ API views for LLM integration
 """
 
 import json
+import traceback
 from django.http import JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 
 from .services import get_gemini_service
@@ -140,7 +140,13 @@ class GeneratePlanView(View):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': f'Error generating plan: {str(e)}'}, status=500)
+            # Log full traceback for debugging
+            error_trace = traceback.format_exc()
+            print(f"[ERROR] GeneratePlanView: {str(e)}")
+            print(f"[ERROR] Traceback: {error_trace}")
+            return JsonResponse({
+                'error': f'Error generating plan: {str(e)}'
+            }, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -153,65 +159,8 @@ class ChatView(View):
     
     def post(self, request):
         """Handle chat message with history and context"""
-        # Debug: Log authentication status
-        print(f"[DEBUG] ChatView - User authenticated: {request.user.is_authenticated}")
-        print(f"[DEBUG] ChatView - User: {request.user}")
-        print(f"[DEBUG] ChatView - Session key: {request.session.session_key}")
-        print(f"[DEBUG] ChatView - Session exists: {hasattr(request, 'session')}")
-        print(f"[DEBUG] ChatView - Cookies received: {request.COOKIES}")
-        print(f"[DEBUG] ChatView - Session cookie name: {request.session.cookie_name}")
-        print(f"[DEBUG] ChatView - Session cookie in request: {request.COOKIES.get(request.session.cookie_name, 'NOT FOUND')}")
-        
         if not request.user.is_authenticated:
-            return JsonResponse({
-                'error': 'Authentication required',
-                'debug': {
-                    'has_session': hasattr(request, 'session'),
-                    'session_key': request.session.session_key if hasattr(request, 'session') else None,
-                    'user_id': getattr(request.user, 'id', None),
-                }
-            }, status=401)
-        print(f"[DEBUG] ChatView - User: {request.user}")
-        print(f"[DEBUG] ChatView - User ID: {request.user.id if request.user.is_authenticated else 'N/A'}")
-        print(f"[DEBUG] ChatView - Session key: {request.session.session_key if hasattr(request, 'session') else 'N/A'}")
-        print(f"[DEBUG] ChatView - Has session: {hasattr(request, 'session')}")
-        print(f"[DEBUG] ChatView - Cookies: {request.META.get('HTTP_COOKIE', 'No cookies')}")
-        
-        # Check if user is authenticated
-        # Try to get user from session if not authenticated
-        if not request.user.is_authenticated:
-            # Try to get session user
-            user_id = request.session.get('_auth_user_id')
-            print(f"[DEBUG] ChatView - Session user_id: {user_id}")
-            
-            if user_id:
-                try:
-                    user = User.objects.get(pk=user_id)
-                    # Manually set user (workaround for session issues)
-                    request.user = user
-                    print(f"[DEBUG] ChatView - Manually set user from session: {user.username}")
-                except User.DoesNotExist:
-                    pass
-        
-        if not request.user.is_authenticated:
-            # Additional debug info
-            print(f"[DEBUG] ChatView - User is AnonymousUser: {request.user.is_anonymous}")
-            print(f"[DEBUG] ChatView - Session exists: {hasattr(request, 'session') and request.session.session_key}")
-            return JsonResponse({
-                'error': 'Authentication required',
-                'debug': {
-                    'user': str(request.user),
-                    'is_authenticated': request.user.is_authenticated,
-                    'session_key': request.session.session_key if hasattr(request, 'session') else None,
-                    'session_user_id': request.session.get('_auth_user_id') if hasattr(request, 'session') else None,
-                }
-            }, status=401)
-        
-        # Check if user is admin - redirect to admin chat
-        if request.user.is_superuser or request.user.is_staff:
-            # Admins can use regular chat, but we could redirect to admin endpoint
-            # For now, let them use regular chat too
-            pass
+            return JsonResponse({'error': 'Authentication required'}, status=401)
         
         try:
             data = json.loads(request.body)
@@ -261,11 +210,25 @@ class ChatView(View):
             })
             
         except ValueError as e:
+            # API key not configured or import error
+            error_msg = str(e)
+            if 'GEMINI_API_KEY' in error_msg or 'not installed' in error_msg:
+                return JsonResponse({
+                    'error': 'LLM service not configured. Please check backend configuration.',
+                    'details': error_msg
+                }, status=500)
             return JsonResponse({'error': str(e)}, status=500)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': f'Error in chat: {str(e)}'}, status=500)
+            # Log full traceback for debugging
+            error_trace = traceback.format_exc()
+            print(f"[ERROR] ChatView: {str(e)}")
+            print(f"[ERROR] Traceback: {error_trace}")
+            return JsonResponse({
+                'error': f'Error in chat: {str(e)}',
+                'details': error_trace if request.user.is_superuser else None  # Only show details to admins
+            }, status=500)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -321,11 +284,23 @@ class AdminInsightsView(View):
             })
             
         except ValueError as e:
+            error_msg = str(e)
+            if 'GEMINI_API_KEY' in error_msg or 'not installed' in error_msg:
+                return JsonResponse({
+                    'error': 'LLM service not configured. Please check backend configuration.',
+                    'details': error_msg
+                }, status=500)
             return JsonResponse({'error': str(e)}, status=500)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': f'Error generating insights: {str(e)}'}, status=500)
+            error_trace = traceback.format_exc()
+            print(f"[ERROR] AdminInsightsView: {str(e)}")
+            print(f"[ERROR] Traceback: {error_trace}")
+            return JsonResponse({
+                'error': f'Error generating insights: {str(e)}',
+                'details': error_trace
+            }, status=500)
     
     def _get_dashboard_metrics(self) -> dict:
         """Collect dashboard metrics for context"""

@@ -1283,8 +1283,9 @@
   border: none !important;
   white-space: nowrap;
   text-align: center;
-  margin: 0;
+  margin: 0 !important;
   vertical-align: middle;
+  width: auto !important;
 }
 
 .form-actions-modern .btn-primary {
@@ -1306,7 +1307,7 @@
 }
 
 .form-actions-modern .btn-secondary {
-  min-width: auto;
+  min-width: 180px;
   background-color: #6b7280;
   color: white !important;
 }

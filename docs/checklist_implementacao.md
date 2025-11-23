@@ -88,9 +88,10 @@
 - [x] ViewSet `CareerPathViewSet` criado
 - [x] Serializers configurados
 - [x] Endpoint `/api/v1/career-paths/` disponível
-- [ ] **FALTA**: Endpoint para listar apenas trilhas pré-definidas (filtro `path_type='PRE'`)
-- [ ] **FALTA**: Endpoint para associar trilha ao usuário
-- [ ] **FALTA**: Validação de trilhas ativas
+- [x] Filtro por `path_type` via query params (`?path_type=PRE`)
+- [ ] **FALTA**: Endpoint específico para associar trilha ao usuário (`/associate/`)
+- [ ] **FALTA**: Modelo de associação User-CareerPath para trilhas pré-definidas
+- [ ] **FALTA**: Campo `is_active` para ativar/desativar trilhas
 
 #### Frontend
 - [x] Página para explorar trilhas pré-definidas (`ExploreCareerPathsPage.tsx`)
@@ -141,11 +142,14 @@
 
 #### Backend
 - [x] Modelo `CareerStage` com campo `is_completed`
-- [ ] **FALTA**: Relacionamento entre User e CareerPath (associação)
-- [ ] **FALTA**: Endpoint para buscar trilhas do usuário
-- [ ] **FALTA**: Endpoint para calcular progresso (% concluído)
-- [ ] **FALTA**: Endpoint para histórico de progresso
-- [ ] **FALTA**: Métricas de progresso (etapas concluídas, tempo estimado, etc.)
+- [x] Campo `completed_at` no modelo `CareerStage`
+- [x] Relacionamento `user` em `CareerPath` (para trilhas personalizadas)
+- [x] Filtro por usuário via query params (`?user={id}`)
+- [ ] **FALTA**: Modelo de associação User-CareerPath para trilhas pré-definidas
+- [ ] **FALTA**: Endpoint específico para buscar trilhas do usuário
+- [ ] **FALTA**: Endpoint para calcular progresso (% concluído) - `/api/v1/career-paths/{id}/progress/`
+- [ ] **FALTA**: Endpoint para histórico de progresso (pode usar `completed_at` existente)
+- [ ] **FALTA**: Métricas de progresso agregadas
 
 #### Frontend
 - [x] Página React para visualizar plano (`MyCareerPlanPage.tsx`)
@@ -162,10 +166,11 @@
 #### Backend
 - [x] Campo `is_completed` no modelo `CareerStage`
 - [x] Campo `completed_at` no modelo `CareerStage`
-- [ ] **FALTA**: Endpoint PATCH para marcar etapa como concluída
+- [x] ViewSet `CareerStageViewSet` permite PATCH (genérico)
+- [ ] **FALTA**: Validação customizada ao marcar etapa (ordem, negócio)
 - [ ] **FALTA**: Validação de ordem (não pode pular etapas?)
-- [ ] **FALTA**: Notificação/evento ao concluir etapa
-- [ ] **FALTA**: Recalcular progresso automaticamente
+- [ ] **FALTA**: Notificação/evento ao concluir etapa (opcional)
+- [ ] **FALTA**: Recalcular progresso automaticamente (signals ou método customizado)
 
 #### Frontend
 - [x] Botão mock em `meu-plano.html`
@@ -181,10 +186,10 @@
 #### Backend
 - [x] Modelos registrados no Django Admin
 - [x] Verificação de permissões admin em `AdminLayout`
-- [ ] **FALTA**: Permissões customizadas para admin
-- [ ] **FALTA**: API REST para CRUD de trilhas (admin only)
+- [x] API REST para CRUD de trilhas (ViewSet genérico)
+- [ ] **FALTA**: Permissões customizadas para admin na API (restrição de acesso)
 - [ ] **FALTA**: Validações de negócio (ex: não deletar trilha com usuários associados)
-- [ ] **FALTA**: Endpoint para ativar/desativar trilhas
+- [ ] **FALTA**: Campo `is_active` e endpoint para ativar/desativar trilhas
 
 #### Frontend
 - [x] Página React `AdminCareerPathsPage.tsx` criada (em `pages/admin/`)
@@ -243,13 +248,16 @@
 - [ ] **FALTA**: Testes unitários
 - [ ] **FALTA**: Integração com app `career`
 
-#### App `llm` (a criar)
-- [ ] **FALTA**: Criar app `llm`
-- [ ] **FALTA**: Service para integração OpenAI
-- [ ] **FALTA**: Service para integração Ollama
-- [ ] **FALTA**: Template de prompts
-- [ ] **FALTA**: Cache de respostas
-- [ ] **FALTA**: Rate limiting
+#### App `llm`
+- [x] App `llm` criado e configurado
+- [x] Service para integração Gemini (equivalente a OpenAI)
+- [x] Template de prompts
+- [x] Modelos de banco (Conversation, ConversationMessage, UserMemory)
+- [x] Endpoints implementados (generate-plan, chat, admin-insights)
+- [x] Validação de entrada do usuário
+- [ ] **FALTA**: Cache de respostas (melhoria futura)
+- [ ] **FALTA**: Rate limiting (melhoria futura)
+- [ ] **FALTA**: Processamento assíncrono (opcional)
 
 ### Frontend - React
 
@@ -662,7 +670,7 @@
 |---|---|---|
 | UC01 - Login | ✅ Parcial | 70% |
 | UC02 - Escolher Trilha | ⚠️ Iniciado | 30% |
-| UC03 - Plano Personalizado | ❌ Não iniciado | 0% |
+| UC03 - Plano Personalizado | ✅ Implementado | 85% |
 | UC04 - Visualizar Progresso | ⚠️ Iniciado | 20% |
 | UC05 - Marcar Etapa | ⚠️ Iniciado | 40% |
 | UC06 - Admin | ⚠️ Iniciado | 25% |
@@ -672,9 +680,9 @@
 | Componente | Status | Progresso |
 |---|---|---|
 | Backend - Users | ✅ Funcional | 80% |
-| Backend - Career | ✅ Estrutura | 60% |
-| Backend - Student Area | ✅ Estrutura | 50% |
-| Backend - LLM | ❌ Não iniciado | 0% |
+| Backend - Career | ⚠️ Parcial | 65% |
+| Backend - Student Area | ⚠️ Parcial | 70% |
+| Backend - LLM | ✅ Funcional | 90% |
 | Frontend - React | ✅ Avançado | 75% |
 | Frontend - Admin | ✅ Funcional | 75% |
 | Frontend - Integração | ❌ Não iniciado | 10% |

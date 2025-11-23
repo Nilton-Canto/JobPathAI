@@ -181,14 +181,30 @@ const AdminCreateCareerPathPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
+    // Clear previous messages
+    setError(null);
+    setSuccessMessage(null);
+    
+    // Validation
     if (!title.trim() || !description.trim()) {
       setError('Por favor, preencha título e descrição da trilha.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (stages.length === 0) {
       setError('Por favor, adicione pelo menos uma etapa à trilha.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Validate all stages have required fields
+    const invalidStages = stages.filter(stage => !stage.title.trim() || !stage.description.trim());
+    if (invalidStages.length > 0) {
+      setError('Todas as etapas devem ter título e descrição preenchidos.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -234,17 +250,11 @@ const AdminCreateCareerPathPage: React.FC = () => {
 
   return (
     <div className="page-container admin-container">
-      <header className="admin-header">
+      <header className="admin-header" style={{ marginBottom: '2rem' }}>
         <div>
           <h1>Criar Nova Trilha de Carreira</h1>
           <p className="admin-subtitle">Defina uma nova trilha pré-definida para os usuários</p>
         </div>
-        <button
-          onClick={() => navigate('/admin/career-paths')}
-          className="btn-secondary"
-        >
-          Cancelar
-        </button>
       </header>
 
       {error && (
@@ -265,10 +275,14 @@ const AdminCreateCareerPathPage: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="profile-form-modern">
+      <form 
+        onSubmit={handleSubmit} 
+        className="profile-form-modern"
+        style={{ maxWidth: '100%' }}
+      >
         {/* Career Path Basic Info */}
-        <div className="form-section">
-          <h3>Informações da Trilha</h3>
+        <div className="form-section" style={{ marginBottom: '2rem' }}>
+          <h3 style={{ marginBottom: '1.5rem', color: '#1f2937' }}>Informações da Trilha</h3>
           <div className="form-grid">
             <div className="form-group-modern">
               <label htmlFor="title">Título da Trilha *</label>
@@ -316,9 +330,17 @@ const AdminCreateCareerPathPage: React.FC = () => {
         </div>
 
         {/* Stages Management */}
-        <div className="form-section">
+        <div className="form-section" style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3>Etapas da Trilha</h3>
+            <div>
+              <h3 style={{ marginBottom: '0.25rem', color: '#1f2937' }}>Etapas da Trilha</h3>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>
+                {stages.length === 0 
+                  ? 'Nenhuma etapa adicionada' 
+                  : `${stages.length} ${stages.length === 1 ? 'etapa adicionada' : 'etapas adicionadas'}`
+                }
+              </p>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -339,14 +361,37 @@ const AdminCreateCareerPathPage: React.FC = () => {
           </div>
 
           {stages.length === 0 && !showStageForm && (
-            <div className="empty-state-modern">
-              <div className="empty-state-icon">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <div className="empty-state-modern" style={{ 
+              padding: '3rem 2rem',
+              textAlign: 'center',
+              background: '#f9fafb',
+              borderRadius: '0.5rem',
+              border: '2px dashed #e5e7eb'
+            }}>
+              <div className="empty-state-icon" style={{ marginBottom: '1rem' }}>
+                <svg width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#9ca3af' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3>Nenhuma etapa adicionada</h3>
-              <p>Adicione etapas para definir o caminho da trilha de carreira.</p>
+              <h3 style={{ color: '#374151', marginBottom: '0.5rem' }}>Nenhuma etapa adicionada</h3>
+              <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>Adicione etapas para definir o caminho da trilha de carreira.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowStageForm(true);
+                  setEditingStageIndex(null);
+                  setCurrentStage({
+                    title: '',
+                    description: '',
+                    order: 1,
+                    skills: [],
+                  });
+                }}
+                className="btn-primary"
+                disabled={loading}
+              >
+                + Adicionar Primeira Etapa
+              </button>
             </div>
           )}
 
@@ -568,16 +613,30 @@ const AdminCreateCareerPathPage: React.FC = () => {
         <div className="form-actions-modern">
           <button
             type="button"
-            onClick={() => navigate('/admin/career-paths')}
+            onClick={() => {
+              if (window.confirm('Tem certeza que deseja cancelar? As alterações não salvas serão perdidas.')) {
+                navigate('/admin/career-paths');
+              }
+            }}
             className="btn-secondary"
             disabled={loading}
           >
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
             Cancelar
           </button>
           <button
             type="submit"
             className="btn-primary"
-            disabled={loading}
+            disabled={loading || !title.trim() || !description.trim() || stages.length === 0}
+            title={
+              !title.trim() || !description.trim() 
+                ? 'Preencha título e descrição da trilha' 
+                : stages.length === 0 
+                ? 'Adicione pelo menos uma etapa' 
+                : 'Criar trilha de carreira'
+            }
           >
             {loading ? (
               <>
@@ -586,10 +645,10 @@ const AdminCreateCareerPathPage: React.FC = () => {
               </>
             ) : (
               <>
-                Criar Trilha
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
+                Criar Trilha
               </>
             )}
           </button>

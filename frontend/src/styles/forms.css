@@ -73,6 +73,12 @@ button[type="submit"]:hover {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Override para botões dentro de form-actions-modern */
+.form-actions-modern button[type="submit"] {
+  width: auto !important;
+  margin-top: 0 !important;
+}
+
 .error-message {
   color: #dc3545;
   font-size: 0.9rem;
