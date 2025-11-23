@@ -91,11 +91,17 @@ class LoginView(View):
                         'is_admin': user.is_superuser or user.is_staff
                     }
                 
-                return JsonResponse({
+                response = JsonResponse({
                     'success': True,
                     'message': 'Login realizado com sucesso',
                     'user': user_data
                 })
+                
+                # Debug: Log response headers
+                print(f"[DEBUG] LoginView - Response headers: {dict(response.headers)}")
+                print(f"[DEBUG] LoginView - Session cookie will be set: {request.session.session_key}")
+                
+                return response
             else:
                 return JsonResponse({'error': 'Senha incorreta'}, status=400)
                 
