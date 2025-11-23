@@ -54,10 +54,10 @@ export const authAPI = {
    * Returns: { success: boolean, message: string, user?: {...} }
    * The backend now returns user data directly in the login response
    */
-  async login(username: string, password: string) {
+  async login(username: string, password: string, rememberMe: boolean = false) {
     const response = await fetchAPI('/login/', {
       method: 'POST',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, remember_me: rememberMe }),
     });
 
     if (!response.ok) {

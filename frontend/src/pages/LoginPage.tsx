@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(username, password);
+      await login(username, password, rememberMe);
       
       // Redirect based on user type
       if (isAdmin()) {

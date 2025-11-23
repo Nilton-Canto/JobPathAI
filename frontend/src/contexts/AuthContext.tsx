@@ -110,9 +110,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string, rememberMe: boolean = false) => {
     try {
-      const response = await authAPI.login(username, password);
+      const response = await authAPI.login(username, password, rememberMe);
       
       if (response.success && response.user) {
         setUser(response.user);

@@ -26,6 +26,7 @@ class LoginView(View):
             data = json.loads(request.body)
             username = data.get('username', '').strip()
             password = data.get('password', '').strip()
+            remember_me = data.get('remember_me', False)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         
@@ -37,6 +38,16 @@ class LoginView(View):
             
             if user.check_password(password):
                 login(request, user)
+                
+                # Configure session expiration based on "remember me"
+                if remember_me:
+                    # Set session to expire in 2 weeks (1209600 seconds)
+                    request.session.set_expiry(1209600)  # 14 days
+                    # Also set session cookie to persist after browser closes
+                    request.session.set_expiry(1209600)
+                else:
+                    # Default session expiration (24 hours or when browser closes)
+                    request.session.set_expiry(86400)  # 24 hours
                 
                 # Get user profile data from StudentProfile
                 user_profile = getattr(user, 'student_profile', None)
