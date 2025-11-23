@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { llmAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import '../../components/FormStyles.css';
 
 /**
@@ -26,6 +27,7 @@ interface Message {
  */
 const ChatWidget: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -117,6 +119,10 @@ const ChatWidget: React.FC = () => {
       
       if (error.message?.includes('Authentication required')) {
         errorText = 'Sua sessão expirou. Por favor, faça login novamente para continuar usando o chat.';
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       } else if (error.message) {
         errorText = error.message;
       }

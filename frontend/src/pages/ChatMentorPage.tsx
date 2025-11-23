@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { llmAPI } from '../services/api';
 // Styles imported via main.tsx -> styles/index.css
 
@@ -10,6 +11,7 @@ interface Message {
 }
 
 const ChatMentorPage: React.FC = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -71,6 +73,10 @@ const ChatMentorPage: React.FC = () => {
       
       if (error.message?.includes('Authentication required')) {
         errorText = 'Sua sessão expirou. Por favor, faça login novamente para continuar usando o chat.';
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       } else if (error.message) {
         errorText = error.message;
       }

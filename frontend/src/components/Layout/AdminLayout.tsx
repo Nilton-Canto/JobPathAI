@@ -74,38 +74,6 @@ const AdminLayout: React.FC = () => {
           <Route path="/career-paths/new" element={<AdminCreateCareerPathPage />} />
           <Route path="/career-paths/:id/edit" element={<AdminEditCareerPathPage />} />
           <Route path="/areas" element={<AdminAreasPage />} />
-          <Route path="/users" element={
-            <div className="page-container admin-container">
-              <header className="admin-header">
-                <div>
-                  <h1>Gerenciar Usuários</h1>
-                  <p className="admin-subtitle">Use o Django Admin para gerenciar usuários</p>
-                </div>
-              </header>
-              <div className="empty-state-dashboard">
-                <div className="empty-state-icon-large">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <h3>Gerenciamento de Usuários via Django Admin</h3>
-                <p>
-                  Para gerenciar usuários, utilize o painel administrativo do Django.
-                </p>
-                <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
-                  Acesse: <code style={{ background: '#f3f4f6', padding: '0.25rem 0.5rem', borderRadius: '0.25rem' }}>http://localhost:8000/admin/</code>
-                </p>
-                <div className="empty-state-actions" style={{ marginTop: '2rem' }}>
-                  <a href="http://localhost:8000/admin/" target="_blank" rel="noopener noreferrer" className="btn-primary">
-                    Abrir Django Admin
-                  </a>
-                  <Link to="/admin" className="btn-secondary">
-                    Voltar para Dashboard
-                  </Link>
-                </div>
-              </div>
-            </div>
-          } />
         </Routes>
       </main>
     </div>

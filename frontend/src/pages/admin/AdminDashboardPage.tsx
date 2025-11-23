@@ -14,7 +14,6 @@ interface DashboardStats {
   predefinedPaths: number;
   personalizedPaths: number;
   totalStages: number;
-  totalUsers: number; // Placeholder - would need backend endpoint
 }
 
 const AdminDashboardPage: React.FC = () => {
@@ -23,7 +22,6 @@ const AdminDashboardPage: React.FC = () => {
     predefinedPaths: 0,
     personalizedPaths: 0,
     totalStages: 0,
-    totalUsers: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +53,6 @@ const AdminDashboardPage: React.FC = () => {
         predefinedPaths: predefinedPaths.length,
         personalizedPaths: personalizedPaths.length,
         totalStages,
-        totalUsers: 0, // TODO: Backend endpoint needed
       });
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -131,19 +128,6 @@ const AdminDashboardPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card stat-card-info">
-          <div className="stat-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">{stats.totalUsers}</div>
-            <div className="stat-label">Usuários Ativos</div>
-            <div className="stat-sublabel">Gerenciar via Django Admin</div>
-          </div>
-        </div>
-
         <div className="stat-card stat-card-warning">
           <div className="stat-icon">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -191,16 +175,6 @@ const AdminDashboardPage: React.FC = () => {
             <h3>Gerenciar Áreas</h3>
             <p>Organizar trilhas por áreas profissionais</p>
           </Link>
-
-          <div className="action-card action-card-outline" style={{ cursor: 'default', opacity: 0.9 }}>
-            <div className="action-icon">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <h3>Gerenciar Usuários</h3>
-            <p>Use o Django Admin para gerenciar usuários</p>
-          </div>
         </div>
       </div>
 
