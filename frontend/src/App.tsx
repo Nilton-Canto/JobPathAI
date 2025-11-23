@@ -13,6 +13,7 @@ import CreateCustomPlanPage from './pages/CreateCustomPlanPage';
 import ChatMentorPage from './pages/ChatMentorPage';
 import MyCareerPlanPage from './pages/MyCareerPlanPage';
 import AdminLayout from './components/Layout/AdminLayout';
+import ProtectedUserRoute from './components/Layout/ProtectedUserRoute';
 import './App.css';
 
 function App() {
@@ -25,14 +26,63 @@ function App() {
         <Route path="/forgot-password" element={<><Header /><main><ForgotPasswordPage /></main></>} />
         <Route path="/" element={<><Header /><main><HomePage /></main></>} />
         
-        {/* User Routes - User Header */}
-        <Route path="/dashboard" element={<><Header /><main><DashboardPage /></main></>} />
-        <Route path="/profile" element={<><Header /><main><ProfilePage /></main></>} />
-        <Route path="/applications" element={<><Header /><main><ApplicationsPage /></main></>} />
-        <Route path="/explore-career-paths" element={<><Header /><main><ExploreCareerPathsPage /></main></>} />
-        <Route path="/create-custom-plan" element={<><Header /><main><CreateCustomPlanPage /></main></>} />
-        <Route path="/chat-mentor" element={<><Header /><main><ChatMentorPage /></main></>} />
-        <Route path="/my-plan/:id" element={<><Header /><main><MyCareerPlanPage /></main></>} />
+        {/* User Routes - User Header - Protected from Admin Access */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><DashboardPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><ProfilePage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/applications" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><ApplicationsPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/explore-career-paths" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><ExploreCareerPathsPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/create-custom-plan" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><CreateCustomPlanPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/chat-mentor" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><ChatMentorPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/my-plan/:id" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><MyCareerPlanPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
         
         {/* Admin Routes - Admin Layout (includes AdminHeader) */}
         <Route path="/admin/*" element={<AdminLayout />} />

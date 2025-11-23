@@ -49,6 +49,12 @@ const Header: React.FC = () => {
     navigate('/login');
   };
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <header className="header">
       <Link to="/" className="header-logo">
@@ -59,28 +65,49 @@ const Header: React.FC = () => {
         </div>
         <h1>JobPathAI</h1>
       </Link>
-      <nav>
+      <nav className={`header-nav ${isMobileMenuOpen ? 'header-nav-open' : ''}`}>
         <ul>
           {isLoggedIn ? (
             <>
-              <li><Link to="/dashboard">Dashboard</Link></li>
-              <li><Link to="/explore-career-paths">Explorar Trilhas</Link></li>
-              <li><Link to="/chat-mentor">Mentor IA</Link></li>
-              <li><Link to="/profile">Perfil</Link></li>
+              <li><Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link></li>
+              <li><Link to="/explore-career-paths" onClick={() => setIsMobileMenuOpen(false)}>Explorar Trilhas</Link></li>
+              <li><Link to="/chat-mentor" onClick={() => setIsMobileMenuOpen(false)}>Mentor IA</Link></li>
+              <li><Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Perfil</Link></li>
               <li>
-                <button onClick={handleLogout} className="header-logout-btn link-button">
+                <Link 
+                  to="/login" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout(e as any);
+                    setIsMobileMenuOpen(false);
+                  }} 
+                  className="header-logout-link"
+                >
                   Sair
-                </button>
+                </Link>
               </li>
             </>
           ) : (
             <>
-              <li><Link to="/login">Login</Link></li>
-              <li><Link to="/register" className="header-register-link">Cadastre-se</Link></li>
+              <li><Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Login</Link></li>
+              <li><Link to="/register" className="header-register-link" onClick={() => setIsMobileMenuOpen(false)}>Cadastre-se</Link></li>
             </>
           )}
         </ul>
       </nav>
+      <button 
+        className="header-mobile-menu-toggle"
+        onClick={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {isMobileMenuOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
     </header>
   );
 };

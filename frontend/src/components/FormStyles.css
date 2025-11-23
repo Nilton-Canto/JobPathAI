@@ -221,8 +221,8 @@ button[type="submit"]:hover {
   padding: 2rem;
 }
 
-/* Responsividade */
-@media (max-width: 480px) {
+/* Responsividade - Form Styles */
+@media (max-width: 768px) {
   .login-container, .register-container {
     margin: 1rem;
     padding: 1.5rem;
@@ -245,6 +245,91 @@ button[type="submit"]:hover {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+  }
+
+  /* Explore Career Paths */
+  .filters-section {
+    flex-direction: column;
+  }
+
+  .search-input,
+  .filter-select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .career-paths-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Create Plan Page */
+  .create-plan-container {
+    padding: 1rem;
+  }
+
+  .plan-header {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  /* Chat Mentor */
+  .chat-container {
+    height: calc(100vh - 150px);
+  }
+
+  .chat-header {
+    flex-wrap: wrap;
+  }
+
+  .message-content {
+    max-width: 85%;
+  }
+
+  /* My Career Plan */
+  .my-plan-container {
+    padding: 1rem;
+  }
+
+  .plan-header-section {
+    padding: 1.5rem;
+  }
+
+  .stage-card {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .stage-number {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container, .register-container {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .dashboard-container {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+
+  .career-path-card {
+    padding: 1rem;
+  }
+
+  .career-path-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }
 
