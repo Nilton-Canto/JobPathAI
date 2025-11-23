@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI } from '../services/api';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 /**
  * OnboardingPage Component

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { careerAPI, stageAPI } from '../services/api';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 interface CareerStage {
   id: number;
@@ -194,12 +194,9 @@ const MyCareerPlanPage: React.FC = () => {
 
       <div className="plan-actions">
         <p>Tem dúvidas sobre alguma destas etapas ou quer ajustar o seu plano?</p>
-        <button
-          onClick={() => navigate('/chat-mentor')}
-          className="btn-secondary"
-        >
-          Falar com o Mentor IA
-        </button>
+        <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
+          Use o botão de chat no canto inferior direito para conversar com o Mentor IA
+        </p>
       </div>
     </div>
   );

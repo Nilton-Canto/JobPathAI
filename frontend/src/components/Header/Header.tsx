@@ -70,6 +70,7 @@ const Header: React.FC = () => {
           {isLoggedIn ? (
             <>
               <li><Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link></li>
+              <li><Link to="/my-career-paths" onClick={() => setIsMobileMenuOpen(false)}>Minhas Trilhas</Link></li>
               <li><Link to="/explore-career-paths" onClick={() => setIsMobileMenuOpen(false)}>Explorar Trilhas</Link></li>
               <li><Link to="/chat-mentor" onClick={() => setIsMobileMenuOpen(false)}>Mentor IA</Link></li>
               <li><Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Perfil</Link></li>

@@ -256,6 +256,22 @@ export const careerAPI = {
 
     return response.ok;
   },
+
+  /**
+   * Associate career path with user (start following a path)
+   */
+  async associateWithUser(pathId: number) {
+    const response = await fetchAPI(`/api/v1/career-paths/${pathId}/associate/`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Association failed' }));
+      throw new Error(error.error || 'Association failed');
+    }
+
+    return await response.json();
+  },
 };
 
 /**
@@ -360,6 +376,79 @@ export const skillsAPI = {
   async removeUserSkill(skillId: number) {
     // This would call DELETE /api/v1/user-skills/{id}/
     throw new Error('Not implemented yet');
+  },
+};
+
+/**
+ * Favorites API
+ */
+export const favoritesAPI = {
+  /**
+   * Get user's favorite career paths
+   */
+  async getAll() {
+    const response = await fetchAPI('/api/v1/favorites/');
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch favorites');
+    }
+
+    const data = await response.json();
+    
+    if (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    return [];
+  },
+
+  /**
+   * Add career path to favorites
+   */
+  async add(pathId: number) {
+    const response = await fetchAPI('/api/v1/favorites/', {
+      method: 'POST',
+      body: JSON.stringify({ career_path_id: pathId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to add favorite' }));
+      throw new Error(error.error || 'Failed to add favorite');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Remove career path from favorites
+   */
+  async remove(pathId: number) {
+    const response = await fetchAPI(`/api/v1/favorites/${pathId}/`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to remove favorite' }));
+      throw new Error(error.error || 'Failed to remove favorite');
+    }
+
+    return response.ok;
+  },
+
+  /**
+   * Check if career path is favorited
+   */
+  async isFavorited(pathId: number): Promise<boolean> {
+    try {
+      const favorites = await this.getAll();
+      return favorites.some((fav: any) => fav.career_path_id === pathId || fav.career_path?.id === pathId);
+    } catch {
+      return false;
+    }
   },
 };
 

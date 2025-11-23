@@ -44,7 +44,7 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); /* Sombra de foco ajustada */
 }
 
-button[type="submit"] {
+button[type="submit"]:not(.chat-widget-send-button) {
   width: 100%;
   padding: 0.8rem 1.5rem;
   background-color: var(--color-primary);
@@ -1581,6 +1581,401 @@ button[type="submit"]:hover {
 .chat-send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ============================================
+   CHAT WIDGET - Floating Popup Chat (Minimalist Design)
+   ============================================ */
+
+/* Floating Chat Button - Vibrant Yellow Style */
+.chat-widget-button {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: #fbbf24;
+  color: #000000;
+  border: 3px solid #000000;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  padding: 0;
+  overflow: hidden;
+}
+
+.chat-widget-button:hover {
+  background: #f59e0b;
+  border-color: #000000;
+  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.5);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.chat-widget-button:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.chat-widget-button svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  stroke-width: 3;
+  color: #000000;
+}
+
+/* Notification Badge - Vibrant */
+.chat-widget-badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  border: 2px solid #fbbf24;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Chat Popup Container - Clean & Minimalist */
+.chat-widget-container {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.5rem;
+  width: 22rem;
+  max-width: calc(100vw - 3rem);
+  height: 32rem;
+  max-height: calc(100vh - 7rem);
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+  animation: chatWidgetSlideUp 0.2s ease-out;
+  overflow: hidden;
+}
+
+@keyframes chatWidgetSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chat Header - Minimalist */
+.chat-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-widget-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.chat-widget-avatar {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chat-widget-avatar svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: #6b7280;
+}
+
+.chat-widget-status-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  background: #10b981;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.chat-widget-header-info h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.chat-widget-header-info p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+
+/* Chat Messages Area - Clean */
+.chat-widget-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chat-widget-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-widget-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-widget-messages::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.chat-widget-messages::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.chat-widget-message {
+  display: flex;
+  animation: chatMessageFadeIn 0.2s ease-out;
+}
+
+@keyframes chatMessageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-widget-message-user {
+  justify-content: flex-end;
+}
+
+.chat-widget-message-mentor {
+  justify-content: flex-start;
+}
+
+.chat-widget-message-content {
+  max-width: 75%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.chat-widget-message-user .chat-widget-message-content {
+  background: #1f2937;
+  color: white;
+  border-color: #1f2937;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.chat-widget-message-mentor .chat-widget-message-content {
+  background: #f3f4f6;
+  color: #111827;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.chat-widget-message-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.chat-widget-message-time {
+  display: block;
+  font-size: 0.625rem;
+  margin-top: 0.375rem;
+  opacity: 0.6;
+}
+
+/* Chat Input Form - Minimalist */
+.chat-widget-input-form {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  box-sizing: border-box;
+}
+
+.chat-widget-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0; /* Allows flex item to shrink below content size */
+}
+
+.chat-widget-input {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border: 1px solid #d1d5db;
+  border-radius: 1.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s;
+  background: #f9fafb;
+  color: #111827;
+  line-height: 1.5;
+  font-family: inherit;
+  height: 2.75rem;
+  box-sizing: border-box;
+}
+
+.chat-widget-input:focus {
+  border-color: #6b7280;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+}
+
+.chat-widget-input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.chat-widget-input::placeholder {
+  color: #9ca3af;
+}
+
+.chat-widget-send-button {
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  max-width: 2.75rem;
+  max-height: 2.75rem;
+  border-radius: 50%;
+  background: #1f2937;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.chat-widget-send-button:hover:not(:disabled) {
+  background: #374151;
+  transform: scale(1.05);
+}
+
+.chat-widget-send-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.chat-widget-send-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #9ca3af;
+}
+
+.chat-widget-send-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke-width: 2.5;
+  stroke: white;
+  color: white;
+}
+
+.chat-widget-spinner {
+  animation: spin 0.6s linear infinite;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Chat Widget */
+@media (max-width: 640px) {
+  .chat-widget-container {
+    right: 0.75rem;
+    bottom: 5rem;
+    width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - 1.5rem);
+    height: calc(100vh - 6rem);
+    max-height: calc(100vh - 6rem);
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  .chat-widget-input-form {
+    padding: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .chat-widget-input {
+    padding: 0.75rem 1rem;
+    min-height: 2.5rem;
+  }
+
+  .chat-widget-send-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    max-width: 2.5rem;
+    max-height: 2.5rem;
+  }
+
+  .chat-widget-button {
+    right: 0.75rem;
+    bottom: 1rem;
+    width: 4rem;
+    height: 4rem;
+    border-width: 3px;
+  }
+
+  .chat-widget-button svg {
+    width: 2.25rem;
+    height: 2.25rem;
+    stroke-width: 3;
+  }
 }
 
 /* Estilos para My Career Plan Page */

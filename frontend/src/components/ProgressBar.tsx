@@ -1,5 +1,5 @@
 import React from 'react';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 /**
  * ProgressBar Component

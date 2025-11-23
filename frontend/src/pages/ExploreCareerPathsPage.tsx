@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { careerAPI } from '../services/api';
 import CareerPathCard from '../components/CareerPathCard';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 interface CareerPath {
   id: number;
@@ -21,14 +21,15 @@ interface CareerStage {
 }
 
 const ExploreCareerPathsPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [careerPaths, setCareerPaths] = useState<CareerPath[]>([]);
   const [filteredPaths, setFilteredPaths] = useState<CareerPath[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedArea, setSelectedArea] = useState('Todas as Áreas');
-  const [selectedLevel, setSelectedLevel] = useState('Todos os Níveis');
-  const [sortBy, setSortBy] = useState('relevancia');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [selectedArea, setSelectedArea] = useState(searchParams.get('area') || 'Todas as Áreas');
+  const [selectedLevel, setSelectedLevel] = useState(searchParams.get('level') || 'Todos os Níveis');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'relevancia');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +39,17 @@ const ExploreCareerPathsPage: React.FC = () => {
   useEffect(() => {
     filterPaths();
   }, [searchTerm, selectedArea, selectedLevel, sortBy, careerPaths]);
+
+  // Update URL query params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set('search', searchTerm);
+    if (selectedArea !== 'Todas as Áreas') params.set('area', selectedArea);
+    if (selectedLevel !== 'Todos os Níveis') params.set('level', selectedLevel);
+    if (sortBy !== 'relevancia') params.set('sort', sortBy);
+    
+    setSearchParams(params, { replace: true });
+  }, [searchTerm, selectedArea, selectedLevel, sortBy, setSearchParams]);
 
   const fetchCareerPaths = async () => {
     try {
@@ -242,6 +254,7 @@ const ExploreCareerPathsPage: React.FC = () => {
           value={selectedArea}
           onChange={(e) => setSelectedArea(e.target.value)}
           className="filter-select"
+          aria-label="Filtrar por área profissional"
         >
           <option>Todas as Áreas</option>
           <option>Tecnologia</option>
@@ -253,6 +266,7 @@ const ExploreCareerPathsPage: React.FC = () => {
           value={selectedLevel}
           onChange={(e) => setSelectedLevel(e.target.value)}
           className="filter-select"
+          aria-label="Filtrar por nível"
         >
           <option>Todos os Níveis</option>
           <option>Iniciante</option>
@@ -263,6 +277,7 @@ const ExploreCareerPathsPage: React.FC = () => {
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
           className="filter-select"
+          aria-label="Ordenar trilhas"
         >
           <option value="relevancia">Relevância</option>
           <option value="etapas">Mais Etapas</option>
@@ -311,16 +326,17 @@ const ExploreCareerPathsPage: React.FC = () => {
           )}
           <div className="career-paths-grid">
             {filteredPaths.map((path) => (
-              <CareerPathCard
-                key={path.id}
-                id={path.id}
-                title={path.title}
-                description={path.description}
-                path_type={path.path_type as 'PRE' | 'PER'}
-                stages={path.stages || []}
-                showStagesPreview={true}
-                linkTo={`/my-plan/${path.id}`}
-              />
+            <CareerPathCard
+              key={path.id}
+              id={path.id}
+              title={path.title}
+              description={path.description}
+              path_type={path.path_type as 'PRE' | 'PER'}
+              stages={path.stages || []}
+              showStagesPreview={true}
+              showFavorite={true}
+              linkTo={`/career-path/${path.id}`}
+            />
             ))}
           </div>
         </>

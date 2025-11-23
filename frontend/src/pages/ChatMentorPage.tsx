@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { llmAPI } from '../services/api';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 interface Message {
   id: number;

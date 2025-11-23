@@ -12,14 +12,19 @@ import ExploreCareerPathsPage from './pages/ExploreCareerPathsPage';
 import CreateCustomPlanPage from './pages/CreateCustomPlanPage';
 import ChatMentorPage from './pages/ChatMentorPage';
 import MyCareerPlanPage from './pages/MyCareerPlanPage';
+import MyCareerPathsPage from './pages/MyCareerPathsPage';
+import CareerPathDetailPage from './pages/CareerPathDetailPage';
 import OnboardingPage from './pages/OnboardingPage';
 import AdminLayout from './components/Layout/AdminLayout';
 import ProtectedUserRoute from './components/Layout/ProtectedUserRoute';
-import './App.css';
+import ChatWidget from './components/ChatWidget/ChatWidget';
+// Styles imported via main.tsx -> styles/index.css
 
 function App() {
   return (
     <Router>
+      {/* Floating Chat Widget - Available on all pages when logged in */}
+      <ChatWidget />
       <Routes>
         {/* Public Routes - User Header */}
         <Route path="/login" element={<><Header /><main><LoginPage /></main></>} />
@@ -54,6 +59,14 @@ function App() {
           } 
         />
         <Route 
+          path="/my-career-paths" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><MyCareerPathsPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
           path="/explore-career-paths" 
           element={
             <ProtectedUserRoute>
@@ -74,6 +87,14 @@ function App() {
           element={
             <ProtectedUserRoute>
               <Header /><main><ChatMentorPage /></main>
+            </ProtectedUserRoute>
+          } 
+        />
+        <Route 
+          path="/career-path/:id" 
+          element={
+            <ProtectedUserRoute>
+              <Header /><main><CareerPathDetailPage /></main>
             </ProtectedUserRoute>
           } 
         />
