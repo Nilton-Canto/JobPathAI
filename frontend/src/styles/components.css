@@ -1,0 +1,640 @@
+/* ============================================
+   REUSABLE COMPONENTS
+   ============================================
+   Componentes reutilizáveis que podem ser usados
+   em múltiplas páginas e contextos.
+   ============================================ */
+
+/* ============================================
+   CAREER PATH CARD COMPONENT
+   ============================================ */
+
+.career-path-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+.career-path-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.career-path-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.career-path-card-title-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.career-path-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.career-path-stages-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.career-path-stages-count svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.career-path-description {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.career-path-progress-section {
+  margin-top: 0.5rem;
+}
+
+.career-path-stages-preview {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stages-preview-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.stages-preview-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stage-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.stage-preview-number {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.stage-preview-number.completed {
+  background: #10b981;
+  color: white;
+}
+
+.stage-preview-title {
+  flex: 1;
+}
+
+.stage-preview-check {
+  width: 1rem;
+  height: 1rem;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.stage-preview-more {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  font-style: italic;
+  padding-left: 2.25rem;
+}
+
+.career-path-card-actions {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.career-path-card-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.career-path-card-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ============================================
+   PROGRESS BAR COMPONENT
+   ============================================ */
+
+.progress-bar-wrapper {
+  width: 100%;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.progress-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.progress-percentage {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.progress-bar {
+  width: 100%;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-small {
+  height: 6px;
+}
+
+.progress-bar-medium {
+  height: 10px;
+}
+
+.progress-bar-large {
+  height: 16px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill-primary {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.progress-fill-success {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.progress-fill-info {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.progress-fill-warning {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.progress-animated {
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.progress-text {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+/* Profile Links */
+.profile-link {
+  color: #667eea;
+  text-decoration: none;
+  word-break: break-all;
+  transition: color 0.2s;
+}
+
+.profile-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* Skills Section */
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.skill-tag-large {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.skill-tag-large:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.skill-tag-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.skill-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9375rem;
+}
+
+.skill-level {
+  font-size: 0.8125rem;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.skill-category {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.skill-years {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.skill-remove-btn {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  border-radius: 0.25rem;
+}
+
+.skill-remove-btn:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.skill-remove-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.empty-skills {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.add-skill-form {
+  animation: fadeIn 0.3s ease-in;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.skills-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-add-skill {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  background-color: #667eea !important;
+  color: white !important;
+  border: none !important;
+}
+
+.btn-add-skill:hover {
+  background-color: #5568d3 !important;
+  color: white !important;
+}
+
+.btn-add-skill-submit {
+  margin-top: 1rem;
+}
+
+.btn-add-first-skill {
+  margin-top: 0.5rem;
+}
+
+/* ============================================
+   TOOLTIPS
+   ============================================ */
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #1f2937;
+  color: white;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.tooltip-wrapper:hover .tooltip {
+  opacity: 1;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.tooltip-top::after {
+  top: 100%;
+  border-top-color: #1f2937;
+  border-bottom: none;
+}
+
+.tooltip-bottom {
+  bottom: 100%;
+  top: auto;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.tooltip-bottom::after {
+  bottom: 100%;
+  top: auto;
+  border-bottom-color: #1f2937;
+  border-top: none;
+}
+
+.tooltip-left {
+  left: auto;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+}
+
+.tooltip-left::after {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #1f2937;
+  border-right: none;
+}
+
+.tooltip-right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0.5rem;
+  margin-bottom: 0;
+}
+
+.tooltip-right::after {
+  right: 100%;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #1f2937;
+  border-left: none;
+}
+
+/* Primary Path Card */
+.primary-path-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid #667eea;
+  border-radius: 1rem;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-path-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.primary-path-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.primary-path-badge svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.primary-path-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.primary-path-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.primary-path-description {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.primary-path-progress {
+  margin-top: 0.5rem;
+}
+
+.primary-path-button {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.primary-path-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ============================================
+   ANIMATIONS & MICROINTERACTIONS
+   ============================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Smooth transitions for interactive elements */
+.career-path-card,
+.action-card,
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover effects with scale */
+.career-path-card:hover,
+.action-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Button press effect */
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Loading pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-checkmark {
+  animation: checkmark 0.5s ease-out;
+}
+

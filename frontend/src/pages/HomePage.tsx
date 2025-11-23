@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 const HomePage: React.FC = () => {
   return (

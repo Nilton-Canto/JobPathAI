@@ -1,4 +1,4 @@
-# Exemplo de Trilha de Carreira - Desenvolvedor Full Stack
+image.png# Exemplo de Trilha de Carreira - Desenvolvedor Full Stack
 
 Este documento contém um exemplo completo de trilha de carreira para ser criada no painel administrativo.
 

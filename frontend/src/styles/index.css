@@ -1,0 +1,13 @@
+/* ============================================
+   STYLES INDEX - Central Import Point
+   ============================================
+   
+   Este arquivo importa todos os estilos modulares.
+   Mantém index.css original para variáveis globais.
+   ============================================ */
+
+@import './layout.css';
+@import './components.css';
+@import './forms.css';
+@import './pages.css';
+@import './chat.css';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 interface JobApplication {
   id: number;

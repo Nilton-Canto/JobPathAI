@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 const RegisterPage: React.FC = () => {
   const [name, setName] = useState<string>('');

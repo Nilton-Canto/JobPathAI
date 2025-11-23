@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { careerAPI } from '../../services/api';
-import '../../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 interface CareerPath {
   id: number;

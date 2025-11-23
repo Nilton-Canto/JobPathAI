@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { userAPI, careerAPI } from '../services/api';
 import Tooltip from '../components/Tooltip';
-import '../components/FormStyles.css';
+// Styles imported via main.tsx -> styles/index.css
 
 interface UserProfile {
   nome: string;
@@ -379,7 +379,7 @@ const DashboardPage: React.FC = () => {
               </svg>
             </div>
             <h3>Mentor IA</h3>
-            <p>Converse com nosso mentor de carreira inteligente</p>
+            <p>Converse com nosso mentor de carreira inteligente ou use o botão de chat flutuante</p>
           </Link>
 
           <Link to="/profile" className="action-card action-card-outline">
