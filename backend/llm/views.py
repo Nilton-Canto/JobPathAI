@@ -153,8 +153,21 @@ class ChatView(View):
     
     def post(self, request):
         """Handle chat message with history and context"""
-        # Debug: Check authentication status
+        # Debug: Log authentication status
         print(f"[DEBUG] ChatView - User authenticated: {request.user.is_authenticated}")
+        print(f"[DEBUG] ChatView - User: {request.user}")
+        print(f"[DEBUG] ChatView - Session key: {request.session.session_key}")
+        print(f"[DEBUG] ChatView - Session exists: {hasattr(request, 'session')}")
+        
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                'error': 'Authentication required',
+                'debug': {
+                    'has_session': hasattr(request, 'session'),
+                    'session_key': request.session.session_key if hasattr(request, 'session') else None,
+                    'user_id': getattr(request.user, 'id', None),
+                }
+            }, status=401)
         print(f"[DEBUG] ChatView - User: {request.user}")
         print(f"[DEBUG] ChatView - User ID: {request.user.id if request.user.is_authenticated else 'N/A'}")
         print(f"[DEBUG] ChatView - Session key: {request.session.session_key if hasattr(request, 'session') else 'N/A'}")

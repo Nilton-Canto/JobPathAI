@@ -177,8 +177,20 @@ class UserProfileView(View):
     
     def get(self, request):
         """Return authenticated user profile"""
+        # Debug: Log authentication status
+        print(f"[DEBUG] UserProfileView - User authenticated: {request.user.is_authenticated}")
+        print(f"[DEBUG] UserProfileView - User: {request.user}")
+        print(f"[DEBUG] UserProfileView - Session key: {request.session.session_key}")
+        
         if not request.user.is_authenticated:
-            return JsonResponse({'error': 'Usuário não autenticado'}, status=401)
+            return JsonResponse({
+                'error': 'Usuário não autenticado',
+                'debug': {
+                    'has_session': hasattr(request, 'session'),
+                    'session_key': request.session.session_key if hasattr(request, 'session') else None,
+                    'user_id': getattr(request.user, 'id', None),
+                }
+            }, status=401)
         
         # Get profile from StudentProfile
         user_profile = getattr(request.user, 'student_profile', None)
