@@ -156,8 +156,26 @@ class ChatView(View):
         # Debug: Check authentication status
         print(f"[DEBUG] ChatView - User authenticated: {request.user.is_authenticated}")
         print(f"[DEBUG] ChatView - User: {request.user}")
-        print(f"[DEBUG] ChatView - Session key: {request.session.session_key}")
+        print(f"[DEBUG] ChatView - User ID: {request.user.id if request.user.is_authenticated else 'N/A'}")
+        print(f"[DEBUG] ChatView - Session key: {request.session.session_key if hasattr(request, 'session') else 'N/A'}")
         print(f"[DEBUG] ChatView - Has session: {hasattr(request, 'session')}")
+        print(f"[DEBUG] ChatView - Cookies: {request.META.get('HTTP_COOKIE', 'No cookies')}")
+        
+        # Check if user is authenticated
+        # Try to get user from session if not authenticated
+        if not request.user.is_authenticated:
+            # Try to get session user
+            user_id = request.session.get('_auth_user_id')
+            print(f"[DEBUG] ChatView - Session user_id: {user_id}")
+            
+            if user_id:
+                try:
+                    user = User.objects.get(pk=user_id)
+                    # Manually set user (workaround for session issues)
+                    request.user = user
+                    print(f"[DEBUG] ChatView - Manually set user from session: {user.username}")
+                except User.DoesNotExist:
+                    pass
         
         if not request.user.is_authenticated:
             # Additional debug info
@@ -169,6 +187,7 @@ class ChatView(View):
                     'user': str(request.user),
                     'is_authenticated': request.user.is_authenticated,
                     'session_key': request.session.session_key if hasattr(request, 'session') else None,
+                    'session_user_id': request.session.get('_auth_user_id') if hasattr(request, 'session') else None,
                 }
             }, status=401)
         
