@@ -39,15 +39,16 @@ class LoginView(View):
             if user.check_password(password):
                 login(request, user)
                 
-                # Configure session expiration based on "remember me"
+                # Configure session persistence based on remember_me
                 if remember_me:
-                    # Set session to expire in 2 weeks (1209600 seconds)
-                    request.session.set_expiry(1209600)  # 14 days
-                    # Also set session cookie to persist after browser closes
-                    request.session.set_expiry(1209600)
+                    # Set session to expire in 30 days (remember me)
+                    request.session.set_expiry(2592000)  # 30 days in seconds
                 else:
-                    # Default session expiration (24 hours or when browser closes)
+                    # Use default session expiry (24 hours) or browser session
                     request.session.set_expiry(86400)  # 24 hours
+                
+                # Ensure session is saved
+                request.session.save()
                 
                 # Get user profile data from StudentProfile
                 user_profile = getattr(user, 'student_profile', None)

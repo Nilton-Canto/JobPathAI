@@ -68,40 +68,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(true);
           localStorage.setItem('userProfile', JSON.stringify(profile));
         } catch (err: any) {
-          // If 401, check if it's a temporary network issue or real auth failure
+          // If 401, user is not authenticated - clear everything
           if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-            // Wait a bit and try once more (might be a timing issue)
-            try {
-              await new Promise(resolve => setTimeout(resolve, 500));
-              const retryProfile = await userAPI.getProfile();
-              setUser(retryProfile);
-              setIsAuthenticated(true);
-              localStorage.setItem('userProfile', JSON.stringify(retryProfile));
-            } catch (retryErr: any) {
-              // If retry also fails, clear everything
-              console.warn('Authentication check failed after retry:', retryErr);
-              setIsAuthenticated(false);
-              setUser(null);
-              localStorage.removeItem('isLoggedIn');
-              localStorage.removeItem('userProfile');
-            }
+            setIsAuthenticated(false);
+            setUser(null);
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userProfile');
             return;
           }
           
-          // For other errors (network, etc.), fallback to localStorage if available
+          // For other errors, fallback to localStorage if available
           const storedProfile = localStorage.getItem('userProfile');
           if (storedProfile) {
             try {
               const profile = JSON.parse(storedProfile);
               setUser(profile);
               setIsAuthenticated(true);
-              // Try to refresh profile in background
-              userAPI.getProfile().then(updatedProfile => {
-                setUser(updatedProfile);
-                localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-              }).catch(() => {
-                // Silent fail - keep using stored profile
-              });
             } catch {
               // Invalid stored profile
               setIsAuthenticated(false);
@@ -116,19 +98,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
       } else {
-        // No logged in status, but check if there's a valid session cookie
-        // This handles the case where user refreshed page but localStorage was cleared
-        try {
-          const profile = await userAPI.getProfile();
-          setUser(profile);
-          setIsAuthenticated(true);
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userProfile', JSON.stringify(profile));
-        } catch {
-          // No valid session
-          setIsAuthenticated(false);
-          setUser(null);
-        }
+        setIsAuthenticated(false);
+        setUser(null);
       }
     } catch (err) {
       console.error('Error checking auth status:', err);
