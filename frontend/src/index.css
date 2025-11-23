@@ -50,7 +50,8 @@ h1 {
   font-size: 2.5em;
 }
 
-button {
+/* Estilos de botões genéricos - não aplicados a botões com classes específicas */
+button:not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.btn-edit-profile):not(.skill-remove-btn):not(.search-clear):not(.header-mobile-menu-toggle):not(.admin-mobile-menu-toggle) {
   border-radius: 4px;
   border: 1px solid var(--color-border);
   padding: 0.75em 1.5em;
@@ -62,7 +63,7 @@ button {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
-button:hover {
+button:not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.btn-edit-profile):not(.skill-remove-btn):not(.search-clear):not(.header-mobile-menu-toggle):not(.admin-mobile-menu-toggle):hover {
   border-color: var(--color-primary);
   background-color: var(--color-primary);
   color: var(--color-text-light);
@@ -81,7 +82,7 @@ button:focus-visible {
   a:hover {
     color: #0056b3;
   }
-  button {
+  button:not(.btn-primary):not(.btn-secondary):not(.btn-danger) {
     background-color: var(--color-background-gray);
     color: var(--color-text-dark);
   }

@@ -12,6 +12,7 @@ import ExploreCareerPathsPage from './pages/ExploreCareerPathsPage';
 import CreateCustomPlanPage from './pages/CreateCustomPlanPage';
 import ChatMentorPage from './pages/ChatMentorPage';
 import MyCareerPlanPage from './pages/MyCareerPlanPage';
+import OnboardingPage from './pages/OnboardingPage';
 import AdminLayout from './components/Layout/AdminLayout';
 import ProtectedUserRoute from './components/Layout/ProtectedUserRoute';
 import './App.css';
@@ -23,6 +24,7 @@ function App() {
         {/* Public Routes - User Header */}
         <Route path="/login" element={<><Header /><main><LoginPage /></main></>} />
         <Route path="/register" element={<><Header /><main><RegisterPage /></main></>} />
+        <Route path="/onboarding" element={<><Header /><main><OnboardingPage /></main></>} />
         <Route path="/forgot-password" element={<><Header /><main><ForgotPasswordPage /></main></>} />
         <Route path="/" element={<><Header /><main><HomePage /></main></>} />
         

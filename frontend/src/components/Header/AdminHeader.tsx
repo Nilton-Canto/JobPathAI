@@ -16,8 +16,8 @@ const AdminHeader: React.FC = () => {
 
   useEffect(() => {
     const checkAuthStatus = () => {
-      const loggedInStatus = localStorage.getItem('isLoggedIn');
-      setIsLoggedIn(loggedInStatus === 'true');
+    const loggedInStatus = localStorage.getItem('isLoggedIn');
+    setIsLoggedIn(loggedInStatus === 'true');
     };
 
     checkAuthStatus();
@@ -102,7 +102,7 @@ const AdminHeader: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
-          </button>
+            </button>
         </div>
       </div>
     </header>

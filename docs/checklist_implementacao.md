@@ -93,11 +93,11 @@
 - [ ] **FALTA**: Validação de trilhas ativas
 
 #### Frontend
-- [ ] **FALTA**: Página para explorar trilhas pré-definidas
-- [ ] **FALTA**: Componente de card de trilha
-- [ ] **FALTA**: Integração com API `/api/v1/career-paths/`
-- [ ] **FALTA**: Filtros por área profissional
-- [ ] **FALTA**: Visualização de detalhes da trilha
+- [x] Página para explorar trilhas pré-definidas (`ExploreCareerPathsPage.tsx`)
+- [x] Componente de card de trilha (`CareerPathCard.tsx`)
+- [x] Integração com API `/api/v1/career-paths/` (com tratamento de erros)
+- [x] Filtros por área profissional (busca, área, nível, ordenação)
+- [ ] **FALTA**: Visualização de detalhes da trilha (`CareerPathDetailPage.tsx`)
 
 #### Conteúdo
 - [ ] **FALTA**: Definir categorias iniciais (Issue #28, #30)
@@ -246,9 +246,9 @@
 - [x] Componentes básicos (Header, AdminHeader, AdminLayout)
 - [x] Separação clara entre área cliente e admin
 - [x] Páginas básicas (Home, Login, Register, Dashboard, Profile)
-- [ ] **FALTA**: Service layer para APIs
-- [ ] **FALTA**: Context API para autenticação
-- [ ] **FALTA**: Gerenciamento de estado (Redux/Zustand?)
+- [x] Service layer para APIs (`api.ts` com todos os endpoints)
+- [ ] **FALTA**: Context API para autenticação (melhoria futura)
+- [ ] **FALTA**: Gerenciamento de estado (Redux/Zustand?) (opcional)
 
 #### Páginas Principais
 - [x] `HomePage.tsx` - Página inicial
@@ -265,12 +265,13 @@
 
 #### Componentes Reutilizáveis
 - [x] `Header.tsx` - Cabeçalho
-- [ ] **FALTA**: `CareerPathCard.tsx` - Card de trilha
-- [ ] **FALTA**: `StageTimeline.tsx` - Timeline de etapas
-- [ ] **FALTA**: `ProgressBar.tsx` - Barra de progresso
-- [ ] **FALTA**: `SkillTag.tsx` - Tag de habilidade
-- [ ] **FALTA**: `LoadingSpinner.tsx` - Loading
-- [ ] **FALTA**: `ErrorMessage.tsx` - Mensagem de erro
+- [x] `CareerPathCard.tsx` - Card de trilha
+- [x] `ProgressBar.tsx` - Barra de progresso
+- [x] `Tooltip.tsx` - Tooltip informativo
+- [ ] **FALTA**: `StageTimeline.tsx` - Timeline de etapas (opcional)
+- [ ] **FALTA**: `SkillTag.tsx` - Tag de habilidade (opcional, há estilos CSS)
+- [ ] **FALTA**: `LoadingSpinner.tsx` - Loading (opcional, há estilos CSS)
+- [ ] **FALTA**: `ErrorMessage.tsx` - Mensagem de erro (opcional, há estilos CSS)
 
 ### Arquivos HTML Estáticos (Protótipos)
 

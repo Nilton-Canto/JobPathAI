@@ -64,7 +64,8 @@ const RegisterPage: React.FC = () => {
       setError(null);
       setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
       setTimeout(() => {
-        navigate('/login');
+        // Redirect to onboarding to collect additional info
+        navigate('/onboarding');
       }, 1500);
     } catch (err: any) {
       console.error(err);

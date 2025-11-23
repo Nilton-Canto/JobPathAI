@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { userAPI, careerAPI } from '../services/api';
+import Tooltip from '../components/Tooltip';
 import '../components/FormStyles.css';
 
 interface UserProfile {
@@ -24,16 +25,25 @@ interface DashboardStats {
   completedStages: number;
   totalStages: number;
   progressPercentage: number;
+  nextStageTitle?: string;
+  nextStagePath?: string;
+  recommendedPaths: number;
+  skillsLearned: number;
 }
 
 const DashboardPage: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [activePaths, setActivePaths] = useState<CareerPath[]>([]);
+  const [primaryPath, setPrimaryPath] = useState<CareerPath | null>(null);
   const [stats, setStats] = useState<DashboardStats>({
     activePaths: 0,
     completedStages: 0,
     totalStages: 0,
     progressPercentage: 0,
+    nextStageTitle: undefined,
+    nextStagePath: undefined,
+    recommendedPaths: 0,
+    skillsLearned: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,16 +82,59 @@ const DashboardPage: React.FC = () => {
         
         // Prefer user's personalized paths, fallback to all paths
         const pathsToShow = userPaths.length > 0 ? userPaths : allPaths;
-        setActivePaths(pathsToShow.slice(0, 3)); // Show only first 3
+        
+        // Set primary path (first path or most progressed)
+        if (pathsToShow.length > 0) {
+          // Find path with highest progress
+          const pathWithProgress = pathsToShow.map(path => {
+            const completed = path.stages?.filter((s: any) => s.is_completed).length || 0;
+            const total = path.stages?.length || 0;
+            return { path, progress: total > 0 ? completed / total : 0 };
+          }).sort((a, b) => b.progress - a.progress);
+          
+          setPrimaryPath(pathWithProgress[0]?.path || pathsToShow[0]);
+          // Show other paths (excluding primary)
+          const otherPaths = pathsToShow.filter(p => p.id !== (pathWithProgress[0]?.path.id || pathsToShow[0].id));
+          setActivePaths(otherPaths.slice(0, 2)); // Show 2 other paths
+        } else {
+          setActivePaths([]);
+        }
         
         // Calculate stats
         let totalStages = 0;
         let completedStages = 0;
+        let nextStage: any = null;
+        let nextStagePathId: number | null = null;
+        const allSkills = new Set<string>();
         
+        // Find next stage to complete and collect skills
         allPaths.forEach((path: CareerPath) => {
           if (path.stages) {
             totalStages += path.stages.length;
-            completedStages += path.stages.filter((stage: any) => stage.is_completed).length;
+            const pathCompletedStages = path.stages.filter((stage: any) => stage.is_completed).length;
+            completedStages += pathCompletedStages;
+            
+            // Find next incomplete stage
+            if (!nextStage) {
+              const incompleteStage = path.stages.find((stage: any) => !stage.is_completed);
+              if (incompleteStage) {
+                nextStage = incompleteStage;
+                nextStagePathId = path.id;
+              }
+            }
+            
+            // Collect skills from completed stages
+            path.stages.forEach((stage: any) => {
+              if (stage.is_completed && stage.skills) {
+                stage.skills.forEach((skill: any) => {
+                  if (typeof skill === 'string') {
+                    allSkills.add(skill);
+                  } else if (skill.name) {
+                    allSkills.add(skill.name);
+                  }
+                });
+              }
+            });
           }
         });
 
@@ -89,11 +142,18 @@ const DashboardPage: React.FC = () => {
           ? Math.round((completedStages / totalStages) * 100) 
           : 0;
 
+        // Get predefined paths count for recommendations
+        const predefinedPaths = allPaths.filter((path: CareerPath) => path.path_type === 'PRE');
+
         setStats({
-          activePaths: allPaths.length,
+          activePaths: pathsToShow.length,
           completedStages,
           totalStages,
           progressPercentage,
+          nextStageTitle: nextStage?.title,
+          nextStagePath: nextStagePathId ? `/my-plan/${nextStagePathId}` : undefined,
+          recommendedPaths: predefinedPaths.length,
+          skillsLearned: allSkills.size,
         });
       } catch (pathsError) {
         console.warn('Could not fetch career paths:', pathsError);
@@ -155,6 +215,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="dashboard-stats-grid">
+        <Tooltip content="Número total de trilhas de carreira que você está seguindo atualmente">
         <div className="stat-card stat-card-primary">
           <div className="stat-icon">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,20 +227,10 @@ const DashboardPage: React.FC = () => {
             <div className="stat-label">Trilhas Ativas</div>
           </div>
         </div>
+        </Tooltip>
 
+        <Tooltip content="Percentual geral de conclusão de todas as etapas de todas as suas trilhas">
         <div className="stat-card stat-card-success">
-          <div className="stat-icon">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">{stats.completedStages}</div>
-            <div className="stat-label">Etapas Concluídas</div>
-          </div>
-        </div>
-
-        <div className="stat-card stat-card-info">
           <div className="stat-icon">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -190,19 +241,112 @@ const DashboardPage: React.FC = () => {
             <div className="stat-label">Progresso Geral</div>
           </div>
         </div>
+        </Tooltip>
 
+        <Tooltip content="Total de etapas que você já completou em todas as suas trilhas">
+          <div className="stat-card stat-card-info">
+            <div className="stat-icon">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="stat-content">
+              <div className="stat-number">{stats.completedStages}</div>
+              <div className="stat-label">Etapas Concluídas</div>
+              <div className="stat-sublabel">de {stats.totalStages} total</div>
+            </div>
+          </div>
+        </Tooltip>
+
+        <Tooltip content="Habilidades únicas que você desenvolveu ao completar etapas das trilhas">
         <div className="stat-card stat-card-warning">
           <div className="stat-icon">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
           </div>
           <div className="stat-content">
-            <div className="stat-number">{stats.totalStages}</div>
-            <div className="stat-label">Total de Etapas</div>
+              <div className="stat-number">{stats.skillsLearned}</div>
+              <div className="stat-label">Habilidades Desenvolvidas</div>
+            </div>
+          </div>
+        </Tooltip>
+      </div>
+
+      {/* Primary Path Highlight */}
+      {primaryPath && (
+        <div className="dashboard-section">
+          <div className="section-header-inline">
+            <h2 className="section-title">Trilha Principal</h2>
+            <Link to="/explore-career-paths" className="section-link">
+              Trocar Trilha →
+            </Link>
+          </div>
+          <div className="primary-path-card">
+            <div className="primary-path-badge">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              Trilha Principal
+            </div>
+            <div className="primary-path-content">
+              <h3 className="primary-path-title">{primaryPath.title}</h3>
+              <p className="primary-path-description">{primaryPath.description}</p>
+              {primaryPath.stages && primaryPath.stages.length > 0 && (
+                <div className="primary-path-progress">
+                  {(() => {
+                    const completed = primaryPath.stages.filter((s: any) => s.is_completed).length;
+                    const total = primaryPath.stages.length;
+                    const progress = Math.round((completed / total) * 100);
+                    return (
+                      <>
+                        <div className="progress-info">
+                          <span className="progress-label">{completed} de {total} etapas concluídas</span>
+                          <span className="progress-percentage">{progress}%</span>
+                        </div>
+                        <div className="progress-bar progress-bar-medium">
+                          <div className="progress-fill progress-fill-primary" style={{ width: `${progress}%` }} />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+              <Link to={`/my-plan/${primaryPath.id}`} className="btn-primary primary-path-button">
+                Ver Detalhes
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Next Step Highlight */}
+      {stats.nextStageTitle && stats.nextStagePath && (
+        <div className="dashboard-section">
+          <div className="next-step-card">
+            <div className="next-step-header">
+              <div className="next-step-icon">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="next-step-content">
+                <h3 className="next-step-title">Próxima Etapa Recomendada</h3>
+                <p className="next-step-description">{stats.nextStageTitle}</p>
+              </div>
+            </div>
+            <Link to={stats.nextStagePath} className="next-step-button">
+              Continuar Trilha
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+        </div>
       </div>
+      )}
 
       {/* Quick Actions */}
       <div className="dashboard-section">
@@ -250,11 +394,11 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Active Career Paths */}
+      {/* Other Active Career Paths */}
       {activePaths.length > 0 && (
         <div className="dashboard-section">
           <div className="section-header-inline">
-            <h2 className="section-title">Suas Trilhas em Andamento</h2>
+            <h2 className="section-title">Outras Trilhas</h2>
             <Link to="/explore-career-paths" className="section-link">
               Ver todas →
             </Link>

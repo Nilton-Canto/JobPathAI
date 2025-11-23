@@ -311,7 +311,7 @@ export const stageAPI = {
  */
 export const skillsAPI = {
   /**
-   * Get all skills
+   * Get all available skills
    */
   async getAll() {
     const response = await fetchAPI('/api/v1/skills/');
@@ -320,7 +320,46 @@ export const skillsAPI = {
       throw new Error('Failed to fetch skills');
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Handle paginated responses
+    if (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    return [];
+  },
+
+  /**
+   * Get user's skills (from student_area)
+   * TODO: Implement when backend endpoint is ready
+   */
+  async getUserSkills() {
+    // This would call something like /api/v1/user-skills/
+    // For now, return empty array
+    return [];
+  },
+
+  /**
+   * Add skill to user profile
+   * TODO: Implement when backend endpoint is ready
+   */
+  async addUserSkill(skillData: { skill_id: number; nivel: string; anos_experiencia?: number }) {
+    // This would call POST /api/v1/user-skills/
+    throw new Error('Not implemented yet');
+  },
+
+  /**
+   * Remove skill from user profile
+   * TODO: Implement when backend endpoint is ready
+   */
+  async removeUserSkill(skillId: number) {
+    // This would call DELETE /api/v1/user-skills/{id}/
+    throw new Error('Not implemented yet');
   },
 };
 

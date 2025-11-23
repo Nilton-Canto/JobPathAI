@@ -93,36 +93,7 @@ section h2 {
   margin-top: 1rem;
 }
 
-.btn-primary {
-  background-color: var(--color-text-light); /* Fundo branco */
-  color: var(--color-primary);
-  border: none;
-  padding: 0.8rem 2rem;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-primary:hover {
-  background-color: #e2e6ea; /* Um pouco mais escuro ao hover */
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra mais sutil */
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--color-text-light);
-  border: 1px solid var(--color-text-light);
-  padding: 0.8rem 2rem;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
-}
+/* Estilos de botões movidos para FormStyles.css para evitar conflitos */
 
 /* About Section */
 .about-section {
@@ -870,6 +841,22 @@ main {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .next-step-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .next-step-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .next-step-button {
+    width: 100%;
+    justify-content: center;
   }
 
   /* Applications Page Responsive */
