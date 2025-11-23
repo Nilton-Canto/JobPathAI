@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { userAPI, careerAPI } from '../services/api';
+import { careerAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import Tooltip from '../components/Tooltip';
 // Styles imported via main.tsx -> styles/index.css
-
-interface UserProfile {
-  nome: string;
-  email: string;
-  idade: number;
-  cpf: string;
-  username?: string;
-}
 
 interface CareerPath {
   id: number;
@@ -32,7 +25,7 @@ interface DashboardStats {
 }
 
 const DashboardPage: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { user, refreshUser } = useAuth();
   const [activePaths, setActivePaths] = useState<CareerPath[]>([]);
   const [primaryPath, setPrimaryPath] = useState<CareerPath | null>(null);
   const [stats, setStats] = useState<DashboardStats>({
@@ -57,20 +50,9 @@ const DashboardPage: React.FC = () => {
     try {
       setLoading(true);
       
-      // Fetch user profile
-      try {
-        const profile = await userAPI.getProfile();
-        setUserProfile(profile);
-        localStorage.setItem('userProfile', JSON.stringify(profile));
-      } catch (profileError) {
-        // Fallback to localStorage
-        const storedProfile = localStorage.getItem('userProfile');
-        if (storedProfile) {
-          setUserProfile(JSON.parse(storedProfile));
-        } else {
-          navigate('/login');
-          return;
-        }
+      // Refresh user profile from context
+      if (!user) {
+        await refreshUser();
       }
 
       // Fetch user's career paths
@@ -200,7 +182,7 @@ const DashboardPage: React.FC = () => {
       <div className="dashboard-welcome">
         <div className="welcome-content">
           <h1 className="welcome-title">
-            Bem-vindo(a), <span className="welcome-name">{userProfile?.nome || 'Usuário'}</span>!
+            Bem-vindo(a), <span className="welcome-name">{user?.nome || 'Usuário'}</span>!
           </h1>
           <p className="welcome-subtitle">
             Gerencie sua jornada profissional e acompanhe seu progresso
@@ -208,7 +190,7 @@ const DashboardPage: React.FC = () => {
         </div>
         <div className="welcome-avatar">
           <div className="avatar-circle">
-            {userProfile?.nome?.charAt(0).toUpperCase() || 'U'}
+            {user?.nome?.charAt(0).toUpperCase() || 'U'}
           </div>
         </div>
       </div>

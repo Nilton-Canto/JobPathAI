@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { llmAPI } from '../../services/api';
-// Styles imported via main.tsx -> styles/index.css
+import { useAuth } from '../../contexts/AuthContext';
+import '../../components/FormStyles.css';
 
 /**
  * ChatWidget Component
@@ -24,9 +25,7 @@ interface Message {
  * Only visible when user is logged in
  */
 const ChatWidget: React.FC = () => {
-  // Check if user is logged in
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  
+  const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -38,6 +37,7 @@ const ChatWidget: React.FC = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null); // Store conversation ID
   const [lastReadMessageId, setLastReadMessageId] = useState(1); // Track last read mentor message
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -91,15 +91,17 @@ const ChatWidget: React.FC = () => {
     setLoading(true);
 
     try {
-      // TODO: Implement LLM API integration when backend is ready
-      // const response = await llmAPI.chat(messageText);
+      // Call LLM API with conversation history
+      const response = await llmAPI.chat(messageText, conversationId || undefined);
       
-      // Simulate API response
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Update conversation ID if returned
+      if (response.conversation_id) {
+        setConversationId(response.conversation_id);
+      }
       
       const mentorResponse: Message = {
         id: messages.length + 2,
-        text: 'Esta é uma resposta simulada. A integração com a API LLM será implementada em breve. Por favor, descreva sua pergunta sobre carreira e eu ajudarei você!',
+        text: response.response || response.insights || 'Resposta recebida',
         sender: 'mentor',
         timestamp: new Date(),
       };
@@ -109,11 +111,11 @@ const ChatWidget: React.FC = () => {
       if (!isOpen) {
         // Badge will show automatically
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: messages.length + 2,
-        text: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+        text: error.message || 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique sua conexão e tente novamente.',
         sender: 'mentor',
         timestamp: new Date(),
       };
@@ -150,7 +152,7 @@ const ChatWidget: React.FC = () => {
   }, [isOpen]);
 
   // Don't render if user is not logged in
-  if (!isLoggedIn) {
+  if (!isAuthenticated) {
     return null;
   }
 

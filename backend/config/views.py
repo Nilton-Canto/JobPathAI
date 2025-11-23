@@ -47,6 +47,11 @@ class StatusView(View):
                 'student_area': {
                     'base': '/api/student/',
                 },
+                'llm': {
+                    'generate_plan': '/api/llm/generate-plan/',
+                    'chat': '/api/llm/chat/',
+                    'admin_insights': '/api/llm/admin-insights/',
+                },
                 'admin': {
                     'django_admin': '/admin/',
                 }

@@ -18,14 +18,16 @@ import OnboardingPage from './pages/OnboardingPage';
 import AdminLayout from './components/Layout/AdminLayout';
 import ProtectedUserRoute from './components/Layout/ProtectedUserRoute';
 import ChatWidget from './components/ChatWidget/ChatWidget';
+import { AuthProvider } from './contexts/AuthContext';
 // Styles imported via main.tsx -> styles/index.css
 
 function App() {
   return (
-    <Router>
-      {/* Floating Chat Widget - Available on all pages when logged in */}
-      <ChatWidget />
-      <Routes>
+    <AuthProvider>
+      <Router>
+        {/* Floating Chat Widget - Available on all pages when logged in */}
+        <ChatWidget />
+        <Routes>
         {/* Public Routes - User Header */}
         <Route path="/login" element={<><Header /><main><LoginPage /></main></>} />
         <Route path="/register" element={<><Header /><main><RegisterPage /></main></>} />
@@ -114,6 +116,7 @@ function App() {
         <Route path="*" element={<><Header /><main><NotFoundPage /></main></>} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 

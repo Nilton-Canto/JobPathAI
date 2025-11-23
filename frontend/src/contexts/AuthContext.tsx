@@ -67,8 +67,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(profile);
           setIsAuthenticated(true);
           localStorage.setItem('userProfile', JSON.stringify(profile));
-        } catch (err) {
-          // Fallback to localStorage if API fails
+        } catch (err: any) {
+          // If 401, user is not authenticated - clear everything
+          if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+            setIsAuthenticated(false);
+            setUser(null);
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userProfile');
+            return;
+          }
+          
+          // For other errors, fallback to localStorage if available
           const storedProfile = localStorage.getItem('userProfile');
           if (storedProfile) {
             try {

@@ -14,36 +14,29 @@ Todas as páginas principais já existem e funcionam, mostrando erros adequados 
 - [x] OnboardingPage
 - [x] DashboardPage
 - [x] ProfilePage
-- [x] ExploreCareerPathsPage
+- [x] ExploreCareerPathsPage (com URL Query Params e favoritos)
+- [x] CareerPathDetailPage (detalhes antes de selecionar)
+- [x] MyCareerPathsPage (lista todas as trilhas do usuário)
 - [x] MyCareerPlanPage
 - [x] CreateCustomPlanPage
-- [x] ChatMentorPage
+- [x] ChatMentorPage (página completa, opcional)
+- [x] ChatWidget (widget flutuante - pop-up em todas as páginas)
 - [x] ApplicationsPage
 
 ---
 
 ## 🎯 O Que Podemos Implementar (Sem Backend)
 
-### 1. CareerPathDetailPage.tsx ⭐ **ALTA PRIORIDADE**
+### 1. ✅ CareerPathDetailPage.tsx - **IMPLEMENTADO**
 
-**Descrição:** Página de detalhes de uma trilha antes de selecioná-la.
-
-**O que implementar:**
+**Status:** ✅ Implementado e funcional
 - Layout completo da página
 - Exibição de todas as etapas da trilha
 - Lista de habilidades necessárias
-- Tempo estimado total
-- Botão "Começar Trilha" (navega para `/my-plan/{id}`)
-- Seção de informações adicionais
+- Tempo estimado total (calculado)
+- Botão "Começar Trilha" ou "Continuar Trilha"
 - Design responsivo
-
-**Como funciona sem backend:**
-- Recebe `id` da trilha via URL params
-- Tenta buscar da API (mostra erro se backend não disponível)
-- Pode usar dados de `localStorage` se houver (fallback)
-- Mostra empty state se não houver dados
-
-**Benefício:** Melhora UX ao explorar trilhas antes de selecionar.
+- Tratamento de erros adequado
 
 ---
 
@@ -100,13 +93,11 @@ Todas as páginas principais já existem e funcionam, mostrando erros adequados 
 
 #### 2.3. Melhorias na Página de Explorar Trilhas
 
-**O que implementar:**
-- **Favoritos Locais:**
-  - Botão de "Favoritar" em cada card
-  - Salvar favoritos em `localStorage`
-  - Filtro "Mostrar apenas favoritos"
-  - Seção "Trilhas Favoritas" no dashboard
+**✅ Implementado:**
+- **Favoritos:** Botão de favoritar nos cards (API pronta, aguardando backend)
+- **URL Query Params:** Filtros salvos na URL, compartilhamento de links
 
+**O que ainda pode implementar:**
 - **Histórico de Visualizações:**
   - Rastrear trilhas visualizadas (localStorage)
   - Seção "Visualizadas Recentemente"
@@ -116,11 +107,6 @@ Todas as páginas principais já existem e funcionam, mostrando erros adequados 
   - Selecionar múltiplas trilhas para comparar
   - Modal ou página de comparação lado a lado
   - Comparar número de etapas, tempo estimado, habilidades
-
-- **URL Query Params:**
-  - Salvar filtros na URL
-  - Permitir compartilhamento de links filtrados
-  - Exemplo: `/explore-career-paths?search=web&area=tecnologia`
 
 - **Debounce na Busca:**
   - Evitar chamadas excessivas de `filterPaths()`
@@ -163,16 +149,14 @@ Todas as páginas principais já existem e funcionam, mostrando erros adequados 
 
 ---
 
-### 3. Context API para Autenticação
+### 3. ✅ Context API para Autenticação - **CRIADO, PRECISA INTEGRAR**
 
-**Descrição:** Centralizar gerenciamento de autenticação.
+**Status:** ✅ `AuthContext.tsx` criado, mas não está sendo usado ainda
 
-**O que implementar:**
-- Criar `AuthContext.tsx`
-- Provider para envolver a aplicação
-- Hooks: `useAuth()`, `useUser()`
-- Sincronização automática entre componentes
-- Gerenciamento de `localStorage` centralizado
+**O que falta:**
+- Integrar `AuthProvider` no `App.tsx`
+- Substituir uso direto de `localStorage` por `useAuth()` hook
+- Atualizar componentes que usam autenticação (Header, ProtectedRoute, etc.)
 
 **Como funciona sem backend:**
 - Gerencia estado de autenticação localmente
@@ -266,15 +250,13 @@ Todas as páginas principais já existem e funcionam, mostrando erros adequados 
 
 ### 🔴 Alta Prioridade (Implementar Agora)
 
-1. **CareerPathDetailPage.tsx** - Página essencial para UX
-2. **Favoritos Locais** - Funcionalidade muito útil
-3. **URL Query Params** - Melhora compartilhamento
+**✅ Tudo implementado!**
 
 ### 🟡 Média Prioridade (Implementar Depois)
 
-1. **Context API para Autenticação** - Melhora arquitetura
+1. **Integrar Context API** - `AuthContext` criado, precisa integrar na aplicação
 2. **Histórico de Visualizações** - Funcionalidade útil
-3. **Melhorias no Dashboard** - Mais informativo
+3. **Melhorias no Dashboard** - Mais informativo (badges, estatísticas)
 
 ### 🟢 Baixa Prioridade (Opcional)
 
@@ -287,20 +269,23 @@ Todas as páginas principais já existem e funcionam, mostrando erros adequados 
 
 ## 🎯 Recomendação de Implementação
 
-### Fase 1: Essencial (1-2 dias)
-1. CareerPathDetailPage.tsx
-2. Favoritos Locais
-3. URL Query Params
+### ✅ Fase 1: Essencial - **CONCLUÍDA**
+1. ✅ CareerPathDetailPage.tsx
+2. ✅ Favoritos (API pronta, botão nos cards)
+3. ✅ URL Query Params
+4. ✅ MyCareerPathsPage.tsx
+5. ✅ ChatWidget flutuante
 
-### Fase 2: Melhorias Importantes (2-3 dias)
-1. Context API para Autenticação
-2. Histórico de Visualizações
-3. Melhorias no Dashboard
+### Fase 2: Melhorias Importantes (1-2 dias)
+1. **Integrar Context API** - Substituir localStorage direto por `useAuth()`
+2. Histórico de Visualizações (localStorage)
+3. Melhorias no Dashboard (badges, estatísticas)
 
 ### Fase 3: Polimento (1-2 dias)
 1. Melhorias visuais e animações
 2. Validações e feedback
 3. Acessibilidade básica
+4. Debounce na busca
 
 ---
 

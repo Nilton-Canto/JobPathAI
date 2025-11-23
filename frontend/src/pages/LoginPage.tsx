@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authAPI, userAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 // Styles imported via main.tsx -> styles/index.css
 
 const LoginPage: React.FC = () => {
@@ -10,6 +10,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { login, isAdmin } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,55 +18,14 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const loginResponse = await authAPI.login(username, password);
+      await login(username, password);
       
-      // Login bem-sucedido
-      if (loginResponse.success) {
-        // Salva dados do usuário retornados pelo login
-        if (loginResponse.user) {
-          localStorage.setItem('userProfile', JSON.stringify(loginResponse.user));
-          localStorage.setItem('isLoggedIn', 'true');
-          
-          // Redirect based on user type
-          const isAdmin = loginResponse.user.is_superuser || loginResponse.user.is_staff || loginResponse.user.is_admin;
-          if (isAdmin) {
-            navigate('/admin');
-          } else {
-            navigate('/dashboard');
-          }
-        } else {
-          // Fallback: se não retornou dados do usuário, tenta buscar perfil
-          try {
-            const userData = await userAPI.getProfile();
-            localStorage.setItem('userProfile', JSON.stringify(userData));
-            localStorage.setItem('isLoggedIn', 'true');
-            
-            const isAdmin = userData.is_superuser || userData.is_staff || userData.is_admin;
-            if (isAdmin) {
-              navigate('/admin');
-            } else {
-              navigate('/dashboard');
-            }
-          } catch (profileError) {
-            console.warn('Erro ao buscar perfil do usuário:', profileError);
-            // Cria perfil básico temporário
-            localStorage.setItem('userProfile', JSON.stringify({
-              username: username,
-              nome: username,
-              email: '',
-              idade: 0,
-              cpf: '',
-              is_superuser: false,
-              is_staff: false,
-              is_admin: false
-            }));
-            localStorage.setItem('isLoggedIn', 'true');
-            navigate('/dashboard');
-          }
-        }
+      // Redirect based on user type
+      if (isAdmin()) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
       }
-      
-      window.dispatchEvent(new Event('storage')); // Notify Header component
     } catch (err: any) {
       setError(err.message || 'Erro de rede. Verifique se o backend está rodando.');
       console.error('Erro na requisição de login:', err);

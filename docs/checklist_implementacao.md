@@ -97,7 +97,11 @@
 - [x] Componente de card de trilha (`CareerPathCard.tsx`)
 - [x] Integração com API `/api/v1/career-paths/` (com tratamento de erros)
 - [x] Filtros por área profissional (busca, área, nível, ordenação)
-- [ ] **FALTA**: Visualização de detalhes da trilha (`CareerPathDetailPage.tsx`)
+- [x] Visualização de detalhes da trilha (`CareerPathDetailPage.tsx`)
+- [x] Página "Minhas Trilhas" (`MyCareerPathsPage.tsx`)
+- [x] URL Query Params para filtros (compartilhamento de links)
+- [x] Favoritos com backend (API endpoints prontos, botão no card)
+- [x] Chat Widget flutuante (`ChatWidget.tsx` - pop-up em todas as páginas)
 
 #### Conteúdo
 - [ ] **FALTA**: Definir categorias iniciais (Issue #28, #30)
@@ -144,12 +148,12 @@
 - [ ] **FALTA**: Métricas de progresso (etapas concluídas, tempo estimado, etc.)
 
 #### Frontend
-- [x] Página HTML mock `meu-plano.html` (protótipo)
-- [ ] **FALTA**: Página React para visualizar plano
-- [ ] **FALTA**: Componente de timeline/kanban de etapas
-- [ ] **FALTA**: Barra de progresso visual
-- [ ] **FALTA**: Indicadores de etapa atual
-- [ ] **FALTA**: Histórico de conclusões
+- [x] Página React para visualizar plano (`MyCareerPlanPage.tsx`)
+- [x] Barra de progresso visual (`ProgressBar.tsx`)
+- [x] Indicadores de etapa atual (cards com estados)
+- [x] Página "Minhas Trilhas" (`MyCareerPathsPage.tsx`)
+- [ ] **FALTA**: Componente de timeline/kanban de etapas (opcional)
+- [ ] **FALTA**: Histórico de conclusões (melhoria futura)
 
 ---
 
@@ -183,16 +187,25 @@
 - [ ] **FALTA**: Endpoint para ativar/desativar trilhas
 
 #### Frontend
-- [x] Página HTML mock `admin-trilhas.html` (protótipo)
-- [x] Página HTML mock `admin-nova-trilha.html` (protótipo)
 - [x] Página React `AdminCareerPathsPage.tsx` criada (em `pages/admin/`)
 - [x] Header separado `AdminHeader.tsx` (design escuro, profissional)
 - [x] Layout separado `AdminLayout.tsx` com verificação de permissões
 - [x] Separação clara: Admin não aparece no header do cliente
-- [ ] **FALTA**: CRUD completo de trilhas (listar funciona, criar/editar pendente)
-- [ ] **FALTA**: CRUD completo de etapas
-- [ ] **FALTA**: Gerenciamento de áreas profissionais
-- [ ] **FALTA**: Interface drag-and-drop para reordenar etapas
+- [x] Dashboard do Admin (`AdminDashboardPage.tsx`) com estatísticas
+- [x] CRUD completo de trilhas:
+  - [x] Listar trilhas (`AdminCareerPathsPage.tsx`)
+  - [x] Criar trilha (`AdminCreateCareerPathPage.tsx`)
+  - [x] Editar trilha (`AdminEditCareerPathPage.tsx`)
+  - [x] Deletar trilha (botão funcional)
+- [x] CRUD completo de etapas (dentro da página de editar trilha):
+  - [x] Adicionar etapas
+  - [x] Editar etapas
+  - [x] Remover etapas
+  - [x] Reordenar etapas (botões ↑↓)
+  - [x] Adicionar habilidades às etapas
+- [x] Página Gerenciar Áreas (`AdminAreasPage.tsx` - placeholder informativo)
+- [ ] **FALTA**: Interface drag-and-drop para reordenar etapas (melhoria futura)
+- [ ] **FALTA**: Ativar/desativar trilhas (melhoria futura)
 
 ---
 
@@ -247,7 +260,9 @@
 - [x] Separação clara entre área cliente e admin
 - [x] Páginas básicas (Home, Login, Register, Dashboard, Profile)
 - [x] Service layer para APIs (`api.ts` com todos os endpoints)
-- [ ] **FALTA**: Context API para autenticação (melhoria futura)
+- [x] Context API para autenticação (`AuthContext.tsx` integrado)
+- [x] API de favoritos (`favoritesAPI` com endpoints prontos)
+- [x] `AuthContext` integrado em toda aplicação (substituído localStorage direto)
 - [ ] **FALTA**: Gerenciamento de estado (Redux/Zustand?) (opcional)
 
 #### Páginas Principais
@@ -256,18 +271,21 @@
 - [x] `RegisterPage.tsx` - Cadastro
 - [x] `DashboardPage.tsx` - Dashboard (melhorado com stats e ações rápidas)
 - [x] `ProfilePage.tsx` - Perfil
-- [x] `ExploreCareerPathsPage.tsx` - Explorar trilhas (criado)
-- [ ] **FALTA**: `CareerPathDetailPage.tsx` - Detalhes da trilha
-- [x] `MyCareerPlanPage.tsx` - Meu plano (criado)
+- [x] `ExploreCareerPathsPage.tsx` - Explorar trilhas (com filtros e URL params)
+- [x] `CareerPathDetailPage.tsx` - Detalhes da trilha (antes de selecionar)
+- [x] `MyCareerPathsPage.tsx` - Minhas Trilhas (lista todas as trilhas do usuário)
+- [x] `MyCareerPlanPage.tsx` - Meu plano (detalhes de uma trilha específica)
 - [x] `CreateCustomPlanPage.tsx` - Criar plano personalizado (criado)
 - [x] `AdminCareerPathsPage.tsx` - Admin de trilhas (em `pages/admin/`)
-- [x] `ChatMentorPage.tsx` - Chat com mentor IA (criado)
+- [x] `ChatMentorPage.tsx` - Chat com mentor IA (página completa, opcional)
+- [x] `ChatWidget.tsx` - Widget flutuante de chat (pop-up em todas as páginas)
 
 #### Componentes Reutilizáveis
 - [x] `Header.tsx` - Cabeçalho
-- [x] `CareerPathCard.tsx` - Card de trilha
+- [x] `CareerPathCard.tsx` - Card de trilha (com botão de favoritar)
 - [x] `ProgressBar.tsx` - Barra de progresso
 - [x] `Tooltip.tsx` - Tooltip informativo
+- [x] `ChatWidget.tsx` - Widget flutuante de chat (pop-up)
 - [ ] **FALTA**: `StageTimeline.tsx` - Timeline de etapas (opcional)
 - [ ] **FALTA**: `SkillTag.tsx` - Tag de habilidade (opcional, há estilos CSS)
 - [ ] **FALTA**: `LoadingSpinner.tsx` - Loading (opcional, há estilos CSS)
@@ -657,10 +675,11 @@
 | Backend - Career | ✅ Estrutura | 60% |
 | Backend - Student Area | ✅ Estrutura | 50% |
 | Backend - LLM | ❌ Não iniciado | 0% |
-| Frontend - React | ⚠️ Básico | 40% |
+| Frontend - React | ✅ Avançado | 75% |
+| Frontend - Admin | ✅ Funcional | 75% |
 | Frontend - Integração | ❌ Não iniciado | 10% |
 | Testes | ⚠️ Parcial | 20% |
-| Documentação | ⚠️ Parcial | 40% |
+| Documentação | ⚠️ Parcial | 50% |
 
 ---
 

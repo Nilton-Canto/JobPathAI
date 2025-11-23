@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import AdminHeader from '../Header/AdminHeader';
+import AdminDashboardPage from '../../pages/admin/AdminDashboardPage';
 import AdminCareerPathsPage from '../../pages/admin/AdminCareerPathsPage';
-import { userAPI } from '../../services/api';
+import AdminCreateCareerPathPage from '../../pages/admin/AdminCreateCareerPathPage';
+import AdminEditCareerPathPage from '../../pages/admin/AdminEditCareerPathPage';
+import AdminAreasPage from '../../pages/admin/AdminAreasPage';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * Admin Layout Component
@@ -10,45 +14,26 @@ import { userAPI } from '../../services/api';
  * Includes authentication and authorization checks
  */
 const AdminLayout: React.FC = () => {
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading, isAdmin, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkAdminStatus();
-  }, []);
-
-  const checkAdminStatus = async () => {
-    try {
-      setLoading(true);
-      
-      // Check if user is logged in
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      if (!isLoggedIn) {
+    if (!isLoading) {
+      if (!isAuthenticated) {
         navigate('/login');
         return;
       }
 
-      // Check if user is admin
-      const adminStatus = await userAPI.isAdmin();
-      setIsAdmin(adminStatus);
-
-      if (!adminStatus) {
+      if (!isAdmin()) {
         // Not an admin, redirect to dashboard
         setTimeout(() => {
           navigate('/dashboard');
         }, 1500);
       }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-      navigate('/dashboard');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [isAuthenticated, isLoading, isAdmin, navigate]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="admin-layout">
         <div className="admin-loading">
@@ -59,7 +44,11 @@ const AdminLayout: React.FC = () => {
     );
   }
 
-  if (isAdmin === false) {
+  if (!isAuthenticated) {
+    return null; // Will redirect to login
+  }
+
+  if (!isAdmin()) {
     return (
       <div className="admin-layout">
         <div className="admin-access-denied">
@@ -74,21 +63,49 @@ const AdminLayout: React.FC = () => {
     );
   }
 
-  if (isAdmin === null) {
-    return null;
-  }
-
   return (
     <div className="admin-layout">
       <AdminHeader />
       <main className="admin-main">
         <Routes>
-          <Route path="/" element={<Navigate to="/admin/career-paths" replace />} />
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/dashboard" element={<AdminDashboardPage />} />
           <Route path="/career-paths" element={<AdminCareerPathsPage />} />
-          <Route path="/career-paths/new" element={<div className="admin-placeholder">Nova Trilha (em desenvolvimento)</div>} />
-          <Route path="/career-paths/:id/edit" element={<div className="admin-placeholder">Editar Trilha (em desenvolvimento)</div>} />
-          <Route path="/areas" element={<div className="admin-placeholder">Gerenciar Áreas (em desenvolvimento)</div>} />
-          <Route path="/users" element={<div className="admin-placeholder">Gerenciar Usuários (em desenvolvimento)</div>} />
+          <Route path="/career-paths/new" element={<AdminCreateCareerPathPage />} />
+          <Route path="/career-paths/:id/edit" element={<AdminEditCareerPathPage />} />
+          <Route path="/areas" element={<AdminAreasPage />} />
+          <Route path="/users" element={
+            <div className="page-container admin-container">
+              <header className="admin-header">
+                <div>
+                  <h1>Gerenciar Usuários</h1>
+                  <p className="admin-subtitle">Use o Django Admin para gerenciar usuários</p>
+                </div>
+              </header>
+              <div className="empty-state-dashboard">
+                <div className="empty-state-icon-large">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                <h3>Gerenciamento de Usuários via Django Admin</h3>
+                <p>
+                  Para gerenciar usuários, utilize o painel administrativo do Django.
+                </p>
+                <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                  Acesse: <code style={{ background: '#f3f4f6', padding: '0.25rem 0.5rem', borderRadius: '0.25rem' }}>http://localhost:8000/admin/</code>
+                </p>
+                <div className="empty-state-actions" style={{ marginTop: '2rem' }}>
+                  <a href="http://localhost:8000/admin/" target="_blank" rel="noopener noreferrer" className="btn-primary">
+                    Abrir Django Admin
+                  </a>
+                  <Link to="/admin" className="btn-secondary">
+                    Voltar para Dashboard
+                  </Link>
+                </div>
+              </div>
+            </div>
+          } />
         </Routes>
       </main>
     </div>

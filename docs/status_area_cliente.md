@@ -30,32 +30,46 @@
   - Busca por texto
   - Filtros (área, nível, ordenação)
   - Grid de cards responsivo
+  - URL Query Params (compartilhamento de links)
+  - Botão de favoritar nos cards
   - Tratamento de erros adequado
   - Empty states
+- [x] **CareerPathDetailPage.tsx** - Detalhes da trilha antes de selecionar:
+  - Informações completas (etapas, habilidades, tempo estimado)
+  - Botão "Começar Trilha" ou "Continuar Trilha"
+  - Design responsivo
+- [x] **MyCareerPathsPage.tsx** - Minhas Trilhas:
+  - Lista todas as trilhas do usuário
+  - Filtros de busca e ordenação
+  - Mostra progresso de cada trilha
+  - Empty states informativos
 - [x] **MyCareerPlanPage.tsx** - Visualizar plano de carreira com:
   - Progresso visual
   - Etapas (concluídas, atual, próximas)
   - Marcar etapa como concluída
 - [x] **CreateCustomPlanPage.tsx** - Criar plano personalizado (UI pronta, aguardando backend LLM)
-- [x] **ChatMentorPage.tsx** - Chat com mentor IA (UI pronta, aguardando backend LLM)
+- [x] **ChatMentorPage.tsx** - Chat com mentor IA (página completa, opcional)
+- [x] **ChatWidget.tsx** - Widget flutuante de chat (pop-up em todas as páginas quando logado)
 - [x] **ApplicationsPage.tsx** - Candidaturas (UI pronta, aguardando backend)
 - [x] **NotFoundPage.tsx** - Página 404
 
 ### Componentes Reutilizáveis
 
 - [x] **Header.tsx** - Header do cliente (responsivo, mobile menu)
-- [x] **CareerPathCard.tsx** - Card de trilha reutilizável
+- [x] **CareerPathCard.tsx** - Card de trilha reutilizável (com botão de favoritar)
 - [x] **ProgressBar.tsx** - Barra de progresso reutilizável
 - [x] **Tooltip.tsx** - Tooltip informativo
+- [x] **ChatWidget.tsx** - Widget flutuante de chat (pop-up)
 
 ### Serviços e API
 
 - [x] **api.ts** - Service layer completo com:
   - `authAPI` (login, register, logout)
   - `userAPI` (getProfile, updateProfile, isAdmin)
-  - `careerAPI` (getAll, getById, getPredefined, getUserPaths, create, update, delete)
+  - `careerAPI` (getAll, getById, getPredefined, getUserPaths, create, update, delete, associateWithUser)
   - `stageAPI` (getAll, getById, markCompleted)
   - `skillsAPI` (getAll, getUserSkills, addUserSkill, removeUserSkill)
+  - `favoritesAPI` (getAll, add, remove, isFavorited) - Endpoints prontos para backend
   - `llmAPI` (generatePlan, chat)
   - Tratamento de erros de conectividade
   - Suporte a paginação do Django REST Framework
@@ -102,16 +116,7 @@
 
 ### Páginas
 
-1. **CareerPathDetailPage.tsx** - Página de detalhes da trilha
-   - **Status**: Não existe
-   - **Necessidade**: Média (pode usar `MyCareerPlanPage` como alternativa)
-   - **Descrição**: Página dedicada para visualizar detalhes completos de uma trilha antes de selecioná-la
-   - **Funcionalidades esperadas**:
-     - Informações completas da trilha
-     - Lista de todas as etapas
-     - Habilidades necessárias
-     - Tempo estimado
-     - Botão "Começar Trilha"
+**Nenhuma página essencial faltando!** ✅
 
 ### Componentes Reutilizáveis
 
@@ -138,10 +143,10 @@
 ### Funcionalidades
 
 1. **Context API para Autenticação**
-   - **Status**: Não implementado
+   - **Status**: ✅ Criado (`AuthContext.tsx`), mas não integrado em toda aplicação
    - **Necessidade**: Média
-   - **Descrição**: Gerenciar estado de autenticação globalmente
-   - **Atual**: Usa `localStorage` diretamente
+   - **Descrição**: Substituir uso direto de `localStorage` por `useAuth()` hook
+   - **Próximo passo**: Integrar `AuthProvider` no `App.tsx` e substituir localStorage
 
 2. **Gerenciamento de Estado Global**
    - **Status**: Não implementado
@@ -150,7 +155,7 @@
    - **Atual**: Estado local em cada componente
 
 3. **URL Query Params para Filtros**
-   - **Status**: Não implementado
+   - **Status**: ✅ Implementado em `ExploreCareerPathsPage`
    - **Necessidade**: Baixa (melhoria de UX)
    - **Descrição**: Salvar filtros na URL para compartilhamento
 
@@ -206,16 +211,16 @@ A área do cliente está funcionalmente completa. Todas as páginas principais e
 
 | Categoria | Implementado | Parcial | Faltando | Total |
 |-----------|--------------|---------|----------|-------|
-| **Páginas** | 11 | 3 | 1 | 15 |
-| **Componentes** | 4 | 1 | 4 | 9 |
+| **Páginas** | 13 | 3 | 0 | 16 |
+| **Componentes** | 5 | 1 | 3 | 9 |
 | **Serviços** | 1 | 0 | 0 | 1 |
 | **Estilos** | 3 | 0 | 0 | 3 |
 
 ### Por Prioridade
 
 - **Alta**: ✅ 0 itens faltando
-- **Média**: ⚠️ 2 itens
-- **Baixa**: 📝 7 itens
+- **Média**: ⚠️ 1 item (integrar AuthContext)
+- **Baixa**: 📝 4 itens (componentes opcionais, debounce, etc.)
 
 ---
 
@@ -283,11 +288,22 @@ A área do cliente está funcionalmente completa. Todas as páginas principais e
 
 ## ✅ Conclusão
 
-**Status Geral da Área do Cliente**: 🟢 **95% Completo**
+**Status Geral da Área do Cliente**: 🟢 **98% Completo**
 
-A área do cliente está **funcionalmente completa** e pronta para uso. As páginas principais existem, funcionam bem, são responsivas e têm tratamento de erros adequado.
+A área do cliente está **quase completamente implementada** e pronta para uso. Todas as páginas principais existem, funcionam bem, são responsivas e têm tratamento de erros adequado.
 
-**O que falta são principalmente melhorias de UX e componentes opcionais**, não funcionalidades essenciais.
+**Implementações Recentes:**
+- ✅ Página "Minhas Trilhas" (`MyCareerPathsPage.tsx`)
+- ✅ Página "Detalhes da Trilha" (`CareerPathDetailPage.tsx`)
+- ✅ Chat Widget flutuante (pop-up em todas as páginas)
+- ✅ Favoritos (API pronta, botão nos cards)
+- ✅ URL Query Params (compartilhamento de links)
+- ✅ Context API criado (pronto para integração)
 
-**Recomendação**: Focar em polir o design e UX antes de integrar com o backend.
+**O que falta são principalmente:**
+- Integrar `AuthContext` em toda aplicação (substituir localStorage direto)
+- Componentes opcionais (StageTimeline, etc.)
+- Melhorias de performance (debounce, etc.)
+
+**Recomendação**: Integrar `AuthContext` e depois focar em polir o design antes de integrar com o backend.
 

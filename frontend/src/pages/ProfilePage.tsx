@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 // Styles imported via main.tsx -> styles/index.css
 
 interface UserSkill {
@@ -34,6 +35,7 @@ interface UserProfile {
 }
 
 const ProfilePage: React.FC = () => {
+  const { user, refreshUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -77,9 +79,15 @@ const ProfilePage: React.FC = () => {
   const loadUserProfile = async () => {
     try {
       setLoading(true);
-      const storedProfile = localStorage.getItem('userProfile');
-      if (storedProfile) {
-        const profile = JSON.parse(storedProfile);
+      
+      // Use user from context, or refresh if not available
+      let profile = user;
+      if (!profile) {
+        await refreshUser();
+        profile = user;
+      }
+      
+      if (profile) {
         setUserData({
           nome: profile.nome || '',
           email: profile.email || '',
@@ -95,21 +103,22 @@ const ProfilePage: React.FC = () => {
           linguas: profile.linguas || [],
         });
       } else {
+        // Try to fetch from API as fallback
         try {
-          const profile = await userAPI.getProfile();
+          const apiProfile = await userAPI.getProfile();
           const formattedProfile = {
-            ...profile,
-            cpf: profile.cpf ? formatCPF(profile.cpf) : '',
-            area_interesse: profile.area_interesse || '',
-            nivel_experiencia: profile.nivel_experiencia || 'sem_experiencia',
-            linkedin_url: profile.linkedin_url || '',
-            github_url: profile.github_url || '',
-            portfolio_url: profile.portfolio_url || '',
-            habilidades: profile.habilidades || [],
-            linguas: profile.linguas || [],
+            ...apiProfile,
+            cpf: apiProfile.cpf ? formatCPF(apiProfile.cpf) : '',
+            area_interesse: apiProfile.area_interesse || '',
+            nivel_experiencia: apiProfile.nivel_experiencia || 'sem_experiencia',
+            linkedin_url: apiProfile.linkedin_url || '',
+            github_url: apiProfile.github_url || '',
+            portfolio_url: apiProfile.portfolio_url || '',
+            habilidades: apiProfile.habilidades || [],
+            linguas: apiProfile.linguas || [],
           };
           setUserData(formattedProfile);
-          localStorage.setItem('userProfile', JSON.stringify(formattedProfile));
+          await refreshUser(); // Update context
         } catch (apiError) {
           console.warn('Could not fetch profile from API');
           navigate('/login');
@@ -239,8 +248,8 @@ const ProfilePage: React.FC = () => {
       // };
       // await userAPI.updateProfile(dataToSave);
       
-      // For now, update localStorage (store with mask for display)
-      localStorage.setItem('userProfile', JSON.stringify(userData));
+      // For now, refresh user profile from context
+      await refreshUser();
       setIsEditing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);

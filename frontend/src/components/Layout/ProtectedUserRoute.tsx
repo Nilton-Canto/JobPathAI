@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { userAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * ProtectedUserRoute Component
@@ -14,35 +14,9 @@ interface ProtectedUserRouteProps {
 }
 
 const ProtectedUserRoute: React.FC<ProtectedUserRouteProps> = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading, isAdmin } = useAuth();
 
-  useEffect(() => {
-    checkAdminStatus();
-  }, []);
-
-  const checkAdminStatus = async () => {
-    try {
-      // Check if user is logged in
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      if (!isLoggedIn) {
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
-
-      // Check if user is admin
-      const adminStatus = await userAPI.isAdmin();
-      setIsAdmin(adminStatus);
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="admin-loading">
         <div className="admin-spinner"></div>
@@ -51,12 +25,16 @@ const ProtectedUserRoute: React.FC<ProtectedUserRouteProps> = ({ children }) => 
     );
   }
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   // If user is admin, redirect to admin area
-  if (isAdmin === true) {
+  if (isAdmin()) {
     return <Navigate to="/admin" replace />;
   }
 
-  // Regular user or not logged in - allow access
+  // Regular user - allow access
   return <>{children}</>;
 };
 

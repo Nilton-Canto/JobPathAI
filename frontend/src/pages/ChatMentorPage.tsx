@@ -20,6 +20,7 @@ const ChatMentorPage: React.FC = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null); // Store conversation ID
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,29 +44,32 @@ const ChatMentorPage: React.FC = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageText = inputMessage;
     setInputMessage('');
     setLoading(true);
 
     try {
-      // TODO: Implement LLM API integration when backend is ready
-      // const response = await llmAPI.chat(inputMessage);
+      // Call LLM API with conversation history
+      const response = await llmAPI.chat(messageText, conversationId || undefined);
       
-      // Simulate API response
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Update conversation ID if returned
+      if (response.conversation_id) {
+        setConversationId(response.conversation_id);
+      }
       
       const mentorResponse: Message = {
         id: messages.length + 2,
-        text: 'Esta é uma resposta simulada. A integração com a API LLM será implementada em breve. Por favor, descreva sua pergunta sobre carreira e eu ajudarei você!',
+        text: response.response || response.insights || 'Resposta recebida',
         sender: 'mentor',
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, mentorResponse]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: messages.length + 2,
-        text: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+        text: error.message || 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique sua conexão e tente novamente.',
         sender: 'mentor',
         timestamp: new Date(),
       };

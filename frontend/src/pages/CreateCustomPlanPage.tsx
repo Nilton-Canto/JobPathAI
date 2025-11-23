@@ -21,21 +21,23 @@ const CreateCustomPlanPage: React.FC = () => {
     setError(null);
 
     try {
-      // TODO: Implement LLM API integration when backend is ready
-      // const plan = await llmAPI.generatePlan(description);
+      // Call LLM API to generate personalized career plan
+      const response = await llmAPI.generatePlan(description);
       
-      // For now, simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (response.success && response.career_path) {
+        // Navigate to the generated plan page
+        navigate(`/my-plan/${response.career_path.id}`);
+      } else {
+        setError('Erro ao gerar plano. Resposta inválida do servidor.');
+      }
       
-      // Navigate to the generated plan page
-      // navigate(`/my-plan/${plan.id}`);
-      
-      // Temporary: show success message
-      alert('Plano personalizado será gerado em breve! Esta funcionalidade está em desenvolvimento.');
-      
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error generating plan:', err);
-      setError('Erro ao gerar plano. Tente novamente mais tarde.');
+      setError(
+        err.message || 
+        'Erro ao gerar plano. Verifique sua conexão e tente novamente. ' +
+        'Certifique-se de que a chave da API Gemini está configurada no backend.'
+      );
     } finally {
       setLoading(false);
     }

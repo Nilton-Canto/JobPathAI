@@ -29,6 +29,7 @@ urlpatterns = [
     # API endpoints - JSON only, frontend React handles UI
     path("api/v1/", include("career.urls")),  # Career paths API
     path('api/student/', include('student_area.api_urls')),  # Student area API REST
+    path("api/llm/", include("llm.urls")),  # LLM API (Gemini integration)
     path("", include("users.urls")),  # User authentication API
     
     # Utility endpoints for developers/admins

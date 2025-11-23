@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * Header Component - User/Client Area Only
@@ -12,40 +12,12 @@ import { authAPI } from '../../services/api';
  * No admin links or navigation should appear here to maintain clear separation.
  */
 const Header: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      const loggedInStatus = localStorage.getItem('isLoggedIn');
-      setIsLoggedIn(loggedInStatus === 'true');
-    };
-
-    checkAuthStatus();
-
-    const handleStorageChange = () => {
-      const newStatus = localStorage.getItem('isLoggedIn') === 'true';
-      setIsLoggedIn(newStatus);
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-    try {
-      await authAPI.logout();
-    } catch (err) {
-      // Logout API may not be implemented yet, continue with local logout
-      console.warn('Logout API call failed:', err);
-    }
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userProfile');
-    setIsLoggedIn(false);
-    window.dispatchEvent(new Event('storage'));
+    await logout();
     navigate('/login');
   };
 
@@ -67,7 +39,7 @@ const Header: React.FC = () => {
       </Link>
       <nav className={`header-nav ${isMobileMenuOpen ? 'header-nav-open' : ''}`}>
         <ul>
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <>
               <li><Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link></li>
               <li><Link to="/my-career-paths" onClick={() => setIsMobileMenuOpen(false)}>Minhas Trilhas</Link></li>

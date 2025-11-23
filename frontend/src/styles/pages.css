@@ -505,6 +505,12 @@
   display: flex;
   gap: 1rem;
   position: relative;
+  transition: all 0.2s ease;
+}
+
+.stage-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .stage-completed {
@@ -621,6 +627,19 @@
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e0e0e0;
+}
+
+.admin-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+}
+
+.admin-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
 }
 
 .admin-table-container {
@@ -2182,5 +2201,26 @@
   .primary-path-title {
     font-size: 1.25rem;
   }
+
+  .stage-card {
+    flex-direction: column;
+  }
+
+  .stage-drag-handle {
+    align-self: flex-start;
+  }
+}
+
+/* Admin Table Improvements */
+.admin-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.admin-table tbody tr:active {
+  background-color: #f3f4f6;
 }
 

@@ -2268,6 +2268,16 @@ button[type="submit"]:hover {
   background: #c82333;
 }
 
+.btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
 /* ============================================
    MODERN LOGIN & REGISTER PAGES
    ============================================ */

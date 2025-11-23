@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "config.apps.ConfigConfig",  # Config app with custom admin configuration
     "users",  # Atualizado de "cadastro" para "users"
     "career",  # Novo app para trilhas de carreira
+    "llm",  # LLM integration (Gemini API)
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

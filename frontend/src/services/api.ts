@@ -104,6 +104,9 @@ export const userAPI = {
     const response = await fetchAPI('/api/user-profile/');
     
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('401 Unauthorized - User not authenticated');
+      }
       throw new Error('Failed to fetch user profile');
     }
 
@@ -258,6 +261,42 @@ export const careerAPI = {
   },
 
   /**
+   * Toggle active status of career path
+   */
+  async toggleActive(id: number, isActive: boolean) {
+    const response = await fetchAPI(`/api/v1/career-paths/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active: isActive }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Update failed' }));
+      throw new Error(error.error || 'Update failed');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Check if career path has associated users
+   */
+  async checkUsers(id: number) {
+    // TODO: Backend should implement endpoint to check users associated with path
+    // For now, return empty array
+    try {
+      const response = await fetchAPI(`/api/v1/career-paths/${id}/users/`);
+      if (response.ok) {
+        const data = await response.json();
+        return Array.isArray(data) ? data : (data.results || []);
+      }
+    } catch (err) {
+      // Endpoint may not exist yet
+      console.warn('Could not check associated users:', err);
+    }
+    return [];
+  },
+
+  /**
    * Associate career path with user (start following a path)
    */
   async associateWithUser(pathId: number) {
@@ -319,6 +358,51 @@ export const stageAPI = {
     }
 
     return await response.json();
+  },
+
+  /**
+   * Create new stage
+   */
+  async create(stageData: any) {
+    const response = await fetchAPI('/api/v1/career-stages/', {
+      method: 'POST',
+      body: JSON.stringify(stageData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Creation failed' }));
+      throw new Error(error.error || 'Creation failed');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Update stage
+   */
+  async update(id: number, stageData: any) {
+    const response = await fetchAPI(`/api/v1/career-stages/${id}/`, {
+      method: 'PUT',
+      body: JSON.stringify(stageData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Update failed' }));
+      throw new Error(error.error || 'Update failed');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Delete stage
+   */
+  async delete(id: number) {
+    const response = await fetchAPI(`/api/v1/career-stages/${id}/`, {
+      method: 'DELETE',
+    });
+
+    return response.ok;
   },
 };
 
