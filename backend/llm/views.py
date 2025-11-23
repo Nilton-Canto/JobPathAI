@@ -158,6 +158,9 @@ class ChatView(View):
         print(f"[DEBUG] ChatView - User: {request.user}")
         print(f"[DEBUG] ChatView - Session key: {request.session.session_key}")
         print(f"[DEBUG] ChatView - Session exists: {hasattr(request, 'session')}")
+        print(f"[DEBUG] ChatView - Cookies received: {request.COOKIES}")
+        print(f"[DEBUG] ChatView - Session cookie name: {request.session.cookie_name}")
+        print(f"[DEBUG] ChatView - Session cookie in request: {request.COOKIES.get(request.session.cookie_name, 'NOT FOUND')}")
         
         if not request.user.is_authenticated:
             return JsonResponse({

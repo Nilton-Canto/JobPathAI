@@ -56,6 +56,14 @@ class LoginView(View):
                     # Force session creation
                     request.session.create()
                 
+                # Debug: Log session info
+                print(f"[DEBUG] LoginView - User authenticated: {request.user.is_authenticated}")
+                print(f"[DEBUG] LoginView - User: {request.user.username}")
+                print(f"[DEBUG] LoginView - Session key: {request.session.session_key}")
+                print(f"[DEBUG] LoginView - Session cookie name: {request.session.cookie_name}")
+                print(f"[DEBUG] LoginView - Session cookie domain: {request.session.get_cookie_domain()}")
+                print(f"[DEBUG] LoginView - Session cookie path: {request.session.get_cookie_path()}")
+                
                 # Get user profile data from StudentProfile
                 user_profile = getattr(user, 'student_profile', None)
                 if user_profile:
