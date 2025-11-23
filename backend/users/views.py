@@ -56,13 +56,7 @@ class LoginView(View):
                     # Force session creation
                     request.session.create()
                 
-                # Debug: Log session info
-                print(f"[DEBUG] LoginView - User authenticated: {request.user.is_authenticated}")
-                print(f"[DEBUG] LoginView - User: {request.user.username}")
-                print(f"[DEBUG] LoginView - Session key: {request.session.session_key}")
-                print(f"[DEBUG] LoginView - Session cookie name: {request.session.cookie_name}")
-                print(f"[DEBUG] LoginView - Session cookie domain: {request.session.get_cookie_domain()}")
-                print(f"[DEBUG] LoginView - Session cookie path: {request.session.get_cookie_path()}")
+                # Session is created and saved
                 
                 # Get user profile data from StudentProfile
                 user_profile = getattr(user, 'student_profile', None)
@@ -97,9 +91,7 @@ class LoginView(View):
                     'user': user_data
                 })
                 
-                # Debug: Log response headers
-                print(f"[DEBUG] LoginView - Response headers: {dict(response.headers)}")
-                print(f"[DEBUG] LoginView - Session cookie will be set: {request.session.session_key}")
+                # Session cookie will be set automatically by Django
                 
                 return response
             else:
@@ -191,11 +183,6 @@ class UserProfileView(View):
     
     def get(self, request):
         """Return authenticated user profile"""
-        # Debug: Log authentication status
-        print(f"[DEBUG] UserProfileView - User authenticated: {request.user.is_authenticated}")
-        print(f"[DEBUG] UserProfileView - User: {request.user}")
-        print(f"[DEBUG] UserProfileView - Session key: {request.session.session_key}")
-        
         if not request.user.is_authenticated:
             return JsonResponse({
                 'error': 'Usuário não autenticado',
