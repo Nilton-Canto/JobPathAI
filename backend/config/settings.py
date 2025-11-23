@@ -142,10 +142,12 @@ CORS_ALLOW_CREDENTIALS = True  # Permite o envio de credenciais (cookies, header
 # ]
 
 # Session configuration for cross-origin requests
-SESSION_COOKIE_SAMESITE = 'None'  # Allow cross-site cookies
+# In development (HTTP), use 'Lax' instead of 'None' (which requires HTTPS)
+SESSION_COOKIE_SAMESITE = 'Lax'  # Allow same-site cookies (works with HTTP)
 SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
-CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-site CSRF cookies
+SESSION_COOKIE_AGE = 86400  # 24 hours
+CSRF_COOKIE_SAMESITE = 'Lax'  # Allow same-site CSRF cookies (works with HTTP)
 CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 STATIC_ROOT = BASE_DIR / "staticfiles"  # Para o build de produção
