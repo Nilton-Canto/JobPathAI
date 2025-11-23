@@ -22,8 +22,22 @@ async function fetchAPI(
     ...options,
   };
 
+  // Debug: Log request details for LLM endpoints
+  if (endpoint.includes('/api/llm/')) {
+    console.log(`[DEBUG] fetchAPI - URL: ${url}`);
+    console.log(`[DEBUG] fetchAPI - Credentials: include`);
+    console.log(`[DEBUG] fetchAPI - Headers:`, defaultOptions.headers);
+  }
+
   try {
     const response = await fetch(url, defaultOptions);
+    
+    // Debug: Log response details for LLM endpoints
+    if (endpoint.includes('/api/llm/')) {
+      console.log(`[DEBUG] fetchAPI - Response status: ${response.status}`);
+      console.log(`[DEBUG] fetchAPI - Response headers:`, Object.fromEntries(response.headers.entries()));
+    }
+    
     return response;
   } catch (error) {
     console.error(`API Error (${endpoint}):`, error);
@@ -561,13 +575,21 @@ export const llmAPI = {
    * Chat with mentor AI
    */
   async chat(message: string, conversationId?: string) {
+    // Debug: Log request details
+    console.log('[DEBUG] llmAPI.chat - Making request to /api/llm/chat/');
+    console.log('[DEBUG] llmAPI.chat - Credentials:', 'include');
+    
     const response = await fetchAPI('/api/llm/chat/', {
       method: 'POST',
       body: JSON.stringify({ message, conversation_id: conversationId }),
     });
 
+    console.log('[DEBUG] llmAPI.chat - Response status:', response.status);
+    console.log('[DEBUG] llmAPI.chat - Response ok:', response.ok);
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Chat failed' }));
+      console.error('[DEBUG] llmAPI.chat - Error response:', error);
       if (response.status === 401) {
         throw new Error('Authentication required. Please log in again.');
       }

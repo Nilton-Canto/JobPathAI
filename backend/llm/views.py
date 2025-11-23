@@ -152,8 +152,24 @@ class ChatView(View):
     
     def post(self, request):
         """Handle chat message with history and context"""
+        # Debug: Check authentication status
+        print(f"[DEBUG] ChatView - User authenticated: {request.user.is_authenticated}")
+        print(f"[DEBUG] ChatView - User: {request.user}")
+        print(f"[DEBUG] ChatView - Session key: {request.session.session_key}")
+        print(f"[DEBUG] ChatView - Has session: {hasattr(request, 'session')}")
+        
         if not request.user.is_authenticated:
-            return JsonResponse({'error': 'Authentication required'}, status=401)
+            # Additional debug info
+            print(f"[DEBUG] ChatView - User is AnonymousUser: {request.user.is_anonymous}")
+            print(f"[DEBUG] ChatView - Session exists: {hasattr(request, 'session') and request.session.session_key}")
+            return JsonResponse({
+                'error': 'Authentication required',
+                'debug': {
+                    'user': str(request.user),
+                    'is_authenticated': request.user.is_authenticated,
+                    'session_key': request.session.session_key if hasattr(request, 'session') else None,
+                }
+            }, status=401)
         
         # Check if user is admin - redirect to admin chat
         if request.user.is_superuser or request.user.is_staff:
