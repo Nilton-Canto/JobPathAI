@@ -67,9 +67,17 @@ const ChatMentorPage: React.FC = () => {
       setMessages((prev) => [...prev, mentorResponse]);
     } catch (error: any) {
       console.error('Error sending message:', error);
+      let errorText = 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique sua conexão e tente novamente.';
+      
+      if (error.message?.includes('Authentication required')) {
+        errorText = 'Sua sessão expirou. Por favor, faça login novamente para continuar usando o chat.';
+      } else if (error.message) {
+        errorText = error.message;
+      }
+      
       const errorMessage: Message = {
         id: messages.length + 2,
-        text: error.message || 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique sua conexão e tente novamente.',
+        text: errorText,
         sender: 'mentor',
         timestamp: new Date(),
       };

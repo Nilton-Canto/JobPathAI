@@ -141,6 +141,13 @@ CORS_ALLOW_CREDENTIALS = True  # Permite o envio de credenciais (cookies, header
 #    "http://127.0.0.1:5173", # Porta padrão do Vite para o frontend
 # ]
 
+# Session configuration for cross-origin requests
+SESSION_COOKIE_SAMESITE = 'None'  # Allow cross-site cookies
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-site CSRF cookies
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+
 STATIC_ROOT = BASE_DIR / "staticfiles"  # Para o build de produção
 
 STATICFILES_DIRS = [

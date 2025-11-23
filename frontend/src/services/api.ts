@@ -568,6 +568,9 @@ export const llmAPI = {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Chat failed' }));
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please log in again.');
+      }
       throw new Error(error.error || 'Chat failed');
     }
 
