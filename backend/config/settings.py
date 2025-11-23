@@ -134,8 +134,21 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# CORS configuration for development
+# Allow all origins temporarily for development
 CORS_ALLOW_ALL_ORIGINS = True  # Temporário para desenvolvimento
 CORS_ALLOW_CREDENTIALS = True  # Permite o envio de credenciais (cookies, headers de autorização)
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 # CORS_ALLOWED_ORIGINS = [
 #    "http://localhost:5173",  # Porta padrão do Vite para o frontend
 #    "http://127.0.0.1:5173", # Porta padrão do Vite para o frontend

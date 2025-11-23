@@ -119,10 +119,8 @@ const ChatWidget: React.FC = () => {
       
       if (error.message?.includes('Authentication required')) {
         errorText = 'Sua sessão expirou. Por favor, faça login novamente para continuar usando o chat.';
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
+        // Don't redirect immediately - let user see the error first
+        // User can manually go to login if needed
       } else if (error.message) {
         errorText = error.message;
       }

@@ -47,8 +47,14 @@ class LoginView(View):
                     # Use default session expiry (24 hours) or browser session
                     request.session.set_expiry(86400)  # 24 hours
                 
-                # Ensure session is saved
+                # Ensure session is saved and modified flag is set
+                request.session.modified = True
                 request.session.save()
+                
+                # Verify session was created
+                if not request.session.session_key:
+                    # Force session creation
+                    request.session.create()
                 
                 # Get user profile data from StudentProfile
                 user_profile = getattr(user, 'student_profile', None)
