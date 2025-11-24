@@ -131,13 +131,20 @@ class CareerPathViewSet(viewsets.ModelViewSet):
         if level:
             queryset = queryset.filter(level=level)
         
-        # Filter by active status (default: only active paths)
+        # Filter by active status (default: only active paths for general users).
+        # But always allow the owner (or staff) to see their own pending/declined paths.
         is_active = self.request.query_params.get('is_active', 'true')
+        user = getattr(self.request, "user", None)
         if is_active.lower() == 'true':
-            queryset = queryset.filter(is_active=True)
+            if user and user.is_authenticated and not user.is_staff:
+                queryset = queryset.filter(
+                    django_models.Q(is_active=True) | django_models.Q(user=user)
+                )
+            else:
+                queryset = queryset.filter(is_active=True)
         elif is_active.lower() == 'false':
             queryset = queryset.filter(is_active=False)
-
+        
         # Filter by status if provided (e.g., pending, approved, declined)
         status_param = self.request.query_params.get('status')
         if status_param:

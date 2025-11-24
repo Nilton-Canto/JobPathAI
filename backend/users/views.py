@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from student_area.models import StudentProfile
 import json
+from django.utils.translation import gettext_lazy as _
 
 
 def _serialize_profile_skills(profile: StudentProfile):
@@ -251,3 +252,18 @@ class UserProfileView(View):
             }
         
         return JsonResponse(profile_data)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AdminStatsView(View):
+    """Return admin-only stats such as student count for dashboard cards"""
+
+    def get(self, request):
+        if not request.user.is_authenticated or not (request.user.is_staff or request.user.is_superuser):
+            return JsonResponse({'error': _('Acesso negado. Apenas administradores.')}, status=403)
+
+        students_count = StudentProfile.objects.count()
+
+        return JsonResponse({
+            'students_count': students_count
+        })

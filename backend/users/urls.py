@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/register/', views.RegisterView.as_view(), name='api_register'),
     path('api/logout/', views.LogoutView.as_view(), name='api_logout'),
     path('api/user-profile/', views.UserProfileView.as_view(), name='api_user_profile'),
+    path('api/admin/stats/', views.AdminStatsView.as_view(), name='api_admin_stats'),
     
     # Keep old routes for backward compatibility (redirect to API)
     path('login/', views.LoginView.as_view(), name='login'),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { careerAPI } from '../../services/api';
+import { careerAPI, adminAPI } from '../../services/api';
 import '../../styles/pages.css';
 
 /**
@@ -14,6 +14,7 @@ interface DashboardStats {
   predefinedPaths: number;
   personalizedPaths: number;
   totalStages: number;
+  totalStudents: number;
 }
 
 const AdminDashboardPage: React.FC = () => {
@@ -22,6 +23,7 @@ const AdminDashboardPage: React.FC = () => {
     predefinedPaths: 0,
     personalizedPaths: 0,
     totalStages: 0,
+    totalStudents: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,10 @@ const AdminDashboardPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const allPaths = await careerAPI.getAll();
+      const [allPaths, adminStats] = await Promise.all([
+        careerAPI.getAll(),
+        adminAPI.getStats(),
+      ]);
       
       // Calculate stats
       const predefinedPaths = allPaths.filter((p: any) => p.path_type === 'PRE');
@@ -53,6 +58,7 @@ const AdminDashboardPage: React.FC = () => {
         predefinedPaths: predefinedPaths.length,
         personalizedPaths: personalizedPaths.length,
         totalStages,
+        totalStudents: adminStats.students_count ?? 0,
       });
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -112,6 +118,19 @@ const AdminDashboardPage: React.FC = () => {
             <div className="stat-sublabel">
               {stats.predefinedPaths} pré-definidas, {stats.personalizedPaths} personalizadas
             </div>
+          </div>
+        </div>
+
+        <div className="stat-card stat-card-info">
+          <div className="stat-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857M15 7a3 3 0 11-6 0 3 3 0 016 0zM21 10a3 3 0 11-6 0 3 3 0 016 0zM9 10a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.totalStudents}</div>
+            <div className="stat-label">Estudantes Registrados</div>
+            <div className="stat-sublabel">Perfis ativos na plataforma</div>
           </div>
         </div>
 

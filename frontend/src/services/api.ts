@@ -933,4 +933,22 @@ export const llmAPI = {
   },
 };
 
+/**
+ * Admin API
+ */
+export const adminAPI = {
+  /**
+   * Get admin dashboard stats (e.g., student count)
+   */
+  async getStats() {
+    const response = await fetchAPI('/api/admin/stats/');
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to fetch admin stats' }));
+      throw new Error(error.error || 'Failed to fetch admin stats');
+    }
+
+    return await response.json();
+  },
+};
 
