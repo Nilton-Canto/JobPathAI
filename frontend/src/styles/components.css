@@ -22,6 +22,8 @@
   height: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  /* Ensure consistent card height */
+  min-height: 280px;
 }
 
 .career-path-card:hover {
@@ -50,6 +52,13 @@
   color: #1f2937;
   margin: 0;
   line-height: 1.3;
+  /* Limit title to 2 lines max */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(1.3em * 2); /* 2 lines max */
 }
 
 .career-path-stages-count {
@@ -72,6 +81,14 @@
   line-height: 1.6;
   margin: 0;
   flex: 1;
+  /* Limit description height and add ellipsis for overflow */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(1.6em * 3); /* 3 lines max */
+  min-height: calc(1.6em * 2); /* At least 2 lines for consistency */
 }
 
 .career-path-progress-section {

@@ -137,6 +137,11 @@ class CareerPathViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=True)
         elif is_active.lower() == 'false':
             queryset = queryset.filter(is_active=False)
+
+        # Filter by status if provided (e.g., pending, approved, declined)
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            queryset = queryset.filter(status=status_param)
         
         return queryset.select_related('user').prefetch_related('stages', 'stages__skills')
     
@@ -259,6 +264,42 @@ class CareerPathViewSet(viewsets.ModelViewSet):
             'started_at': user_path.started_at,
             'updated_at': user_path.updated_at
         })
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def approve(self, request, pk=None):
+        """Aprova a trilha gerada (ativa e marca status)."""
+        path = self.get_object()
+        if not (request.user.is_staff or request.user == path.user):
+            raise PermissionDenied('Apenas o criador ou um admin pode aprovar.')
+        path.status = 'approved'
+        path.is_active = True
+        path.save(update_fields=['status', 'is_active', 'updated_at'])
+        serializer = self.get_serializer(path)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def decline(self, request, pk=None):
+        """Recusa a trilha gerada (desativa)."""
+        path = self.get_object()
+        if not (request.user.is_staff or request.user == path.user):
+            raise PermissionDenied('Apenas o criador ou um admin pode recusar.')
+        path.status = 'declined'
+        path.is_active = False
+        path.save(update_fields=['status', 'is_active', 'updated_at'])
+        serializer = self.get_serializer(path)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def request_refinement(self, request, pk=None):
+        """Coloca a trilha em modo pendente para ajustes antes de aprovar."""
+        path = self.get_object()
+        if not (request.user.is_staff or request.user == path.user):
+            raise PermissionDenied('Apenas o criador ou um admin pode refinar.')
+        path.status = 'pending'
+        path.is_active = False
+        path.save(update_fields=['status', 'is_active', 'updated_at'])
+        serializer = self.get_serializer(path)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(
         detail=False,

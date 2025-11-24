@@ -27,7 +27,7 @@ from .utils import (
     get_conversation_history,
     update_user_memory
 )
-from career.models import CareerPath, CareerStage, Skill
+from career.models import CareerPath, CareerStage, Skill, UserCareerPath
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -88,7 +88,16 @@ class GeneratePlanView(View):
                 title=plan_data['title'],
                 description=plan_data.get('description', ''),
                 user=request.user,
-                path_type='PER'  # Personalizada
+                path_type='PER',  # Personalizada
+                status='pending',
+                is_active=False
+            )
+
+            # Automatically associate the creator with the new path so progress endpoints work
+            UserCareerPath.objects.get_or_create(
+                user=request.user,
+                career_path=career_path,
+                defaults={'is_active': True}
             )
             
             # Create CareerStages
@@ -175,6 +184,66 @@ class ChatView(View):
             
             # Save user message
             save_message(conversation, 'user', message)
+
+            # Quick command handler to aprovar/recusar/refinar via chat prefix
+            lower_msg = message.lower().strip()
+            if lower_msg.startswith('/aprovar'):
+                parts = lower_msg.split()
+                if len(parts) >= 2:
+                    try:
+                        path_id = int(parts[1])
+                        from career.models import CareerPath
+                        path = CareerPath.objects.get(pk=path_id)
+                        if not (request.user.is_staff or request.user == path.user):
+                            raise PermissionDenied('Apenas o criador ou admin pode aprovar.')
+                        path.status = 'approved'
+                        path.is_active = True
+                        path.save(update_fields=['status', 'is_active', 'updated_at'])
+                        resp_text = f"Trilha {path.title} aprovada e ativada."
+                        save_message(conversation, 'assistant', resp_text)
+                        return JsonResponse({'success': True, 'response': resp_text, 'conversation_id': conversation.conversation_id})
+                    except Exception as e:
+                        err = f'Erro ao aprovar: {e}'
+                        save_message(conversation, 'assistant', err)
+                        return JsonResponse({'success': False, 'error': err}, status=400)
+            if lower_msg.startswith('/recusar') or lower_msg.startswith('/declinar'):
+                parts = lower_msg.split()
+                if len(parts) >= 2:
+                    try:
+                        path_id = int(parts[1])
+                        from career.models import CareerPath
+                        path = CareerPath.objects.get(pk=path_id)
+                        if not (request.user.is_staff or request.user == path.user):
+                            raise PermissionDenied('Apenas o criador ou admin pode recusar.')
+                        path.status = 'declined'
+                        path.is_active = False
+                        path.save(update_fields=['status', 'is_active', 'updated_at'])
+                        resp_text = f"Trilha {path.title} recusada e desativada."
+                        save_message(conversation, 'assistant', resp_text)
+                        return JsonResponse({'success': True, 'response': resp_text, 'conversation_id': conversation.conversation_id})
+                    except Exception as e:
+                        err = f'Erro ao recusar: {e}'
+                        save_message(conversation, 'assistant', err)
+                        return JsonResponse({'success': False, 'error': err}, status=400)
+            if lower_msg.startswith('/refinar'):
+                parts = lower_msg.split()
+                if len(parts) >= 2:
+                    try:
+                        path_id = int(parts[1])
+                        from career.models import CareerPath
+                        path = CareerPath.objects.get(pk=path_id)
+                        if not (request.user.is_staff or request.user == path.user):
+                            raise PermissionDenied('Apenas o criador ou admin pode refinar.')
+                        path.status = 'pending'
+                        path.is_active = False
+                        path.save(update_fields=['status', 'is_active', 'updated_at'])
+                        resp_text = f"Trilha {path.title} marcada como pendente para ajustes."
+                        save_message(conversation, 'assistant', resp_text)
+                        return JsonResponse({'success': True, 'response': resp_text, 'conversation_id': conversation.conversation_id})
+                    except Exception as e:
+                        err = f'Erro ao refinar: {e}'
+                        save_message(conversation, 'assistant', err)
+                        return JsonResponse({'success': False, 'error': err}, status=400)
 
             # Ensure LLM service is configured and available
             try:

@@ -57,6 +57,11 @@ class CareerPath(models.Model):
     description = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Para trilhas personalizadas
     path_type = models.CharField(max_length=3, choices=PATH_TYPES, default='PRE')
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pendente'),
+        ('approved', 'Aprovada'),
+        ('declined', 'Recusada'),
+    ], default='pending')
     
     # Novos campos para filtros e melhor organização
     area = models.ForeignKey('Area', on_delete=models.SET_NULL, blank=True, null=True, related_name='career_paths', help_text='Área profissional da trilha')
