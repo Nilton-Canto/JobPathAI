@@ -479,6 +479,21 @@
   margin-bottom: 1rem;
 }
 
+.plan-status-badge.badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.plan-status-badge.badge-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.plan-status-badge.badge-secondary {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
 .status-dot {
   width: 8px;
   height: 8px;
@@ -541,8 +556,11 @@
 }
 
 .stage-number-completed {
-  background: #4caf50;
+  background: #10b981;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stage-number-current {
@@ -568,8 +586,19 @@
 }
 
 .stage-badge-completed {
-  background: #d4edda;
-  color: #155724;
+  background: #d1fae5;
+  color: #065f46;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.stage-completed-date {
+  font-size: 0.875rem;
+  color: #10b981;
+  margin-top: 0.5rem;
+  font-weight: 500;
 }
 
 .stage-badge-current {
@@ -678,11 +707,81 @@
   margin-top: 0.25rem;
 }
 
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.badge-success {
+  background-color: #10b981;
+  color: white;
 }
 
 .badge-primary {
@@ -1199,6 +1298,11 @@
   max-width: 800px;
 }
 
+/* Profile form in modal - remove max-width constraint */
+.modal-content .profile-form-modern {
+  max-width: 100%;
+}
+
 .form-section {
   margin-bottom: 2rem;
 }
@@ -1261,6 +1365,42 @@
   align-items: center;
   padding-top: 1.5rem;
   border-top: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+/* Modal form actions - centered when needed */
+.form-actions-centered {
+  justify-content: center !important;
+}
+
+/* Links styled as buttons in modal actions */
+.modal-content .form-actions-modern a.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  padding: 0.625rem 1.5rem !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  min-height: 2.5rem !important;
+  height: 2.5rem !important;
+  line-height: 1.4 !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
+  margin: 0 !important;
+  width: auto !important;
+  background-color: #6b7280 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.modal-content .form-actions-modern a.btn-secondary:hover {
+  background-color: #4b5563 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .form-actions-modern .btn-primary,

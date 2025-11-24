@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (
-    Skill, 
+    Skill,
+    Area,
     CareerPath, 
     CareerStage,
     UserCareerPath,
@@ -17,13 +18,44 @@ class SkillAdmin(admin.ModelAdmin):
     list_filter = ('name',)
 
 
+@admin.register(Area)
+class AreaAdmin(admin.ModelAdmin):
+    """Admin configuration for Area model"""
+    list_display = ('name', 'is_active', 'created_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('name', 'description')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('name', 'description', 'is_active')
+        }),
+        ('Datas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
 @admin.register(CareerPath)
 class CareerPathAdmin(admin.ModelAdmin):
     """Admin configuration for CareerPath model"""
-    list_display = ('title', 'path_type', 'user', 'created_at')
-    list_filter = ('path_type', 'created_at')
+    list_display = ('title', 'path_type', 'area', 'level', 'is_active', 'user', 'created_at')
+    list_filter = ('path_type', 'area', 'level', 'is_active', 'created_at')
     search_fields = ('title', 'description')
     readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('title', 'description', 'path_type', 'user', 'is_active')
+        }),
+        ('Metadados', {
+            'fields': ('area', 'level', 'estimated_time_months', 'hours_per_week'),
+            'classes': ('collapse',)
+        }),
+        ('Datas', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
     filter_horizontal = ()  # Para ManyToMany fields se houver
 
 

@@ -10,6 +10,11 @@ interface CareerPath {
   description: string;
   path_type: string;
   stages?: CareerStage[];
+  area?: string;
+  level?: string;
+  estimated_time_months?: number;
+  hours_per_week?: number;
+  is_active?: boolean;
 }
 
 interface CareerStage {
@@ -34,11 +39,11 @@ const ExploreCareerPathsPage: React.FC = () => {
 
   useEffect(() => {
     fetchCareerPaths();
-  }, []);
+  }, []); // Only fetch once on mount
 
   useEffect(() => {
     filterPaths();
-  }, [searchTerm, selectedArea, selectedLevel, sortBy, careerPaths]);
+  }, [searchTerm, selectedArea, selectedLevel, sortBy, careerPaths]); // Filter when any of these change
 
   // Update URL query params when filters change
   useEffect(() => {
@@ -56,8 +61,17 @@ const ExploreCareerPathsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Attempt to fetch career paths from API
-      const paths = await careerAPI.getPredefined();
+      // Build query params for backend filtering
+      const queryParams: any = { path_type: 'PRE', is_active: 'true' };
+      if (selectedArea !== 'Todas as Áreas') {
+        queryParams.area = selectedArea;
+      }
+      if (selectedLevel !== 'Todos os Níveis') {
+        queryParams.level = selectedLevel;
+      }
+      
+      // Attempt to fetch career paths from API with filters
+      const paths = await careerAPI.getAll(queryParams);
       
       // Validate response
       if (!Array.isArray(paths)) {
@@ -108,27 +122,46 @@ const ExploreCareerPathsPage: React.FC = () => {
       });
     }
 
-    // Filter by area (searches in title/description for area keywords)
+    // Filter by area (use backend field if available, otherwise fallback to keyword search)
     if (selectedArea !== 'Todas as Áreas') {
-      const areaKeywords: { [key: string]: string[] } = {
-        'Tecnologia': ['tecnologia', 'tech', 'desenvolvimento', 'programação', 'software', 'web', 'mobile', 'dev'],
-        'Design': ['design', 'ux', 'ui', 'interface', 'visual', 'criativo'],
-        'Negócios': ['negócio', 'business', 'gestão', 'gerenciamento', 'empreendedorismo', 'marketing'],
-        'Dados': ['dados', 'data', 'análise', 'analytics', 'ciência de dados', 'big data', 'machine learning'],
-      };
-      
-      const keywords = areaKeywords[selectedArea] || [];
-      if (keywords.length > 0) {
-        filtered = filtered.filter((path) => {
+      filtered = filtered.filter((path) => {
+        // Use backend field if available
+        if (path.area) {
+          return path.area === selectedArea;
+        }
+        
+        // Fallback: keyword search for paths without area field
+        const areaKeywords: { [key: string]: string[] } = {
+          'Tecnologia': ['tecnologia', 'tech', 'desenvolvimento', 'programação', 'software', 'web', 'mobile', 'dev'],
+          'Design': ['design', 'ux', 'ui', 'interface', 'visual', 'criativo'],
+          'Negócios': ['negócio', 'business', 'gestão', 'gerenciamento', 'empreendedorismo', 'marketing'],
+          'Dados': ['dados', 'data', 'análise', 'analytics', 'ciência de dados', 'big data', 'machine learning'],
+        };
+        
+        const keywords = areaKeywords[selectedArea] || [];
+        if (keywords.length > 0) {
           const text = `${path.title} ${path.description}`.toLowerCase();
           return keywords.some(keyword => text.includes(keyword));
-        });
-      }
+        }
+        
+        return false;
+      });
     }
 
-    // Filter by level (based on stage count - heuristic)
+    // Filter by level (use backend field if available, otherwise fallback to stage count heuristic)
     if (selectedLevel !== 'Todos os Níveis') {
       filtered = filtered.filter((path) => {
+        // Use backend field if available
+        if (path.level) {
+          // Check if level matches or contains the selected level
+          if (path.level === selectedLevel) return true;
+          if (path.level.includes(selectedLevel)) return true;
+          if (selectedLevel === 'Iniciante' && path.level.includes('Iniciante')) return true;
+          if (selectedLevel === 'Intermediário' && path.level.includes('Intermediário')) return true;
+          if (selectedLevel === 'Avançado' && path.level.includes('Avançado')) return true;
+        }
+        
+        // Fallback: heuristic based on stage count
         const stageCount = path.stages?.length || 0;
         if (selectedLevel === 'Iniciante') return stageCount <= 5;
         if (selectedLevel === 'Intermediário') return stageCount > 5 && stageCount <= 10;

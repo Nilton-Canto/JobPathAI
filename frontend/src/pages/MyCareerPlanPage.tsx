@@ -39,8 +39,23 @@ const MyCareerPlanPage: React.FC = () => {
   const fetchCareerPath = async (pathId: number) => {
     try {
       setLoading(true);
-      const path = await careerAPI.getById(pathId);
-      setCareerPath(path);
+      // Use progress endpoint to get user-specific progress data
+      try {
+        const progressData = await careerAPI.getProgress(pathId);
+        // Transform progress data to match CareerPath interface
+        setCareerPath({
+          id: progressData.career_path_id,
+          title: progressData.career_path_title,
+          description: '', // Will be filled from getById if needed
+          path_type: 'PRE', // Default, can be updated
+          stages: progressData.stages || [],
+          created_at: progressData.started_at,
+        });
+      } catch (progressErr) {
+        // Fallback to getById if progress endpoint fails (user not associated)
+        const path = await careerAPI.getById(pathId);
+        setCareerPath(path);
+      }
     } catch (err) {
       console.error('Error fetching career path:', err);
       setError('Erro ao carregar plano de carreira.');
@@ -60,6 +75,17 @@ const MyCareerPlanPage: React.FC = () => {
   const getCurrentStage = (): CareerStage | null => {
     if (!careerPath || !careerPath.stages) return null;
     return careerPath.stages.find((stage) => !stage.is_completed) || null;
+  };
+
+  const getStatus = (): { label: string; badgeClass: string } => {
+    const progress = calculateProgress();
+    if (progress === 100) {
+      return { label: 'Concluída', badgeClass: 'badge-success' };
+    } else if (progress > 0) {
+      return { label: 'Em Progresso', badgeClass: 'badge-info' };
+    } else {
+      return { label: 'Não Iniciada', badgeClass: 'badge-secondary' };
+    }
   };
 
   const handleCompleteStage = async (stageId: number) => {
@@ -106,9 +132,9 @@ const MyCareerPlanPage: React.FC = () => {
   return (
     <div className="page-container my-plan-container">
       <div className="plan-header-section">
-        <div className="plan-status-badge">
+        <div className={`plan-status-badge ${getStatus().badgeClass}`}>
           <span className="status-dot"></span>
-          Em Progresso
+          {getStatus().label}
         </div>
         <h1>{careerPath.title}</h1>
         <p>{careerPath.description}</p>
@@ -134,12 +160,26 @@ const MyCareerPlanPage: React.FC = () => {
         {/* Completed Stages */}
         {completedStages.map((stage) => (
           <div key={stage.id} className="stage-card stage-completed">
-            <div className="stage-number stage-number-completed">✓</div>
+            <div className="stage-number stage-number-completed">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.5rem', height: '1.5rem' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
             <div className="stage-content">
               <h3 className="stage-title-completed">{stage.title}</h3>
               <p className="stage-description">{stage.description}</p>
+              {stage.completed_at && (
+                <p className="stage-completed-date" style={{ fontSize: '0.875rem', color: '#10b981', marginTop: '0.5rem', fontWeight: 500 }}>
+                  Concluído em {new Date(stage.completed_at).toLocaleDateString('pt-BR')}
+                </p>
+              )}
             </div>
-            <span className="stage-badge stage-badge-completed">Concluído</span>
+            <span className="stage-badge stage-badge-completed">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Concluído
+            </span>
           </div>
         ))}
 

@@ -36,4 +36,5 @@ urlpatterns = [
     path("api/status/", views.StatusView.as_view(), name="api_status"),  # API status and endpoints info
     path("api/health/", views.HealthCheckView.as_view(), name="api_health"),  # Health check
     path("api/stats/", views.DatabaseStatsView.as_view(), name="api_stats"),  # Database stats (admin only)
+    path("api/csrf-token/", views.CsrfTokenView.as_view(), name="api_csrf_token"),  # CSRF token endpoint
 ]

@@ -20,6 +20,11 @@ interface CareerPath {
   path_type: string;
   stages: CareerStage[];
   created_at?: string;
+  area?: string;
+  level?: string;
+  estimated_time_months?: number;
+  hours_per_week?: number;
+  is_active?: boolean;
 }
 
 const CareerPathDetailPage: React.FC = () => {
@@ -86,9 +91,36 @@ const CareerPathDetailPage: React.FC = () => {
     return Array.from(skillsSet);
   };
 
-  const estimateTime = (): string => {
-    // Estimate: 2-3 weeks per stage on average
+  const getEstimatedTime = (): string => {
+    // Use backend data if available, otherwise estimate
+    if (careerPath?.estimated_time_months) {
+      const months = careerPath.estimated_time_months;
+      const hours = careerPath.hours_per_week;
+      
+      let timeStr = '';
+      if (months >= 12) {
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+        if (remainingMonths > 0) {
+          timeStr = `${years} ano${years > 1 ? 's' : ''} e ${remainingMonths} mês${remainingMonths > 1 ? 'es' : ''}`;
+        } else {
+          timeStr = `${years} ano${years > 1 ? 's' : ''}`;
+        }
+      } else {
+        timeStr = `${months} mês${months > 1 ? 'es' : ''}`;
+      }
+      
+      if (hours) {
+        timeStr += ` (${hours}h/semana)`;
+      }
+      
+      return timeStr;
+    }
+    
+    // Fallback: Estimate based on stages
     const totalStages = careerPath?.stages?.length || 0;
+    if (totalStages === 0) return 'Não especificado';
+    
     const weeks = Math.ceil(totalStages * 2.5);
     const months = Math.ceil(weeks / 4);
     
@@ -96,11 +128,12 @@ const CareerPathDetailPage: React.FC = () => {
       const years = Math.floor(months / 12);
       const remainingMonths = months % 12;
       if (remainingMonths > 0) {
-        return `${years} ano${years > 1 ? 's' : ''} e ${remainingMonths} mês${remainingMonths > 1 ? 'es' : ''}`;
+        return `${years} ano${years > 1 ? 's' : ''} e ${remainingMonths} mês${remainingMonths > 1 ? 'es' : ''} (estimado)`;
       }
-      return `${years} ano${years > 1 ? 's' : ''}`;
+      return `${years} ano${years > 1 ? 's' : ''} (estimado)`;
     }
-    return `${months} mês${months > 1 ? 'es' : ''}`;
+    
+    return `${months} mês${months > 1 ? 'es' : ''} (estimado)`;
   };
 
   if (loading) {
@@ -140,7 +173,7 @@ const CareerPathDetailPage: React.FC = () => {
 
   const progress = calculateProgress();
   const allSkills = getAllSkills();
-  const estimatedTime = estimateTime();
+  const estimatedTime = getEstimatedTime();
 
   return (
     <div className="page-container my-plan-container">
@@ -158,7 +191,23 @@ const CareerPathDetailPage: React.FC = () => {
         </div>
         
         <h1>{careerPath.title}</h1>
-        <p style={{ fontSize: '1.125rem', lineHeight: '1.6', marginBottom: '2rem' }}>{careerPath.description}</p>
+        <p style={{ fontSize: '1.125rem', lineHeight: '1.6', marginBottom: '1rem' }}>{careerPath.description}</p>
+        
+        {/* Metadata badges */}
+        {(careerPath.area || careerPath.level) && (
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+            {careerPath.area && (
+              <span className="badge badge-primary" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
+                {careerPath.area}
+              </span>
+            )}
+            {careerPath.level && (
+              <span className="badge badge-secondary" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
+                {careerPath.level}
+              </span>
+            )}
+          </div>
+        )}
         
         {/* Info Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
@@ -244,7 +293,12 @@ const CareerPathDetailPage: React.FC = () => {
                 )}
               </div>
               {stage.is_completed && (
-                <span className="stage-badge stage-badge-completed">Concluído</span>
+                <span className="stage-badge stage-badge-completed">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1rem', height: '1rem', marginRight: '0.25rem', display: 'inline-block' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Concluído
+                </span>
               )}
             </div>
           ))}
@@ -259,14 +313,36 @@ const CareerPathDetailPage: React.FC = () => {
         <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
           {progress > 0 
             ? 'Continue sua jornada nesta trilha de carreira!'
-            : 'Comece sua jornada profissional seguindo esta trilha passo a passo.'}
+            : 'Associe-se a esta trilha para começar sua jornada profissional passo a passo.'}
         </p>
-        <Link to={`/my-plan/${careerPath.id}`} className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-          {progress > 0 ? 'Continuar Trilha' : 'Começar Trilha'}
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
-        </Link>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {progress > 0 ? (
+            <Link to={`/my-plan/${careerPath.id}`} className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              Continuar Trilha
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          ) : (
+            <button
+              onClick={async () => {
+                try {
+                  await careerAPI.associateWithUser(careerPath.id);
+                  navigate(`/my-plan/${careerPath.id}`);
+                } catch (err: any) {
+                  alert(err.message || 'Erro ao associar trilha. Tente novamente.');
+                }
+              }}
+              className="btn-primary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              Associar e Começar Trilha
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

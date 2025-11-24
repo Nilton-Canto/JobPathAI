@@ -5,15 +5,16 @@ Includes ViewSets with custom actions for associate, progress, etc.
 
 from django.db import models as django_models
 from django.utils import timezone
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import ValidationError, PermissionDenied
 
-from .models import Skill, CareerPath, CareerStage, UserCareerPath, UserStageProgress, Favorite
+from .models import Skill, Area, CareerPath, CareerStage, UserCareerPath, UserStageProgress, Favorite
 from .serializers import (
-    SkillSerializer, 
+    SkillSerializer,
+    AreaSerializer,
     CareerPathSerializer, 
     CareerStageSerializer,
     UserCareerPathSerializer,
@@ -22,11 +23,66 @@ from .serializers import (
 )
 
 
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission: Only admins can create/edit/delete.
+    Others can only read.
+    """
+    def has_permission(self, request, view):
+        # Read permissions for everyone
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        
+        # Write permissions only for authenticated staff/superusers
+        return request.user and request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser)
+    
+    def has_object_permission(self, request, view, obj):
+        # Read permissions for everyone
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        
+        # Write permissions only for authenticated staff/superusers
+        return request.user and request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser)
+
+
 class SkillViewSet(viewsets.ModelViewSet):
     """ViewSet for Skills"""
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
+
+
+class AreaViewSet(viewsets.ModelViewSet):
+    """ViewSet for Professional Areas with CRUD operations"""
+    queryset = Area.objects.all()
+    serializer_class = AreaSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def get_queryset(self):
+        """Filter by active status if requested"""
+        queryset = Area.objects.all()
+        is_active = self.request.query_params.get('is_active', None)
+        if is_active is not None:
+            is_active_bool = is_active.lower() == 'true'
+            queryset = queryset.filter(is_active=is_active_bool)
+        return queryset.order_by('name')
+    
+    def destroy(self, request, *args, **kwargs):
+        """
+        Override destroy to prevent deletion if area has associated career paths
+        """
+        area = self.get_object()
+        
+        # Check if area has associated career paths
+        path_count = area.get_path_count()
+        
+        if path_count > 0:
+            return Response({
+                'error': f'Não é possível deletar esta área. Ela possui {path_count} trilha(s) associada(s).',
+                'path_count': path_count
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        return super().destroy(request, *args, **kwargs)
 
 
 class CareerPathViewSet(viewsets.ModelViewSet):
@@ -38,7 +94,7 @@ class CareerPathViewSet(viewsets.ModelViewSet):
     """
     queryset = CareerPath.objects.all()
     serializer_class = CareerPathSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     
     def get_queryset(self):
         """
@@ -65,10 +121,22 @@ class CareerPathViewSet(viewsets.ModelViewSet):
                 django_models.Q(description__icontains=search)
             )
         
-        # Filter by area (if we add area field later)
-        # area = self.request.query_params.get('area', None)
-        # if area:
-        #     queryset = queryset.filter(area=area)
+        # Filter by area
+        area = self.request.query_params.get('area', None)
+        if area:
+            queryset = queryset.filter(area=area)
+        
+        # Filter by level
+        level = self.request.query_params.get('level', None)
+        if level:
+            queryset = queryset.filter(level=level)
+        
+        # Filter by active status (default: only active paths)
+        is_active = self.request.query_params.get('is_active', 'true')
+        if is_active.lower() == 'true':
+            queryset = queryset.filter(is_active=True)
+        elif is_active.lower() == 'false':
+            queryset = queryset.filter(is_active=False)
         
         return queryset.select_related('user').prefetch_related('stages', 'stages__skills')
     
@@ -218,6 +286,72 @@ class CareerPathViewSet(viewsets.ModelViewSet):
         
         return super().destroy(request, *args, **kwargs)
 
+    @action(detail=True, methods=['patch'], permission_classes=[IsAdminOrReadOnly])
+    def toggle_active(self, request, pk=None):
+        """
+        Toggle active status of a career path
+        PATCH /api/v1/career-paths/{id}/toggle_active/
+        """
+        career_path = self.get_object()
+        is_active = request.data.get('is_active')
+
+        # Default: invert current state if not provided
+        if is_active is None:
+            is_active = not career_path.is_active
+
+        career_path.is_active = bool(is_active)
+        career_path.save(update_fields=['is_active'])
+
+        serializer = self.get_serializer(career_path)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
+    def areas(self, request):
+        """
+        Get list of available professional areas (legacy endpoint for compatibility)
+        GET /api/v1/career-paths/areas/
+        """
+        # Get active areas from Area model
+        areas = Area.objects.filter(is_active=True).order_by('name')
+        areas_data = []
+        
+        for area in areas:
+            path_count = area.get_path_count()
+            areas_data.append({
+                'value': area.name,
+                'label': area.name,
+                'id': area.id,
+                'path_count': path_count
+            })
+        
+        return Response({
+            'areas': areas_data,
+            'total': len(areas_data)
+        })
+    
+    @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
+    def levels(self, request):
+        """
+        Get list of available difficulty levels
+        GET /api/v1/career-paths/levels/
+        """
+        levels = CareerPath.LEVEL_CHOICES
+        levels_data = []
+        
+        for level_value, level_label in levels:
+            # Count paths in this level
+            path_count = CareerPath.objects.filter(level=level_value, is_active=True).count()
+            levels_data.append({
+                'value': level_value,
+                'label': level_label,
+                'path_count': path_count
+            })
+        
+        return Response({
+            'levels': levels_data,
+            'total': len(levels_data)
+        })
+
 
 class CareerStageViewSet(viewsets.ModelViewSet):
     """
@@ -225,7 +359,16 @@ class CareerStageViewSet(viewsets.ModelViewSet):
     """
     queryset = CareerStage.objects.all()
     serializer_class = CareerStageSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_permissions(self):
+        """
+        Allow authenticated students to marcar etapa como concluída (PATCH is_completed).
+        Admins keep full access for other operations.
+        """
+        if self.request.method == 'PATCH' and 'is_completed' in self.request.data:
+            return [permissions.IsAuthenticated()]
+        return super().get_permissions()
     
     def partial_update(self, request, *args, **kwargs):
         """

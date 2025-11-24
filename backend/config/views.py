@@ -6,9 +6,12 @@ Backend views for JobPathAI
 
 from django.http import JsonResponse, HttpResponseRedirect
 from django.views import View
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from django.db import connection
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.middleware.csrf import get_token
 
 
 class RootRedirectView(View):
@@ -150,3 +153,16 @@ class DatabaseStatsView(View):
             'status': 'ok',
             'stats': stats
         })
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class CsrfTokenView(View):
+    """
+    Endpoint to get CSRF token
+    This ensures the CSRF cookie is set in the response
+    """
+    
+    def get(self, request):
+        """Return CSRF token"""
+        token = get_token(request)
+        return JsonResponse({'csrfToken': token})

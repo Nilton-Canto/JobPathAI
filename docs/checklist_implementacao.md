@@ -89,9 +89,12 @@
 - [x] Serializers configurados
 - [x] Endpoint `/api/v1/career-paths/` disponível
 - [x] Filtro por `path_type` via query params (`?path_type=PRE`)
-- [ ] **FALTA**: Endpoint específico para associar trilha ao usuário (`/associate/`)
-- [ ] **FALTA**: Modelo de associação User-CareerPath para trilhas pré-definidas
-- [ ] **FALTA**: Campo `is_active` para ativar/desativar trilhas
+- [x] Endpoint específico para associar trilha ao usuário (`/associate/`) ✅
+- [x] Modelo de associação User-CareerPath para trilhas pré-definidas ✅
+- [x] Campo `is_active` para ativar/desativar trilhas ✅
+- [x] Endpoint `/api/v1/career-paths/areas/` para listar áreas ✅
+- [x] Endpoint `/api/v1/career-paths/levels/` para listar níveis ✅
+- [x] Filtros por área, nível e is_active ✅
 
 #### Frontend
 - [x] Página para explorar trilhas pré-definidas (`ExploreCareerPathsPage.tsx`)
@@ -187,9 +190,9 @@
 - [x] Modelos registrados no Django Admin
 - [x] Verificação de permissões admin em `AdminLayout`
 - [x] API REST para CRUD de trilhas (ViewSet genérico)
-- [ ] **FALTA**: Permissões customizadas para admin na API (restrição de acesso)
-- [ ] **FALTA**: Validações de negócio (ex: não deletar trilha com usuários associados)
-- [ ] **FALTA**: Campo `is_active` e endpoint para ativar/desativar trilhas
+- [x] Permissões customizadas para admin na API (`IsAdminOrReadOnly`) ✅
+- [x] Validações de negócio (não deletar trilha com usuários associados) ✅
+- [x] Campo `is_active` e filtros por status ✅
 
 #### Frontend
 - [x] Página React `AdminCareerPathsPage.tsx` criada (em `pages/admin/`)
@@ -208,9 +211,9 @@
   - [x] Remover etapas
   - [x] Reordenar etapas (botões ↑↓)
   - [x] Adicionar habilidades às etapas
-- [x] Página Gerenciar Áreas (`AdminAreasPage.tsx` - placeholder informativo)
+- [x] Página Gerenciar Áreas (`AdminAreasPage.tsx` - integrada com backend) ✅
+- [x] Endpoints para listar áreas e níveis (`/areas/`, `/levels/`) ✅
 - [ ] **FALTA**: Interface drag-and-drop para reordenar etapas (melhoria futura)
-- [ ] **FALTA**: Ativar/desativar trilhas (melhoria futura)
 
 ---
 

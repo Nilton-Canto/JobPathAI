@@ -1,11 +1,24 @@
 from rest_framework import serializers
-from .models import Skill, CareerPath, CareerStage, UserCareerPath, UserStageProgress, Favorite
+from .models import Skill, Area, CareerPath, CareerStage, UserCareerPath, UserStageProgress, Favorite
 
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = '__all__'
+
+
+class AreaSerializer(serializers.ModelSerializer):
+    path_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Area
+        fields = ['id', 'name', 'description', 'is_active', 'created_at', 'updated_at', 'path_count']
+        read_only_fields = ['created_at', 'updated_at']
+    
+    def get_path_count(self, obj):
+        """Get count of active career paths in this area"""
+        return obj.get_path_count()
 
 
 class CareerStageSerializer(serializers.ModelSerializer):
@@ -18,6 +31,9 @@ class CareerStageSerializer(serializers.ModelSerializer):
 
 class CareerPathSerializer(serializers.ModelSerializer):
     stages = CareerStageSerializer(many=True, read_only=True)
+    # Area as simple representation to avoid circular reference
+    area_name = serializers.CharField(source='area.name', read_only=True)
+    area_id = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all(), source='area', write_only=True, required=False, allow_null=True)
     # Add computed fields for user context (if user is authenticated)
     is_favorited = serializers.SerializerMethodField()
     is_associated = serializers.SerializerMethodField()

@@ -3,10 +3,58 @@
  * Centralized service for making API calls to the Django backend
  */
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+// Base URL for the backend API.
+// Falls back to the current host on porta 8000 to keep cookies/CSRF in the same site.
+const API_BASE_URL =
+  (import.meta as any)?.env?.VITE_API_BASE_URL ||
+  `${window.location.protocol}//${window.location.hostname}:8000`;
 
 /**
- * Generic fetch wrapper with error handling
+ * Get CSRF token from cookies
+ */
+function getCsrfToken(): string | null {
+  // Try to get CSRF token from cookie
+  const name = 'csrftoken';
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [key, value] = cookie.trim().split('=');
+    if (key === name && value) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+/**
+ * Fetch CSRF token from backend
+ * This ensures we have a valid CSRF token before making write requests
+ */
+async function fetchCsrfToken(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/csrf-token/`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      // The backend sets the cookie, but also returns the token in JSON
+      // Try to get from cookie first, then from response
+      let token = getCsrfToken();
+      if (!token && data.csrfToken) {
+        token = data.csrfToken;
+      }
+      return token;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch CSRF token from endpoint:', err);
+  }
+  return null;
+}
+
+
+/**
+ * Generic fetch wrapper with error handling and CSRF token support
  */
 async function fetchAPI(
   endpoint: string,
@@ -14,16 +62,137 @@ async function fetchAPI(
 ): Promise<Response> {
   const url = `${API_BASE_URL}${endpoint}`;
   
+  // Determine if this is a write operation that needs CSRF token
+  const method = options.method || 'GET';
+  const needsCsrf = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase());
+  
+  // Get CSRF token if needed - fetch it first if not available
+  let csrfToken: string | null = null;
+  if (needsCsrf) {
+    csrfToken = getCsrfToken();
+    
+    // If no CSRF token available, fetch it from the dedicated endpoint
+    // This ensures we have the CSRF cookie before attempting write operations
+    if (!csrfToken) {
+      csrfToken = await fetchCsrfToken();
+      
+      // If still no token, try making a GET request to any endpoint as fallback
+      if (!csrfToken) {
+        try {
+          await fetch(`${API_BASE_URL}/api/v1/career-paths/`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          // Wait a moment for the cookie to be processed by the browser
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
+          // Try to get the token again after the request
+          csrfToken = getCsrfToken();
+        } catch (err) {
+          console.warn('Failed to fetch CSRF token:', err);
+        }
+      }
+    }
+  }
+  
+  // Build headers
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  // Merge with existing headers if provided
+  if (options.headers) {
+    if (options.headers instanceof Headers) {
+      options.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else if (Array.isArray(options.headers)) {
+      options.headers.forEach(([key, value]) => {
+        headers[key] = value;
+      });
+    } else {
+      Object.assign(headers, options.headers);
+    }
+  }
+  
+  // Add CSRF token if available and needed
+  if (csrfToken && needsCsrf) {
+    headers['X-CSRFToken'] = csrfToken;
+  }
+  
   const defaultOptions: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     credentials: 'include', // Include cookies for session authentication
     ...options,
   };
 
   try {
-    const response = await fetch(url, defaultOptions);
+    let response = await fetch(url, defaultOptions);
+    
+    // If we get a 403, check if it's CSRF or authentication issue
+    if (!response.ok && response.status === 403) {
+      const responseText = await response.clone().text();
+      let responseData: any = {};
+      try {
+        responseData = JSON.parse(responseText);
+      } catch {
+        // Not JSON, use text
+      }
+      
+      // Check if it's a CSRF issue or authentication issue
+      const isAuthError = responseData.detail?.includes('Authentication') || 
+                         responseData.error?.includes('Authentication') ||
+                         responseText.includes('Authentication');
+      
+      if (isAuthError && needsCsrf) {
+        // This might be a CSRF issue - try to get token and retry
+        console.warn('403 Forbidden - attempting to get CSRF token and retry');
+        
+        // Wait a bit for cookies to be set, then check again
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const retryCsrfToken = getCsrfToken();
+        
+        if (retryCsrfToken && !csrfToken) {
+          // Update headers with CSRF token
+          const retryHeaders: Record<string, string> = {
+            ...headers,
+            'X-CSRFToken': retryCsrfToken,
+          };
+          const retryOptions: RequestInit = {
+            ...defaultOptions,
+            headers: retryHeaders,
+          };
+          response = await fetch(url, retryOptions);
+        } else if (!retryCsrfToken) {
+          // If still no token, try making a GET request first to get the CSRF cookie
+          try {
+            await fetch(`${API_BASE_URL}/api/v1/career-paths/`, {
+              method: 'GET',
+              credentials: 'include',
+            });
+            const newCsrfToken = getCsrfToken();
+            if (newCsrfToken) {
+              const finalHeaders: Record<string, string> = {
+                ...headers,
+                'X-CSRFToken': newCsrfToken,
+              };
+              const finalOptions: RequestInit = {
+                ...defaultOptions,
+                headers: finalHeaders,
+              };
+              response = await fetch(url, finalOptions);
+            }
+          } catch (err) {
+            console.warn('Failed to fetch CSRF token:', err);
+          }
+        }
+      }
+    }
+    
     return response;
   } catch (error) {
     console.error(`API Error (${endpoint}):`, error);
@@ -160,9 +329,23 @@ export const careerAPI = {
   /**
    * Get all career paths
    * Handles paginated responses from Django REST Framework
+   * @param queryParams - Optional query parameters for filtering (e.g., { area: 'Tecnologia', level: 'Iniciante', is_active: 'true' })
    */
-  async getAll() {
-    const response = await fetchAPI('/api/v1/career-paths/');
+  async getAll(queryParams?: Record<string, string>) {
+    let url = '/api/v1/career-paths/';
+    
+    // Build query string if params provided
+    if (queryParams && Object.keys(queryParams).length > 0) {
+      const params = new URLSearchParams();
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value) {
+          params.append(key, value);
+        }
+      });
+      url += `?${params.toString()}`;
+    }
+    
+    const response = await fetchAPI(url);
     
     if (!response.ok) {
       throw new Error('Failed to fetch career paths');
@@ -208,11 +391,23 @@ export const careerAPI = {
   },
 
   /**
-   * Get user's career paths
+   * Get user's associated career paths (both predefined and personalized)
+   * Only returns paths that the user has explicitly associated with
    */
   async getUserPaths() {
     const allPaths = await this.getAll();
-    return allPaths.filter((path: any) => path.path_type === 'PER');
+    // Filter by is_associated field (set by backend serializer)
+    return allPaths.filter((path: any) => path.is_associated === true);
+  },
+  
+  /**
+   * Deactivate/leave a career path (set is_active to false)
+   */
+  async leavePath(pathId: number) {
+    // Note: This would require a backend endpoint like /api/v1/career-paths/{id}/leave/
+    // For now, we'll need to implement this on the backend
+    // This is a placeholder for future implementation
+    throw new Error('Leave path functionality not yet implemented on backend');
   },
 
   /**
@@ -264,7 +459,7 @@ export const careerAPI = {
    * Toggle active status of career path
    */
   async toggleActive(id: number, isActive: boolean) {
-    const response = await fetchAPI(`/api/v1/career-paths/${id}/`, {
+    const response = await fetchAPI(`/api/v1/career-paths/${id}/toggle_active/`, {
       method: 'PATCH',
       body: JSON.stringify({ is_active: isActive }),
     });
@@ -280,20 +475,15 @@ export const careerAPI = {
   /**
    * Check if career path has associated users
    */
-  async checkUsers(id: number) {
-    // TODO: Backend should implement endpoint to check users associated with path
-    // For now, return empty array
-    try {
-      const response = await fetchAPI(`/api/v1/career-paths/${id}/users/`);
-      if (response.ok) {
-        const data = await response.json();
-        return Array.isArray(data) ? data : (data.results || []);
-      }
-    } catch (err) {
-      // Endpoint may not exist yet
-      console.warn('Could not check associated users:', err);
+  async checkUsers(id: number): Promise<{ has_users: boolean }> {
+    const response = await fetchAPI(`/api/v1/career-paths/${id}/check_users/`);
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to check users' }));
+      throw new Error(error.error || 'Failed to check users');
     }
-    return [];
+
+    return await response.json();
   },
 
   /**
@@ -324,6 +514,136 @@ export const careerAPI = {
     }
 
     return await response.json();
+  },
+
+  /**
+   * Get list of available professional areas (legacy endpoint)
+   */
+  async getAreas() {
+    const response = await fetchAPI('/api/v1/career-paths/areas/');
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch areas');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Get list of available difficulty levels
+   */
+  async getLevels() {
+    const response = await fetchAPI('/api/v1/career-paths/levels/');
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch levels');
+    }
+
+    return await response.json();
+  },
+};
+
+/**
+ * Professional Areas API
+ */
+export const areaAPI = {
+  /**
+   * Get all areas
+   */
+  async getAll(queryParams?: Record<string, string>) {
+    let url = '/api/v1/areas/';
+    
+    if (queryParams && Object.keys(queryParams).length > 0) {
+      const params = new URLSearchParams();
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value) {
+          params.append(key, value);
+        }
+      });
+      url += `?${params.toString()}`;
+    }
+    
+    const response = await fetchAPI(url);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch areas');
+    }
+
+    const data = await response.json();
+    
+    // Handle paginated responses
+    if (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    return [];
+  },
+
+  /**
+   * Get area by ID
+   */
+  async getById(id: number) {
+    const response = await fetchAPI(`/api/v1/areas/${id}/`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch area');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Create new area
+   */
+  async create(areaData: { name: string; description?: string; is_active?: boolean }) {
+    const response = await fetchAPI('/api/v1/areas/', {
+      method: 'POST',
+      body: JSON.stringify(areaData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Creation failed' }));
+      throw new Error(error.error || error.detail || 'Creation failed');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Update area
+   */
+  async update(id: number, areaData: { name?: string; description?: string; is_active?: boolean }) {
+    const response = await fetchAPI(`/api/v1/areas/${id}/`, {
+      method: 'PUT',
+      body: JSON.stringify(areaData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Update failed' }));
+      throw new Error(error.error || error.detail || 'Update failed');
+    }
+
+    return await response.json();
+  },
+
+  /**
+   * Delete area
+   */
+  async delete(id: number) {
+    const response = await fetchAPI(`/api/v1/areas/${id}/`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Deletion failed' }));
+      throw new Error(error.error || error.detail || 'Deletion failed');
+    }
+
+    return true;
   },
 };
 
@@ -598,6 +918,5 @@ export const llmAPI = {
     return await response.json();
   },
 };
-
 
 

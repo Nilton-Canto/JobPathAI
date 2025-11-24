@@ -194,15 +194,21 @@ const CareerPathCard: React.FC<CareerPathCardProps> = ({
 
       <div className="career-path-card-actions">
         {linkTo ? (
-          <Link to={linkTo} className="btn-primary career-path-card-button">
-            {showProgress ? 'Continuar Trilha' : 'Explorar Trilha'}
+          <Link
+            to={linkTo}
+            className="btn-primary career-path-card-button"
+          >
+            <span>{showProgress ? 'Continuar Trilha' : 'Explorar Trilha'}</span>
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
         ) : (
-          <button onClick={handleClick} className="btn-primary career-path-card-button">
-            {showProgress ? 'Continuar Trilha' : 'Explorar Trilha'}
+          <button
+            onClick={handleClick}
+            className="btn-primary career-path-card-button"
+          >
+            <span>{showProgress ? 'Continuar Trilha' : 'Explorar Trilha'}</span>
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>

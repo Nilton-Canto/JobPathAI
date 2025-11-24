@@ -57,26 +57,24 @@ const DashboardPage: React.FC = () => {
 
       // Fetch user's career paths
       try {
-        // TODO: Backend should implement proper user-path association
-        // For now, show all paths (or user's personalized paths if any)
+        // Get only paths that user has explicitly associated with
         const userPaths = await careerAPI.getUserPaths();
-        const allPaths = await careerAPI.getAll();
         
-        // Prefer user's personalized paths, fallback to all paths
-        const pathsToShow = userPaths.length > 0 ? userPaths : allPaths;
+        // Only show paths that user has associated with (no fallback to all paths)
+        const pathsToShow = userPaths;
         
         // Set primary path (first path or most progressed)
         if (pathsToShow.length > 0) {
           // Find path with highest progress
-          const pathWithProgress = pathsToShow.map(path => {
+          const pathWithProgress = pathsToShow.map((path: CareerPath) => {
             const completed = path.stages?.filter((s: any) => s.is_completed).length || 0;
             const total = path.stages?.length || 0;
             return { path, progress: total > 0 ? completed / total : 0 };
-          }).sort((a, b) => b.progress - a.progress);
+          }).sort((a: { path: CareerPath; progress: number }, b: { path: CareerPath; progress: number }) => b.progress - a.progress);
           
           setPrimaryPath(pathWithProgress[0]?.path || pathsToShow[0]);
           // Show other paths (excluding primary)
-          const otherPaths = pathsToShow.filter(p => p.id !== (pathWithProgress[0]?.path.id || pathsToShow[0].id));
+          const otherPaths = pathsToShow.filter((p: CareerPath) => p.id !== (pathWithProgress[0]?.path.id || pathsToShow[0].id));
           setActivePaths(otherPaths.slice(0, 2)); // Show 2 other paths
         } else {
           setActivePaths([]);
@@ -89,8 +87,8 @@ const DashboardPage: React.FC = () => {
         let nextStagePathId: number | null = null;
         const allSkills = new Set<string>();
         
-        // Find next stage to complete and collect skills
-        allPaths.forEach((path: CareerPath) => {
+        // Find next stage to complete and collect skills (only from user's associated paths)
+        pathsToShow.forEach((path: CareerPath) => {
           if (path.stages) {
             totalStages += path.stages.length;
             const pathCompletedStages = path.stages.filter((stage: any) => stage.is_completed).length;
@@ -124,8 +122,9 @@ const DashboardPage: React.FC = () => {
           ? Math.round((completedStages / totalStages) * 100) 
           : 0;
 
-        // Get predefined paths count for recommendations
-        const predefinedPaths = allPaths.filter((path: CareerPath) => path.path_type === 'PRE');
+        // Get predefined paths count for recommendations (from all available paths, not just user's)
+        const allAvailablePaths = await careerAPI.getAll({ is_active: 'true', path_type: 'PRE' });
+        const predefinedPaths = Array.isArray(allAvailablePaths) ? allAvailablePaths : [];
 
         setStats({
           activePaths: pathsToShow.length,
@@ -260,8 +259,8 @@ const DashboardPage: React.FC = () => {
         <div className="dashboard-section">
           <div className="section-header-inline">
             <h2 className="section-title">Trilha Principal</h2>
-            <Link to="/explore-career-paths" className="section-link">
-              Trocar Trilha →
+            <Link to="/my-career-paths" className="section-link">
+              Gerenciar Trilhas →
             </Link>
           </div>
           <div className="primary-path-card">
@@ -287,7 +286,7 @@ const DashboardPage: React.FC = () => {
                           <span className="progress-percentage">{progress}%</span>
                         </div>
                         <div className="progress-bar progress-bar-medium">
-                          <div className="progress-fill progress-fill-primary" style={{ width: `${progress}%` }} />
+                          <div className="progress-fill progress-fill-primary" style={{ width: `${progress}%` } as React.CSSProperties} />
                         </div>
                       </>
                     );
@@ -405,7 +404,7 @@ const DashboardPage: React.FC = () => {
                   </div>
                   <p className="path-preview-description">{path.description}</p>
                   <div className="path-preview-progress">
-                    <div className="progress-bar-small" style={{ '--progress-width': `${progress}%` } as React.CSSProperties}>
+                    <div className="progress-bar-small" style={{ '--progress-width': `${progress}%` } as React.CSSProperties & { '--progress-width': string }}>
                       <div className="progress-fill-small"></div>
                     </div>
                     <span className="progress-text-small">
@@ -420,7 +419,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Empty State - No Active Paths */}
-      {activePaths.length === 0 && (
+      {!primaryPath && activePaths.length === 0 && (
         <div className="dashboard-section">
           <div className="empty-state-dashboard">
             <div className="empty-state-icon-large">

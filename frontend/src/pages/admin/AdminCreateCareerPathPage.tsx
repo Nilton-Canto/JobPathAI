@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { careerAPI, stageAPI } from '../../services/api';
+import { areaAPI, careerAPI, stageAPI } from '../../services/api';
 import '../../styles/pages.css';
 import '../../styles/components.css';
 
@@ -22,11 +22,16 @@ const AdminCreateCareerPathPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [areas, setAreas] = useState<{ id: number; name: string }[]>([]);
   
   // Career Path Form Data
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [pathType, setPathType] = useState<'PRE' | 'PER'>('PRE');
+  const [selectedAreaId, setSelectedAreaId] = useState<number | ''>('');
+  const [level, setLevel] = useState('');
+  const [estimatedTimeMonths, setEstimatedTimeMonths] = useState<number | ''>('');
+  const [hoursPerWeek, setHoursPerWeek] = useState<number | ''>('');
   
   // Stages Management
   const [stages, setStages] = useState<CareerStage[]>([]);
@@ -40,6 +45,26 @@ const AdminCreateCareerPathPage: React.FC = () => {
   });
   const [draggedStageIndex, setDraggedStageIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const loadAreas = async () => {
+      try {
+        const response = await areaAPI.getAll();
+        // API may return paginated {results}, normalize to array
+        const data = Array.isArray(response) ? response : response?.results || [];
+        setAreas(
+          data.map((area: any) => ({
+            id: area.id,
+            name: area.name,
+          }))
+        );
+      } catch (err) {
+        console.warn('Não foi possível carregar áreas, usando seletor vazio:', err);
+      }
+    };
+
+    loadAreas();
+  }, []);
 
   const handleAddStage = () => {
     if (!currentStage.title.trim() || !currentStage.description.trim()) {
@@ -213,11 +238,27 @@ const AdminCreateCareerPathPage: React.FC = () => {
 
     try {
       // Create career path
-      const careerPathData = {
+      const careerPathData: any = {
         title: title.trim(),
         description: description.trim(),
         path_type: pathType,
       };
+
+      // Add optional fields if provided
+      if (selectedAreaId) {
+        careerPathData.area_id = selectedAreaId;
+      }
+      if (level.trim()) {
+        careerPathData.level = level.trim();
+      }
+      if (estimatedTimeMonths) {
+        careerPathData.estimated_time_months = Number(estimatedTimeMonths);
+      }
+      if (hoursPerWeek) {
+        careerPathData.hours_per_week = Number(hoursPerWeek);
+      }
+      // Set as active by default
+      careerPathData.is_active = true;
 
       const createdPath = await careerAPI.create(careerPathData);
 
@@ -229,7 +270,8 @@ const AdminCreateCareerPathPage: React.FC = () => {
             title: stage.title,
             description: stage.description,
             order: stage.order,
-            skills: stage.skills,
+            // Backend espera IDs de skills; enquanto não mapeamos nomes -> IDs, enviamos vazio para não quebrar
+            skills: [],
           };
           await stageAPI.create(stageData);
         }
@@ -298,21 +340,94 @@ const AdminCreateCareerPathPage: React.FC = () => {
               />
             </div>
 
-            <div className="form-group-modern">
-              <label htmlFor="pathType">Tipo de Trilha *</label>
-              <select
-                id="pathType"
-                value={pathType}
-                onChange={(e) => setPathType(e.target.value as 'PRE' | 'PER')}
-                className="form-input-modern"
-                required
-                disabled={loading}
-              >
-                <option value="PRE">Pré-definida</option>
-                <option value="PER">Personalizada</option>
-              </select>
-            </div>
+          <div className="form-group-modern">
+            <label htmlFor="pathType">Tipo de Trilha *</label>
+            <select
+              id="pathType"
+              value={pathType}
+              onChange={(e) => setPathType(e.target.value as 'PRE' | 'PER')}
+              className="form-input-modern"
+              required
+              disabled={loading}
+            >
+              <option value="PRE">Pré-definida</option>
+              <option value="PER">Personalizada</option>
+            </select>
           </div>
+        </div>
+
+        <div className="form-grid">
+          <div className="form-group-modern">
+            <label htmlFor="area">Área Profissional</label>
+            <select
+              id="area"
+              value={selectedAreaId}
+              onChange={(e) => setSelectedAreaId(e.target.value ? Number(e.target.value) : '')}
+              className="form-input-modern"
+              disabled={loading || areas.length === 0}
+            >
+              <option value="">Selecione uma área</option>
+              {areas.map((area) => (
+                <option key={area.id} value={area.id}>
+                  {area.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group-modern">
+            <label htmlFor="level">Nível</label>
+            <select
+              id="level"
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              className="form-input-modern"
+              disabled={loading}
+            >
+              <option value="">Selecione um nível</option>
+              <option value="Iniciante">Iniciante</option>
+              <option value="Intermediário">Intermediário</option>
+              <option value="Avançado">Avançado</option>
+              <option value="Iniciante a Intermediário">Iniciante a Intermediário</option>
+              <option value="Intermediário a Avançado">Intermediário a Avançado</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div className="form-grid">
+          <div className="form-group-modern">
+            <label htmlFor="estimatedTimeMonths">Tempo Estimado (meses)</label>
+            <input
+              type="number"
+              id="estimatedTimeMonths"
+              value={estimatedTimeMonths}
+              onChange={(e) => setEstimatedTimeMonths(e.target.value ? parseInt(e.target.value) : '')}
+              className="form-input-modern"
+              placeholder="Ex: 6"
+              min="1"
+              max="120"
+              disabled={loading}
+            />
+            <small>Número de meses estimados para completar a trilha</small>
+          </div>
+
+          <div className="form-group-modern">
+            <label htmlFor="hoursPerWeek">Horas por Semana</label>
+            <input
+              type="number"
+              id="hoursPerWeek"
+              value={hoursPerWeek}
+              onChange={(e) => setHoursPerWeek(e.target.value ? parseInt(e.target.value) : '')}
+              className="form-input-modern"
+              placeholder="Ex: 10"
+              min="1"
+              max="168"
+              disabled={loading}
+            />
+            <small>Horas de estudo recomendadas por semana</small>
+          </div>
+        </div>
 
           <div className="form-group-modern">
             <label htmlFor="description">Descrição *</label>
