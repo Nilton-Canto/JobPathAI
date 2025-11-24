@@ -73,7 +73,13 @@ const RegisterPage: React.FC = () => {
         localStorage.setItem('userProfile', JSON.stringify(response.user));
         
         // Refresh AuthContext to update authentication state
-        await refreshUser();
+        // Only refresh if we have a successful response
+        try {
+          await refreshUser();
+        } catch (refreshErr) {
+          // If refresh fails, still proceed with the data we have
+          console.warn('Failed to refresh user after registration, but proceeding:', refreshErr);
+        }
       }
       
       setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
@@ -83,7 +89,18 @@ const RegisterPage: React.FC = () => {
       }, 1500);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Erro de rede. Verifique se o backend está rodando.');
+      
+      // Check if it's a connection error
+      const isConnectionError = err.message?.includes('Failed to fetch') || 
+                               err.message?.includes('ERR_CONNECTION_REFUSED') ||
+                               err.message?.includes('NetworkError') ||
+                               err instanceof TypeError;
+      
+      if (isConnectionError) {
+        setError('Não foi possível conectar ao servidor. Verifique se o backend está rodando na porta 8000.');
+      } else {
+        setError(err.message || 'Erro de rede. Verifique se o backend está rodando.');
+      }
     } finally {
       setLoading(false);
     }

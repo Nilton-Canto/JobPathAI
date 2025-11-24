@@ -68,12 +68,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(true);
           localStorage.setItem('userProfile', JSON.stringify(profile));
         } catch (err: any) {
+          // Check if it's a connection error (backend not running)
+          const isConnectionError = err.message?.includes('Failed to fetch') || 
+                                   err.message?.includes('ERR_CONNECTION_REFUSED') ||
+                                   err.message?.includes('NetworkError') ||
+                                   err instanceof TypeError;
+          
           // If 401, user is not authenticated - clear everything
           if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
             setIsAuthenticated(false);
             setUser(null);
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userProfile');
+            return;
+          }
+          
+          // If connection error, use localStorage as fallback (backend might be starting)
+          if (isConnectionError) {
+            console.warn('Backend connection failed, using localStorage fallback');
+            const storedProfile = localStorage.getItem('userProfile');
+            if (storedProfile) {
+              try {
+                const profile = JSON.parse(storedProfile);
+                setUser(profile);
+                setIsAuthenticated(true);
+                // Don't clear localStorage on connection errors - user might still be valid
+                return;
+              } catch {
+                // Invalid stored profile
+                setIsAuthenticated(false);
+                setUser(null);
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userProfile');
+              }
+            } else {
+              // No stored profile, but keep isLoggedIn flag in case backend comes back
+              setIsAuthenticated(false);
+              setUser(null);
+            }
             return;
           }
           
@@ -125,6 +157,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (err: any) {
       console.error('Login error:', err);
+      
+      // Check if it's a connection error
+      const isConnectionError = err.message?.includes('Failed to fetch') || 
+                               err.message?.includes('ERR_CONNECTION_REFUSED') ||
+                               err.message?.includes('NetworkError') ||
+                               err instanceof TypeError;
+      
+      if (isConnectionError) {
+        throw new Error('Não foi possível conectar ao servidor. Verifique se o backend está rodando.');
+      }
+      
       throw err;
     }
   };
@@ -148,9 +191,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const profile = await userAPI.getProfile();
       setUser(profile);
       localStorage.setItem('userProfile', JSON.stringify(profile));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error refreshing user:', err);
-      // Fallback to stored profile
+      
+      // Check if it's a connection error
+      const isConnectionError = err.message?.includes('Failed to fetch') || 
+                               err.message?.includes('ERR_CONNECTION_REFUSED') ||
+                               err.message?.includes('NetworkError') ||
+                               err instanceof TypeError;
+      
+      // If connection error, don't clear user data - just log warning
+      if (isConnectionError) {
+        console.warn('Backend connection failed during refresh, keeping current user data');
+        return;
+      }
+      
+      // For other errors, fallback to stored profile
       const storedProfile = localStorage.getItem('userProfile');
       if (storedProfile) {
         try {

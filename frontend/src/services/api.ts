@@ -210,20 +210,28 @@ export const authAPI = {
    * The backend now returns user data directly in the login response
    */
   async login(username: string, password: string, rememberMe: boolean = false) {
-    const response = await fetchAPI('/login/', {
-      method: 'POST',
-      body: JSON.stringify({ username, password, remember_me: rememberMe }),
-    });
+    try {
+      const response = await fetchAPI('/login/', {
+        method: 'POST',
+        body: JSON.stringify({ username, password, remember_me: rememberMe }),
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Login failed' }));
-      throw new Error(error.error || 'Login failed');
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Login failed' }));
+        throw new Error(error.error || error.detail || 'Login failed');
+      }
+
+      const data = await response.json();
+      
+      // Backend returns { success, message, user } directly
+      return data;
+    } catch (err: any) {
+      // Re-throw connection errors with better message
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+        throw new Error('Failed to fetch - Backend não está acessível. Verifique se está rodando na porta 8000.');
+      }
+      throw err;
     }
-
-    const data = await response.json();
-    
-    // Backend returns { success, message, user } directly
-    return data;
   },
 
   /**
@@ -240,20 +248,28 @@ export const authAPI = {
     password: string;
     confirm_password: string;
   }) {
-    const response = await fetchAPI('/register/', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    });
+    try {
+      const response = await fetchAPI('/register/', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Registration failed' }));
-      throw new Error(error.error || error.detail || 'Registration failed');
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Registration failed' }));
+        throw new Error(error.error || error.detail || 'Registration failed');
+      }
+
+      const data = await response.json();
+      
+      // Backend returns { success, message, user } directly
+      return data;
+    } catch (err: any) {
+      // Re-throw connection errors with better message
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+        throw new Error('Failed to fetch - Backend não está acessível. Verifique se está rodando na porta 8000.');
+      }
+      throw err;
     }
-
-    const data = await response.json();
-    
-    // Backend returns { success, message, user } directly
-    return data;
   },
 
   /**
@@ -275,16 +291,24 @@ export const userAPI = {
    * Get user profile
    */
   async getProfile() {
-    const response = await fetchAPI('/api/user-profile/');
-    
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('401 Unauthorized - User not authenticated');
+    try {
+      const response = await fetchAPI('/api/user-profile/');
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('401 Unauthorized - User not authenticated');
+        }
+        throw new Error('Failed to fetch user profile');
       }
-      throw new Error('Failed to fetch user profile');
-    }
 
-    return await response.json();
+      return await response.json();
+    } catch (err: any) {
+      // Re-throw connection errors with better message
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+        throw new Error('Failed to fetch - Backend não está acessível. Verifique se está rodando na porta 8000.');
+      }
+      throw err;
+    }
   },
 
   /**

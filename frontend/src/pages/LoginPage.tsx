@@ -27,7 +27,17 @@ const LoginPage: React.FC = () => {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Erro de rede. Verifique se o backend está rodando.');
+      // Check if it's a connection error
+      const isConnectionError = err.message?.includes('Failed to fetch') || 
+                               err.message?.includes('ERR_CONNECTION_REFUSED') ||
+                               err.message?.includes('NetworkError') ||
+                               err instanceof TypeError;
+      
+      if (isConnectionError) {
+        setError('Não foi possível conectar ao servidor. Verifique se o backend está rodando na porta 8000.');
+      } else {
+        setError(err.message || 'Erro de rede. Verifique se o backend está rodando.');
+      }
       console.error('Erro na requisição de login:', err);
     } finally {
       setLoading(false);
