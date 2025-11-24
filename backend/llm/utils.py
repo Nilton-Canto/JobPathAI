@@ -49,6 +49,12 @@ def get_user_context(user: User) -> Dict:
                 'cidade': profile.cidade,
                 'estado': profile.estado,
             }
+            try:
+                context['profile']['skills'] = list(
+                    profile.habilidades.values_list('skill__nome', flat=True)
+                )
+            except Exception:
+                context['profile']['skills'] = []
     except ImportError:
         pass
     

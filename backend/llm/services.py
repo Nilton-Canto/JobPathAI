@@ -52,6 +52,12 @@ class GeminiService:
         self.client = genai.Client(api_key=GEMINI_API_KEY)
         self.model = GEMINI_MODEL
     
+    def _build_prompt(self, prompt: str, system_instruction: Optional[str] = None) -> str:
+        """Combine system instruction with prompt when API does not accept system_instruction kwarg."""
+        if system_instruction:
+            return f"{system_instruction}\n\n{prompt}"
+        return prompt
+
     def generate_content(self, prompt: str, system_instruction: Optional[str] = None) -> str:
         """
         Generate content using Gemini API
@@ -64,11 +70,10 @@ class GeminiService:
             Generated text response
         """
         try:
-            # According to Gemini API docs, generate_content takes model and contents
+            combined = self._build_prompt(prompt, system_instruction)
             response = self.client.models.generate_content(
                 model=self.model,
-                contents=prompt,
-                system_instruction=system_instruction if system_instruction else None
+                contents=combined
             )
             return response.text
         except Exception as e:
@@ -135,13 +140,10 @@ class GeminiService:
             Assistant response
         """
         try:
-            # The message parameter can already include full conversation history
-            # This method just calls generate_content with the message
-            # If conversation_history is provided, it's already formatted in the message
+            combined = self._build_prompt(message, system_instruction)
             response = self.client.models.generate_content(
                 model=self.model,
-                contents=message,
-                system_instruction=system_instruction if system_instruction else None
+                contents=combined
             )
             return response.text
         except Exception as e:

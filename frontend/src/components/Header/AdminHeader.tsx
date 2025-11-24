@@ -39,7 +39,7 @@ const AdminHeader: React.FC = () => {
           <nav className={`admin-nav ${isMobileMenuOpen ? 'admin-nav-open' : ''}`}>
             <Link to="/admin/dashboard" className="admin-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
               Dashboard
-            </Link>
+          </Link>
             <Link to="/admin/career-paths" className="admin-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
               Trilhas
             </Link>

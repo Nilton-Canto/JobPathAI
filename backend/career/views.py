@@ -145,6 +145,24 @@ class CareerPathViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+    def _get_user_skill_names(self, user):
+        """
+        Return set of skill names already present in the student's profile.
+        Helps flag skills that the user ja tem ao montar o progresso.
+        """
+        try:
+            from student_area.models import StudentProfile, StudentSkill as StudentProfileSkill
+        except Exception:
+            return set()
+
+        profile = StudentProfile.objects.filter(user=user).first()
+        if not profile:
+            return set()
+
+        return set(
+            StudentProfileSkill.objects.filter(student=profile).values_list('skill__nome', flat=True)
+        )
     
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def associate(self, request, pk=None):
@@ -196,11 +214,12 @@ class CareerPathViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_404_NOT_FOUND)
         
         # Get all stages for this path
-        stages = career_path.stages.all().order_by('order')
+        stages = career_path.stages.all().order_by('order').prefetch_related('skills')
         
         # Get user progress for each stage
         stage_progress = []
         completed_count = 0
+        user_skill_names = self._get_user_skill_names(user)
         
         for stage in stages:
             try:
@@ -217,7 +236,14 @@ class CareerPathViewSet(viewsets.ModelViewSet):
                 'description': stage.description,
                 'order': stage.order,
                 'is_completed': is_completed,
-                'skills': [skill.name for skill in stage.skills.all()]
+                'skills': [
+                    {
+                        'id': skill.id,
+                        'name': skill.name,
+                        'description': skill.description,
+                        'has_skill': skill.name in user_skill_names
+                    } for skill in stage.skills.all()
+                ]
             })
         
         total_stages = stages.count()
@@ -234,7 +260,12 @@ class CareerPathViewSet(viewsets.ModelViewSet):
             'updated_at': user_path.updated_at
         })
     
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated],
+        url_path='my-paths'
+    )
     def my_paths(self, request):
         """
         Get list of career paths associated with current user
@@ -247,6 +278,7 @@ class CareerPathViewSet(viewsets.ModelViewSet):
             user=user,
             is_active=True
         ).select_related('career_path').prefetch_related('career_path__stages', 'career_path__stages__skills')
+        user_skill_names = self._get_user_skill_names(user)
         
         # Serialize career paths with user-specific progress
         paths_data = []
@@ -279,7 +311,14 @@ class CareerPathViewSet(viewsets.ModelViewSet):
                     'order': stage.order,
                     'is_completed': is_completed,
                     'completed_at': completed_at,
-                    'skills': [skill.name for skill in stage.skills.all()]
+                    'skills': [
+                        {
+                            'id': skill.id,
+                            'name': skill.name,
+                            'description': skill.description,
+                            'has_skill': skill.name in user_skill_names
+                        } for skill in stage.skills.all()
+                    ]
                 })
             
             # Serialize career path
@@ -446,12 +485,43 @@ class CareerStageViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """
-        Allow authenticated students to marcar etapa como concluída (PATCH is_completed).
+        Allow authenticated students to marcar etapa como concluida (PATCH is_completed).
         Admins keep full access for other operations.
         """
         if self.request.method == 'PATCH' and 'is_completed' in self.request.data:
             return [permissions.IsAuthenticated()]
         return super().get_permissions()
+
+    def _sync_profile_skills(self, user, stage):
+        """
+        Add stage skills to StudentProfile.habilidades when a stage is concluida.
+        Returns list of awarded skill dicts for feedback.
+        """
+        try:
+            from student_area.models import StudentProfile, Skill as StudentSkillModel, StudentSkill as StudentProfileSkill
+        except Exception:
+            return []
+
+        profile, _ = StudentProfile.objects.get_or_create(user=user)
+        awarded = []
+
+        for stage_skill in stage.skills.all():
+            profile_skill, _ = StudentSkillModel.objects.get_or_create(
+                nome=stage_skill.name,
+                defaults={'categoria': 'tecnica'}
+            )
+            student_skill, created = StudentProfileSkill.objects.get_or_create(
+                student=profile,
+                skill=profile_skill,
+                defaults={'nivel': 'intermediario'}
+            )
+            if created:
+                awarded.append({
+                    'id': student_skill.id,
+                    'name': profile_skill.nome,
+                    'categoria': profile_skill.categoria,
+                })
+        return awarded
     
     def partial_update(self, request, *args, **kwargs):
         """
@@ -459,11 +529,13 @@ class CareerStageViewSet(viewsets.ModelViewSet):
         Prevents users from skipping stages
         """
         instance = self.get_object()
+        awarded_skills = []
+        marking_completed = bool(request.data.get('is_completed'))
         
         # Check if trying to mark as completed
-        if 'is_completed' in request.data and request.data['is_completed']:
+        if marking_completed:
             if not request.user.is_authenticated:
-                raise PermissionDenied('Autenticação necessária para marcar etapas')
+                raise PermissionDenied('Autenticacao necessaria para marcar etapas')
             
             # Check if previous stages are completed
             previous_stages = CareerStage.objects.filter(
@@ -480,14 +552,14 @@ class CareerStageViewSet(viewsets.ModelViewSet):
                     )
                     if not progress.is_completed:
                         return Response({
-                            'error': f'Você precisa completar a etapa anterior primeiro: "{prev_stage.title}"',
+                            'error': f'Voce precisa completar a etapa anterior primeiro: "{prev_stage.title}"',
                             'required_stage_id': prev_stage.id,
                             'required_stage_title': prev_stage.title,
                             'required_stage_order': prev_stage.order
                         }, status=status.HTTP_400_BAD_REQUEST)
                 except UserStageProgress.DoesNotExist:
                     return Response({
-                        'error': f'Você precisa completar a etapa anterior primeiro: "{prev_stage.title}"',
+                        'error': f'Voce precisa completar a etapa anterior primeiro: "{prev_stage.title}"',
                         'required_stage_id': prev_stage.id,
                         'required_stage_title': prev_stage.title,
                         'required_stage_order': prev_stage.order
@@ -508,8 +580,21 @@ class CareerStageViewSet(viewsets.ModelViewSet):
                 user_progress.is_completed = True
                 user_progress.completed_at = timezone.now()
                 user_progress.save()
+
+            awarded_skills = self._sync_profile_skills(request.user, instance)
         
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+
+        if response.status_code < 400 and marking_completed:
+            if awarded_skills is not None:
+                response.data['awarded_skills'] = awarded_skills
+            try:
+                user_path = UserCareerPath.objects.get(user=request.user, career_path=instance.career_path, is_active=True)
+                response.data['progress_percent'] = user_path.get_progress()
+            except UserCareerPath.DoesNotExist:
+                response.data['progress_percent'] = None
+
+        return response
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):

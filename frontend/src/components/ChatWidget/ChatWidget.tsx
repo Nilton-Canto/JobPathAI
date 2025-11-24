@@ -101,9 +101,13 @@ const ChatWidget: React.FC = () => {
         setConversationId(response.conversation_id);
       }
       
+      const mentorText = response.llm_available === false
+        ? `${response.response || response.insights || 'Resposta recebida'} (mentor IA em modo offline)`
+        : (response.response || response.insights || 'Resposta recebida');
+
       const mentorResponse: Message = {
         id: messages.length + 2,
-        text: response.response || response.insights || 'Resposta recebida',
+        text: mentorText,
         sender: 'mentor',
         timestamp: new Date(),
       };
@@ -296,4 +300,3 @@ const ChatWidget: React.FC = () => {
 };
 
 export default ChatWidget;
-

@@ -82,9 +82,9 @@ async function fetchAPI(
           await fetch(`${API_BASE_URL}/api/v1/career-paths/`, {
             method: 'GET',
             credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+    headers: {
+      'Content-Type': 'application/json',
+    },
           });
           
           // Wait a moment for the cookie to be processed by the browser

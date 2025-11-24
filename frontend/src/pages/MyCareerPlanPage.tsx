@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { careerAPI, stageAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 // Styles imported via main.tsx -> styles/index.css
 
 interface CareerStage {
@@ -25,10 +26,12 @@ interface CareerPath {
 const MyCareerPlanPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [careerPath, setCareerPath] = useState<CareerPath | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [completingStage, setCompletingStage] = useState<number | null>(null);
+  const [stageMessage, setStageMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -114,12 +117,22 @@ const MyCareerPlanPage: React.FC = () => {
   const handleCompleteStage = async (stageId: number) => {
     try {
       setCompletingStage(stageId);
-      await stageAPI.markCompleted(stageId);
+      setStageMessage(null);
+      const result = await stageAPI.markCompleted(stageId);
+      
+      if (result?.awarded_skills?.length) {
+        const skillNames = result.awarded_skills.map((s: any) => s.name).join(', ');
+        setStageMessage(`Etapa concluída! Habilidades adicionadas ao seu perfil: ${skillNames}.`);
+      } else {
+        setStageMessage('Etapa marcada como concluída!');
+      }
       
       // Refresh career path data
       if (id) {
         await fetchCareerPath(parseInt(id));
       }
+      // Refresh user profile to pull new skills into dashboard/profile
+      await refreshUser();
     } catch (err) {
       console.error('Error completing stage:', err);
       alert('Erro ao marcar etapa como concluída. Tente novamente.');
@@ -151,6 +164,11 @@ const MyCareerPlanPage: React.FC = () => {
   const currentStage = getCurrentStage();
   const completedStages = careerPath.stages.filter((stage) => stage.is_completed);
   const upcomingStages = careerPath.stages.filter((stage) => !stage.is_completed);
+
+  const renderSkillLabel = (skill: any) => {
+    if (typeof skill === 'string') return skill;
+    return skill?.name || skill?.skill_name || 'Habilidade';
+  };
 
   return (
     <div className="page-container my-plan-container">
@@ -221,11 +239,17 @@ const MyCareerPlanPage: React.FC = () => {
                   <div className="skills-tags">
                     {currentStage.skills.map((skill, idx) => (
                       <span key={idx} className="skill-tag">
-                        {skill.name}
+                        {renderSkillLabel(skill)}
                       </span>
                     ))}
                   </div>
                 </div>
+              )}
+
+              {stageMessage && (
+                <p style={{ marginTop: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                  {stageMessage}
+                </p>
               )}
 
               <button

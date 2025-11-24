@@ -175,6 +175,23 @@ class ChatView(View):
             
             # Save user message
             save_message(conversation, 'user', message)
+
+            # Ensure LLM service is configured and available
+            try:
+                gemini_service = get_gemini_service()
+            except (ValueError, ImportError) as e:
+                fallback_response = (
+                    "Estou temporariamente indisponível porque o serviço de IA não está configurado. "
+                    "Configure a chave GEMINI_API_KEY ou instale o cliente google-genai para habilitar o mentor IA."
+                )
+                save_message(conversation, 'assistant', fallback_response)
+                return JsonResponse({
+                    'success': True,
+                    'response': fallback_response,
+                    'conversation_id': conversation.conversation_id,
+                    'llm_available': False,
+                    'error': str(e)
+                }, status=200)
             
             # Get user context for personalized responses
             user_context = get_user_context(request.user)
@@ -191,7 +208,6 @@ class ChatView(View):
                 full_message = message
             
             # Call Gemini API with user context
-            gemini_service = get_gemini_service()
             system_instruction = get_mentor_chat_system_instruction(user_context_str)
             
             response_text = gemini_service.chat(

@@ -372,58 +372,119 @@
    ============================================ */
 
 .create-plan-container {
-  max-width: 800px;
+  max-width: 900px;
 }
 
 .plan-header {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border-radius: 8px;
+  border-radius: 1rem;
   margin-bottom: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.3);
 }
 
 .plan-icon {
-  font-size: 3rem;
+  font-size: 4rem;
   margin-bottom: 1rem;
+  display: block;
 }
 
 .plan-header h1 {
   color: white;
   margin-bottom: 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+}
+
+.plan-header p {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.plan-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.plan-form .form-group {
+  margin-bottom: 2rem;
+}
+
+.plan-form .form-group label {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
 }
 
 .plan-form textarea {
   width: 100%;
-  padding: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
   font-size: 1rem;
   font-family: inherit;
   resize: vertical;
-  min-height: 200px;
+  min-height: 250px;
   box-sizing: border-box;
+  background: #f9fafb;
+  color: #111827;
+  transition: all 0.2s ease;
+  line-height: 1.6;
+}
+
+.plan-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.plan-form textarea::placeholder {
+  color: #9ca3af;
 }
 
 .char-count {
   text-align: right;
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 0.875rem;
+  color: #6b7280;
   margin-top: 0.5rem;
+  font-weight: 500;
 }
 
 .form-hint {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
 }
 
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
+.create-plan-submit-button {
+  min-width: 240px !important;
+}
+
+.create-plan-submit-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.create-plan-submit-button .button-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.create-plan-error {
+  margin-bottom: 1.5rem;
 }
 
 .loading-overlay {
@@ -2037,6 +2098,27 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.page-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-header-action-button {
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.page-header-action-button .button-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
 }
 
 .page-header-icon {
@@ -2092,6 +2174,24 @@
 .empty-state-modern p {
   color: #6b7280;
   margin-bottom: 1rem;
+}
+
+.error-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.results-count {
+  margin-bottom: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.clear-filters-button {
+  margin-top: 1rem;
 }
 
 .applications-table-container {
@@ -2233,15 +2333,31 @@
   }
 
   .plan-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .plan-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .plan-header p {
+    font-size: 1rem;
+  }
+
+  .plan-form {
     padding: 1.5rem;
   }
 
-  .form-actions {
+  .form-actions-modern {
     flex-direction: column;
   }
 
-  .form-actions button {
+  .form-actions-modern button {
     width: 100%;
+  }
+
+  .create-plan-submit-button {
+    min-width: 100% !important;
   }
 
   .my-plan-container {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { careerAPI } from '../services/api';
 import CareerPathCard from '../components/CareerPathCard';
 // Styles imported via main.tsx -> styles/index.css
@@ -228,9 +228,9 @@ const ExploreCareerPathsPage: React.FC = () => {
             <p>{error}</p>
           </div>
         </div>
-        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <div className="error-actions">
           <button onClick={fetchCareerPaths} className="btn-primary">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="button-icon">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Tentar Novamente
@@ -252,10 +252,16 @@ const ExploreCareerPathsPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <div>
+          <div className="page-header-text">
             <h1>Explorar Trilhas de Carreira</h1>
             <p>Descubra caminhos pré-definidos para as profissões mais procuradas e comece sua jornada profissional.</p>
           </div>
+          <Link to="/create-custom-plan" className="btn-primary page-header-action-button">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="button-icon">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Criar Plano IA
+          </Link>
         </div>
       </header>
 
@@ -352,7 +358,7 @@ const ExploreCareerPathsPage: React.FC = () => {
       ) : (
         <>
           {filteredPaths.length > 0 && (
-            <div style={{ marginBottom: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+            <div className="results-count">
               Mostrando {filteredPaths.length} {filteredPaths.length === 1 ? 'trilha' : 'trilhas'}
               {careerPaths.length !== filteredPaths.length && ` de ${careerPaths.length} total`}
             </div>

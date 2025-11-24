@@ -133,6 +133,8 @@ const DashboardPage: React.FC = () => {
         // Get predefined paths count for recommendations (from all available paths, not just user's)
         const allAvailablePaths = await careerAPI.getAll({ is_active: 'true', path_type: 'PRE' });
         const predefinedPaths = Array.isArray(allAvailablePaths) ? allAvailablePaths : [];
+        const profileSkillsCount = user?.habilidades?.length || 0;
+        const skillsLearned = profileSkillsCount > 0 ? profileSkillsCount : allSkills.size;
 
         setStats({
           activePaths: pathsToShow.length,
@@ -142,7 +144,7 @@ const DashboardPage: React.FC = () => {
           nextStageTitle: nextStage?.title,
           nextStagePath: nextStagePathId ? `/my-plan/${nextStagePathId}` : undefined,
           recommendedPaths: predefinedPaths.length,
-          skillsLearned: allSkills.size,
+          skillsLearned,
         });
       } catch (pathsError) {
         console.warn('Could not fetch career paths:', pathsError);

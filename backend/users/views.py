@@ -13,6 +13,26 @@ from student_area.models import StudentProfile
 import json
 
 
+def _serialize_profile_skills(profile: StudentProfile):
+    """Return list of skills for the given student profile."""
+    skills = []
+    try:
+        for habilidade in profile.habilidades.select_related('skill').all():
+            skills.append({
+                'id': habilidade.id,
+                'skill_id': habilidade.skill.id,
+                'skill_name': habilidade.skill.nome,
+                'skill_categoria': habilidade.skill.categoria,
+                'nivel': habilidade.nivel,
+                'anos_experiencia': habilidade.anos_experiencia,
+                'adicionado_em': habilidade.adicionado_em,
+            })
+    except Exception:
+        # Keep silent to avoid breaking login/profile endpoints if relation is missing
+        skills = []
+    return skills
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
     """
@@ -61,6 +81,7 @@ class LoginView(View):
                 # Get user profile data from StudentProfile
                 user_profile = getattr(user, 'student_profile', None)
                 if user_profile:
+                    skills_data = _serialize_profile_skills(user_profile)
                     user_data = {
                         'id': user.id,
                         'username': user.username,
@@ -68,6 +89,9 @@ class LoginView(View):
                         'nome': user.get_full_name() or user.username,
                         'idade': user_profile.idade,
                         'cpf': user_profile.cpf,
+                        'area_interesse': user_profile.area_interesse,
+                        'nivel_experiencia': user_profile.nivel_experiencia,
+                        'habilidades': skills_data,
                         'is_superuser': user.is_superuser,
                         'is_staff': user.is_staff,
                         'is_admin': user.is_superuser or user.is_staff
@@ -80,6 +104,7 @@ class LoginView(View):
                         'nome': user.get_full_name() or user.username,
                         'idade': None,
                         'cpf': None,
+                        'habilidades': [],
                         'is_superuser': user.is_superuser,
                         'is_staff': user.is_staff,
                         'is_admin': user.is_superuser or user.is_staff
@@ -196,6 +221,7 @@ class UserProfileView(View):
         # Get profile from StudentProfile
         user_profile = getattr(request.user, 'student_profile', None)
         if user_profile:
+            skills_data = _serialize_profile_skills(user_profile)
             profile_data = {
                 'id': request.user.id,
                 'username': request.user.username,
@@ -203,6 +229,9 @@ class UserProfileView(View):
                 'nome': request.user.get_full_name() or request.user.username,
                 'idade': user_profile.idade,
                 'cpf': user_profile.cpf,
+                'area_interesse': user_profile.area_interesse,
+                'nivel_experiencia': user_profile.nivel_experiencia,
+                'habilidades': skills_data,
                 'is_superuser': request.user.is_superuser,
                 'is_staff': request.user.is_staff,
                 'is_admin': request.user.is_superuser or request.user.is_staff,
@@ -215,6 +244,7 @@ class UserProfileView(View):
                 'nome': request.user.get_full_name() or request.user.username,
                 'idade': None,
                 'cpf': None,
+                'habilidades': [],
                 'is_superuser': request.user.is_superuser,
                 'is_staff': request.user.is_staff,
                 'is_admin': request.user.is_superuser or request.user.is_staff,
