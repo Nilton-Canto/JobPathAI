@@ -436,6 +436,32 @@
   margin-bottom: 1rem;
 }
 
+.onboarding-input-wrapper {
+  margin-top: 1rem;
+}
+
+.onboarding-input {
+  min-height: auto !important;
+  height: 3rem !important;
+  resize: none !important;
+}
+
+.onboarding-progress-fill[data-progress] {
+  width: calc(var(--progress-width, 0) * 100%);
+}
+
+.onboarding-progress-fill[data-progress="0.333"] {
+  width: 33.333%;
+}
+
+.onboarding-progress-fill[data-progress="0.667"] {
+  width: 66.667%;
+}
+
+.onboarding-progress-fill[data-progress="1"] {
+  width: 100%;
+}
+
 .onboarding-label {
   display: block;
   font-weight: 600;
