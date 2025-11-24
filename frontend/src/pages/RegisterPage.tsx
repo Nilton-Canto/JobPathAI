@@ -235,14 +235,14 @@ const RegisterPage: React.FC = () => {
             {loading ? (
               <>
                 <span className="button-spinner"></span>
-                Registando...
+                Registrando...
               </>
             ) : (
               <>
                 <svg className="button-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125c0 .621.504 1.125 1.125 1.125h2.25a1.125 1.125 0 001.125-1.125V6a2.25 2.25 0 00-2.25-2.25h-2.25A2.25 2.25 0 009 6v.75m0 0v3" />
                 </svg>
-                Registar
+                Registrar
               </>
             )}
           </button>
