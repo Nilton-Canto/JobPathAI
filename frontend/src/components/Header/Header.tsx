@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 
 /**
  * Header Component - User/Client Area Only
@@ -12,12 +12,18 @@ import { useAuth } from '../../contexts/AuthContext';
  * No admin links or navigation should appear here to maintain clear separation.
  */
 const Header: React.FC = () => {
-  const { isAuthenticated, logout } = useAuth();
+  // Safely get auth context - use useContext directly to avoid hook error
+  const authContext = useContext(AuthContext);
+  const isAuthenticated = authContext?.isAuthenticated ?? false;
+  const logout = authContext?.logout;
+  
   const navigate = useNavigate();
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-    await logout();
+    if (logout) {
+      await logout();
+    }
     navigate('/login');
   };
 

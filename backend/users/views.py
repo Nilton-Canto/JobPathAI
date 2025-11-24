@@ -180,9 +180,51 @@ class RegisterView(View):
                 idade=int(idade) if idade and idade.isdigit() else None,
                 cpf=cpf if cpf else None
             )
+            
+            # Automatically log in the user after registration
+            login(request, user)
+            
+            # Set session expiry (24 hours by default)
+            request.session.set_expiry(86400)  # 24 hours
+            request.session.modified = True
+            request.session.save()
+            
+            # Get user profile data for response
+            user_profile = getattr(user, 'student_profile', None)
+            if user_profile:
+                skills_data = _serialize_profile_skills(user_profile)
+                user_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'nome': user.get_full_name() or user.username,
+                    'idade': user_profile.idade,
+                    'cpf': user_profile.cpf,
+                    'area_interesse': user_profile.area_interesse,
+                    'nivel_experiencia': user_profile.nivel_experiencia,
+                    'habilidades': skills_data,
+                    'is_superuser': user.is_superuser,
+                    'is_staff': user.is_staff,
+                    'is_admin': user.is_superuser or user.is_staff
+                }
+            else:
+                user_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'nome': user.get_full_name() or user.username,
+                    'idade': None,
+                    'cpf': None,
+                    'habilidades': [],
+                    'is_superuser': user.is_superuser,
+                    'is_staff': user.is_staff,
+                    'is_admin': user.is_superuser or user.is_staff
+                }
+            
             return JsonResponse({
                 'success': True,
-                'message': 'Usuário cadastrado com sucesso!'
+                'message': 'Usuário cadastrado com sucesso!',
+                'user': user_data
             }, status=201)
         except Exception as e:
             return JsonResponse({'error': f'Erro ao criar usuário: {str(e)}'}, status=500)

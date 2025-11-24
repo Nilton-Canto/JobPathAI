@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 // Styles imported via main.tsx -> styles/index.css
 
 const RegisterPage: React.FC = () => {
@@ -16,6 +17,7 @@ const RegisterPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
@@ -51,7 +53,7 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await authAPI.register({
+      const response = await authAPI.register({
         name,
         username,
         email,
@@ -62,6 +64,18 @@ const RegisterPage: React.FC = () => {
       });
 
       setError(null);
+      
+      // Backend now returns user data after auto-login
+      // Update AuthContext with user data
+      if (response.user) {
+        // Update localStorage and AuthContext
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userProfile', JSON.stringify(response.user));
+        
+        // Refresh AuthContext to update authentication state
+        await refreshUser();
+      }
+      
       setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
       setTimeout(() => {
         // Redirect to onboarding to collect additional info

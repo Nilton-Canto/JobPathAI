@@ -47,11 +47,7 @@ const OnboardingPage: React.FC = () => {
   };
 
   const handleAreaSelect = (area: string) => {
-    if (area === 'Outra') {
-      setOnboardingData(prev => ({ ...prev, area_interesse: '' }));
-    } else {
-      setOnboardingData(prev => ({ ...prev, area_interesse: area }));
-    }
+    setOnboardingData(prev => ({ ...prev, area_interesse: area }));
   };
 
   const handleNext = () => {
@@ -121,8 +117,8 @@ const OnboardingPage: React.FC = () => {
         <div className="onboarding-progress">
           <div className="onboarding-progress-bar">
             <div 
-              className="onboarding-progress-fill"
-              data-progress={step / 3}
+              className="onboarding-progress-fill" 
+              style={{ width: `${(step / 3) * 100}%` }}
             />
           </div>
           <span className="onboarding-progress-text">Passo {step} de 3</span>
@@ -146,20 +142,20 @@ const OnboardingPage: React.FC = () => {
                     key={area}
                     type="button"
                     onClick={() => handleAreaSelect(area)}
-                    className={`onboarding-area-card ${(area === 'Outra' && onboardingData.area_interesse === '') || (area !== 'Outra' && onboardingData.area_interesse === area) ? 'selected' : ''}`}
+                    className={`onboarding-area-card ${onboardingData.area_interesse === area ? 'selected' : ''}`}
                   >
                     {area}
                   </button>
                 ))}
               </div>
-              {onboardingData.area_interesse === '' && (
-                <div className="onboarding-textarea-wrapper onboarding-input-wrapper">
+              {onboardingData.area_interesse === 'Outra' && (
+                <div className="form-group-modern onboarding-custom-area-input">
                   <input
                     type="text"
                     name="area_interesse"
                     value={onboardingData.area_interesse}
                     onChange={(e) => setOnboardingData(prev => ({ ...prev, area_interesse: e.target.value }))}
-                    className="onboarding-textarea onboarding-input"
+                    className="form-input-modern"
                     placeholder="Digite sua área de interesse"
                   />
                 </div>

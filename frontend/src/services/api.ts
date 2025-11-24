@@ -228,6 +228,8 @@ export const authAPI = {
 
   /**
    * Register new user
+   * Returns: { success: boolean, message: string, user?: {...} }
+   * The backend now returns user data directly in the register response after auto-login
    */
   async register(userData: {
     name: string;
@@ -244,11 +246,14 @@ export const authAPI = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Registration failed' }));
-      throw new Error(error.detail || 'Registration failed');
+      const error = await response.json().catch(() => ({ error: 'Registration failed' }));
+      throw new Error(error.error || error.detail || 'Registration failed');
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Backend returns { success, message, user } directly
+    return data;
   },
 
   /**
