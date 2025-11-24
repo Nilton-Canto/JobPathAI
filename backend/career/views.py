@@ -234,6 +234,89 @@ class CareerPathViewSet(viewsets.ModelViewSet):
             'updated_at': user_path.updated_at
         })
     
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_paths(self, request):
+        """
+        Get list of career paths associated with current user
+        GET /api/v1/career-paths/my-paths/
+        """
+        user = request.user
+        
+        # Get all active associations for this user
+        associations = UserCareerPath.objects.filter(
+            user=user,
+            is_active=True
+        ).select_related('career_path').prefetch_related('career_path__stages', 'career_path__stages__skills')
+        
+        # Serialize career paths with user-specific progress
+        paths_data = []
+        for assoc in associations:
+            career_path = assoc.career_path
+            
+            # Get stages with user progress
+            stages = career_path.stages.all().order_by('order')
+            stage_progress = []
+            completed_count = 0
+            
+            for stage in stages:
+                progress = None
+                is_completed = False
+                completed_at = None
+                
+                try:
+                    progress = UserStageProgress.objects.get(user=user, stage=stage)
+                    is_completed = progress.is_completed
+                    if is_completed:
+                        completed_count += 1
+                        completed_at = progress.completed_at
+                except UserStageProgress.DoesNotExist:
+                    is_completed = False
+                
+                stage_progress.append({
+                    'id': stage.id,
+                    'title': stage.title,
+                    'description': stage.description,
+                    'order': stage.order,
+                    'is_completed': is_completed,
+                    'completed_at': completed_at,
+                    'skills': [skill.name for skill in stage.skills.all()]
+                })
+            
+            # Serialize career path
+            path_data = CareerPathSerializer(career_path, context={'request': request}).data
+            # Override stages with user-specific progress
+            path_data['stages'] = stage_progress
+            path_data['progress_percent'] = assoc.get_progress()
+            path_data['started_at'] = assoc.started_at
+            path_data['updated_at'] = assoc.updated_at
+            
+            paths_data.append(path_data)
+        
+        return Response(paths_data)
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def leave(self, request, pk=None):
+        """
+        Deactivate association with a career path (leave path)
+        POST /api/v1/career-paths/{id}/leave/
+        """
+        career_path = self.get_object()
+        user = request.user
+        
+        try:
+            association = UserCareerPath.objects.get(user=user, career_path=career_path, is_active=True)
+            association.is_active = False
+            association.save()
+            
+            return Response({
+                'message': 'Você saiu desta trilha com sucesso',
+                'association': UserCareerPathSerializer(association, context={'request': request}).data
+            }, status=status.HTTP_200_OK)
+        except UserCareerPath.DoesNotExist:
+            return Response({
+                'error': 'Você não está associado a esta trilha'
+            }, status=status.HTTP_404_NOT_FOUND)
+    
     @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
     def users(self, request, pk=None):
         """

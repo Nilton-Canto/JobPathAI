@@ -393,21 +393,35 @@ export const careerAPI = {
   /**
    * Get user's associated career paths (both predefined and personalized)
    * Only returns paths that the user has explicitly associated with
+   * Uses dedicated endpoint that returns only associated paths with user-specific progress
    */
   async getUserPaths() {
-    const allPaths = await this.getAll();
-    // Filter by is_associated field (set by backend serializer)
-    return allPaths.filter((path: any) => path.is_associated === true);
+    const response = await fetchAPI('/api/v1/career-paths/my-paths/');
+    
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to fetch user paths' }));
+      throw new Error(error.error || 'Failed to fetch user paths');
+    }
+    
+    const data = await response.json();
+    // Handle paginated response
+    return Array.isArray(data) ? data : (data.results || []);
   },
   
   /**
-   * Deactivate/leave a career path (set is_active to false)
+   * Leave/deactivate a career path (set is_active to false)
    */
   async leavePath(pathId: number) {
-    // Note: This would require a backend endpoint like /api/v1/career-paths/{id}/leave/
-    // For now, we'll need to implement this on the backend
-    // This is a placeholder for future implementation
-    throw new Error('Leave path functionality not yet implemented on backend');
+    const response = await fetchAPI(`/api/v1/career-paths/${pathId}/leave/`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to leave path' }));
+      throw new Error(error.error || 'Failed to leave path');
+    }
+
+    return await response.json();
   },
 
   /**

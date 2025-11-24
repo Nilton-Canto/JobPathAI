@@ -42,25 +42,48 @@ const MyCareerPlanPage: React.FC = () => {
       // Use progress endpoint to get user-specific progress data
       try {
         const progressData = await careerAPI.getProgress(pathId);
+        // Also get full path details for description and other fields
+        const fullPath = await careerAPI.getById(pathId);
         // Transform progress data to match CareerPath interface
         setCareerPath({
           id: progressData.career_path_id,
           title: progressData.career_path_title,
-          description: '', // Will be filled from getById if needed
-          path_type: 'PRE', // Default, can be updated
+          description: fullPath.description || '',
+          path_type: fullPath.path_type || 'PRE',
           stages: progressData.stages || [],
           created_at: progressData.started_at,
         });
-      } catch (progressErr) {
-        // Fallback to getById if progress endpoint fails (user not associated)
-        const path = await careerAPI.getById(pathId);
-        setCareerPath(path);
+      } catch (progressErr: any) {
+        // If user not associated, show error
+        if (progressErr.message && progressErr.message.includes('não está associado')) {
+          setError('Você não está associado a esta trilha. Associe-se primeiro na página de detalhes.');
+        } else {
+          // Fallback to getById if progress endpoint fails for other reasons
+          const path = await careerAPI.getById(pathId);
+          setCareerPath(path);
+        }
       }
     } catch (err) {
       console.error('Error fetching career path:', err);
       setError('Erro ao carregar plano de carreira.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLeavePath = async () => {
+    if (!id || !careerPath) return;
+    
+    if (!window.confirm(`Tem certeza que deseja sair da trilha "${careerPath.title}"? Você poderá associar-se novamente depois.`)) {
+      return;
+    }
+
+    try {
+      await careerAPI.leavePath(parseInt(id));
+      navigate('/my-career-paths');
+    } catch (err: any) {
+      console.error('Error leaving path:', err);
+      alert(err.message || 'Erro ao sair da trilha. Tente novamente.');
     }
   };
 
@@ -233,10 +256,24 @@ const MyCareerPlanPage: React.FC = () => {
       </div>
 
       <div className="plan-actions">
-        <p>Tem dúvidas sobre alguma destas etapas ou quer ajustar o seu plano?</p>
-        <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
-          Use o botão de chat no canto inferior direito para conversar com o Mentor IA
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <p>Tem dúvidas sobre alguma destas etapas ou quer ajustar o seu plano?</p>
+            <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
+              Use o botão de chat no canto inferior direito para conversar com o Mentor IA
+            </p>
+          </div>
+          <button
+            onClick={handleLeavePath}
+            className="btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Sair da Trilha
+          </button>
+        </div>
       </div>
     </div>
   );

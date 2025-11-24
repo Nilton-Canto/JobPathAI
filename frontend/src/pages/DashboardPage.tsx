@@ -65,11 +65,18 @@ const DashboardPage: React.FC = () => {
         
         // Set primary path (first path or most progressed)
         if (pathsToShow.length > 0) {
-          // Find path with highest progress
+          // Find path with highest progress (use progress_percent from backend if available)
           const pathWithProgress = pathsToShow.map((path: CareerPath) => {
-            const completed = path.stages?.filter((s: any) => s.is_completed).length || 0;
-            const total = path.stages?.length || 0;
-            return { path, progress: total > 0 ? completed / total : 0 };
+            // Use progress_percent from backend if available, otherwise calculate
+            let progress = 0;
+            if ((path as any).progress_percent !== undefined) {
+              progress = (path as any).progress_percent / 100;
+            } else {
+              const completed = path.stages?.filter((s: any) => s.is_completed).length || 0;
+              const total = path.stages?.length || 0;
+              progress = total > 0 ? completed / total : 0;
+            }
+            return { path, progress };
           }).sort((a: { path: CareerPath; progress: number }, b: { path: CareerPath; progress: number }) => b.progress - a.progress);
           
           setPrimaryPath(pathWithProgress[0]?.path || pathsToShow[0]);
@@ -77,6 +84,7 @@ const DashboardPage: React.FC = () => {
           const otherPaths = pathsToShow.filter((p: CareerPath) => p.id !== (pathWithProgress[0]?.path.id || pathsToShow[0].id));
           setActivePaths(otherPaths.slice(0, 2)); // Show 2 other paths
         } else {
+          setPrimaryPath(null);
           setActivePaths([]);
         }
         

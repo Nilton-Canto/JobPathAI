@@ -33,6 +33,8 @@ const CareerPathDetailPage: React.FC = () => {
   const [careerPath, setCareerPath] = useState<CareerPath | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAssociated, setIsAssociated] = useState(false);
+  const [associating, setAssociating] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -47,6 +49,9 @@ const CareerPathDetailPage: React.FC = () => {
       
       const path = await careerAPI.getById(pathId);
       setCareerPath(path);
+      
+      // Check if user is associated with this path
+      setIsAssociated(path.is_associated === true);
     } catch (err: any) {
       console.error('Error fetching career path:', err);
       
@@ -63,6 +68,42 @@ const CareerPathDetailPage: React.FC = () => {
       setError(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAssociate = async () => {
+    if (!careerPath || associating) return;
+    
+    try {
+      setAssociating(true);
+      await careerAPI.associateWithUser(careerPath.id);
+      setIsAssociated(true);
+      navigate(`/my-plan/${careerPath.id}`);
+    } catch (err: any) {
+      console.error('Error associating path:', err);
+      alert(err.message || 'Erro ao associar trilha. Tente novamente.');
+    } finally {
+      setAssociating(false);
+    }
+  };
+
+  const handleLeavePath = async () => {
+    if (!careerPath) return;
+    
+    if (!window.confirm(`Tem certeza que deseja sair da trilha "${careerPath.title}"? Você poderá associar-se novamente depois.`)) {
+      return;
+    }
+
+    try {
+      await careerAPI.leavePath(careerPath.id);
+      setIsAssociated(false);
+      // Refresh page data
+      if (id) {
+        await fetchCareerPath(parseInt(id));
+      }
+    } catch (err: any) {
+      console.error('Error leaving path:', err);
+      alert(err.message || 'Erro ao sair da trilha. Tente novamente.');
     }
   };
 
@@ -308,38 +349,55 @@ const CareerPathDetailPage: React.FC = () => {
       {/* Action Section */}
       <div style={{ marginTop: '2rem', padding: '2rem', background: 'white', borderRadius: '1rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', textAlign: 'center' }}>
         <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>
-          Pronto para começar?
+          {isAssociated ? 'Trilha Associada' : 'Pronto para começar?'}
         </h3>
         <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-          {progress > 0 
-            ? 'Continue sua jornada nesta trilha de carreira!'
+          {isAssociated 
+            ? (progress > 0 
+                ? 'Continue sua jornada nesta trilha de carreira!'
+                : 'Você está associado a esta trilha. Comece completando as etapas!')
             : 'Associe-se a esta trilha para começar sua jornada profissional passo a passo.'}
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {progress > 0 ? (
-            <Link to={`/my-plan/${careerPath.id}`} className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              Continuar Trilha
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
+          {isAssociated ? (
+            <>
+              <Link to={`/my-plan/${careerPath.id}`} className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                {progress > 0 ? 'Continuar Trilha' : 'Ver Minha Trilha'}
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <button
+                onClick={handleLeavePath}
+                className="btn-secondary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Sair da Trilha
+              </button>
+            </>
           ) : (
             <button
-              onClick={async () => {
-                try {
-                  await careerAPI.associateWithUser(careerPath.id);
-                  navigate(`/my-plan/${careerPath.id}`);
-                } catch (err: any) {
-                  alert(err.message || 'Erro ao associar trilha. Tente novamente.');
-                }
-              }}
+              onClick={handleAssociate}
+              disabled={associating}
               className="btn-primary"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              Associar e Começar Trilha
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              {associating ? (
+                <>
+                  <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⟳</span>
+                  Associando...
+                </>
+              ) : (
+                <>
+                  Associar e Começar Trilha
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '1.25rem', height: '1.25rem' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
+              )}
             </button>
           )}
         </div>
