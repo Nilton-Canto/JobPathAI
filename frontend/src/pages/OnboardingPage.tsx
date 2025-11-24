@@ -77,11 +77,18 @@ const OnboardingPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Update user profile with onboarding data
-      await userAPI.updateProfile({
-        area_interesse: onboardingData.area_interesse,
-        nivel_experiencia: onboardingData.nivel_experiencia,
-      });
+      // Update user profile with onboarding data (objetivos is optional)
+      const profileUpdate: any = {
+        area_interesse: onboardingData.area_interesse || '',
+        nivel_experiencia: onboardingData.nivel_experiencia || 'sem_experiencia',
+      };
+
+      // Only add objetivos if provided
+      if (onboardingData.objetivos && onboardingData.objetivos.trim()) {
+        profileUpdate.bio = onboardingData.objetivos.trim();
+      }
+
+      await userAPI.updateProfile(profileUpdate);
 
       // Store in localStorage
       const storedProfile = localStorage.getItem('userProfile');
@@ -91,6 +98,7 @@ const OnboardingPage: React.FC = () => {
           ...profile,
           area_interesse: onboardingData.area_interesse,
           nivel_experiencia: onboardingData.nivel_experiencia,
+          bio: onboardingData.objetivos || profile.bio || '',
         }));
       }
 
@@ -192,17 +200,22 @@ const OnboardingPage: React.FC = () => {
               <p className="onboarding-description">
                 Você pode adicionar seus objetivos de carreira (opcional). Isso nos ajuda a criar recomendações ainda mais personalizadas.
               </p>
-              <div className="form-group-modern">
-                <label htmlFor="objetivos">Objetivos de Carreira (opcional)</label>
+              <div className="onboarding-textarea-wrapper">
+                <label htmlFor="objetivos" className="onboarding-label">
+                  Objetivos de Carreira <span className="onboarding-optional">(opcional)</span>
+                </label>
                 <textarea
                   id="objetivos"
                   name="objetivos"
                   value={onboardingData.objetivos}
                   onChange={handleChange}
-                  className="form-input-modern"
-                  rows={4}
-                  placeholder="Ex: Quero me tornar um desenvolvedor full-stack sênior em 2 anos..."
+                  className="onboarding-textarea"
+                  rows={5}
+                  placeholder="Ex: Quero me tornar um desenvolvedor full-stack sênior em 2 anos, trabalhando com tecnologias modernas como React e Node.js..."
                 />
+                <p className="onboarding-hint">
+                  Compartilhe seus objetivos profissionais para receber recomendações mais precisas
+                </p>
               </div>
             </div>
           )}

@@ -205,7 +205,7 @@ class LogoutView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserProfileView(View):
-    """API endpoint to get authenticated user profile - returns JSON only"""
+    """API endpoint to get and update authenticated user profile - returns JSON only"""
     
     def get(self, request):
         """Return authenticated user profile"""
@@ -252,6 +252,60 @@ class UserProfileView(View):
             }
         
         return JsonResponse(profile_data)
+    
+    def put(self, request):
+        """Update authenticated user profile"""
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Usuário não autenticado'}, status=401)
+        
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+        
+        # Get or create StudentProfile
+        user_profile, created = StudentProfile.objects.get_or_create(user=request.user)
+        
+        # Update fields if provided
+        if 'area_interesse' in data:
+            user_profile.area_interesse = data['area_interesse'] or ''
+        if 'nivel_experiencia' in data:
+            user_profile.nivel_experiencia = data['nivel_experiencia'] or 'sem_experiencia'
+        if 'bio' in data:
+            user_profile.bio = data['bio'] or ''
+        if 'telefone' in data:
+            user_profile.telefone = data['telefone'] or ''
+        if 'endereco' in data:
+            user_profile.endereco = data['endereco'] or ''
+        if 'cidade' in data:
+            user_profile.cidade = data['cidade'] or ''
+        if 'estado' in data:
+            user_profile.estado = data['estado'] or ''
+        if 'cep' in data:
+            user_profile.cep = data['cep'] or ''
+        
+        user_profile.save()
+        
+        # Return updated profile
+        skills_data = _serialize_profile_skills(user_profile)
+        return JsonResponse({
+            'success': True,
+            'message': 'Perfil atualizado com sucesso',
+            'profile': {
+                'id': request.user.id,
+                'username': request.user.username,
+                'email': request.user.email,
+                'nome': request.user.get_full_name() or request.user.username,
+                'idade': user_profile.idade,
+                'cpf': user_profile.cpf,
+                'area_interesse': user_profile.area_interesse,
+                'nivel_experiencia': user_profile.nivel_experiencia,
+                'habilidades': skills_data,
+                'is_superuser': request.user.is_superuser,
+                'is_staff': request.user.is_staff,
+                'is_admin': request.user.is_superuser or request.user.is_staff,
+            }
+        })
 
 
 @method_decorator(csrf_exempt, name='dispatch')
