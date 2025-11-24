@@ -31,8 +31,9 @@ main {
   position: relative;
 }
 
-/* Login and Register pages need full-width background */
-main:has(.login-page-wrapper) {
+/* Login, Register and Onboarding pages need full-width background */
+main:has(.login-page-wrapper),
+main:has(.onboarding-page-wrapper) {
   margin-top: 0;
   padding: 0;
   background: transparent;

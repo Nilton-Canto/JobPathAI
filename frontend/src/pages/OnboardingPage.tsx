@@ -149,13 +149,14 @@ const OnboardingPage: React.FC = () => {
                 ))}
               </div>
               {onboardingData.area_interesse === 'Outra' && (
-                <div className="form-group-modern" style={{ marginTop: '1rem' }}>
+                <div className="onboarding-textarea-wrapper" style={{ marginTop: '1rem' }}>
                   <input
                     type="text"
                     name="area_interesse"
-                    value={onboardingData.area_interesse}
+                    value={onboardingData.area_interesse === 'Outra' ? '' : onboardingData.area_interesse}
                     onChange={(e) => setOnboardingData(prev => ({ ...prev, area_interesse: e.target.value }))}
-                    className="form-input-modern"
+                    className="onboarding-textarea"
+                    style={{ minHeight: 'auto', height: '3rem', resize: 'none' }}
                     placeholder="Digite sua área de interesse"
                   />
                 </div>
